@@ -1,0 +1,7 @@
+venv
+dist
+build
+backups
+__pycache__
+
+productivity.db
