@@ -69,35 +69,36 @@ class AppOrchestrator:
                 except Exception:
                     pass
 
-    def create_startup_bat(self):
-        """Cria script .bat na pasta de inicialização do Windows."""
+    def create_startup_script(self):
+        """Cria script .vbs oculto na pasta de inicialização do Windows."""
         try:
             startup_folder = os.path.join(
                 os.getenv("APPDATA"),
                 r"Microsoft\Windows\Start Menu\Programs\Startup",
             )
-            bat_path = os.path.join(startup_folder, f"{APP_NAME}.bat")
+            vbs_path = os.path.join(startup_folder, f"{APP_NAME}.vbs")
             app_dir = get_app_dir()
             main_script = os.path.join(app_dir, "main.py")
             python_exe = get_pythonw_executable()
 
-            bat_content = (
-                "@echo off\r\n"
-                f'cd /d "{app_dir}"\r\n'
-                f'"{python_exe}" "{main_script}"\r\n'
+            vbs_content = (
+                'Set WshShell = CreateObject("WScript.Shell")\r\n'
+                f'WshShell.CurrentDirectory = "{app_dir}"\r\n'
+                f'WshShell.Run """{python_exe}"" ""{main_script}""", 0, False\r\n'
             )
 
             needs_write = True
-            if os.path.exists(bat_path):
-                with open(bat_path, "r", encoding="utf-8") as f:
-                    needs_write = f.read() != bat_content
+            if os.path.exists(vbs_path):
+                with open(vbs_path, "r", encoding="utf-8") as f:
+                    needs_write = f.read() != vbs_content
             if needs_write:
-                with open(bat_path, "w", encoding="utf-8") as f:
-                    f.write(bat_content)
+                with open(vbs_path, "w", encoding="utf-8") as f:
+                    f.write(vbs_content)
 
-            shortcut_path = os.path.join(startup_folder, f"{APP_NAME}.lnk")
-            if os.path.exists(shortcut_path):
-                os.remove(shortcut_path)
+            for legacy_name in (f"{APP_NAME}.bat", f"{APP_NAME}.lnk"):
+                legacy_path = os.path.join(startup_folder, legacy_name)
+                if os.path.exists(legacy_path):
+                    os.remove(legacy_path)
         except Exception as e:
             print(f"Erro ao criar script de inicialização: {e}")
 
@@ -177,7 +178,7 @@ class AppOrchestrator:
         sys.exit(0)
 
     def start(self):
-        self.create_startup_bat()
+        self.create_startup_script()
 
         self.tracker_thread = threading.Thread(target=self.run_tracker, daemon=True)
         self.tracker_thread.start()
