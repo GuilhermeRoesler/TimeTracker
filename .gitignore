@@ -5,3 +5,4 @@ backups
 __pycache__
 
 productivity.db
+*.db
