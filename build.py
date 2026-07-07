@@ -77,6 +77,7 @@ def build_exe():
         '--hidden-import=streamlit',
         '--hidden-import=pandas',
         '--hidden-import=plotly',
+        '--hidden-import=numpy',
         '--hidden-import=win32timezone',
         
         # Coleta de metadados
@@ -84,6 +85,8 @@ def build_exe():
         '--collect-all=altair',
         '--collect-all=pandas',
         '--collect-all=pyarrow',
+        '--collect-all=plotly',
+        '--collect-all=numpy',
     ]
 
     # Executar PyInstaller

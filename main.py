@@ -32,13 +32,25 @@ def get_resource_path(relative_path):
             # Modo OneFile: usa a pasta temporária
             base_path = sys._MEIPASS
         else:
-            # Modo OneDir: usa a pasta onde o .exe está
-            base_path = os.path.dirname(sys.executable)
+            # Modo OneDir: PyInstaller 6+ coloca dados em _internal/
+            exe_dir = os.path.dirname(sys.executable)
+            internal_dir = os.path.join(exe_dir, '_internal')
+            base_path = internal_dir if os.path.isdir(internal_dir) else exe_dir
     else:
         # Modo Desenvolvimento
         base_path = os.path.dirname(os.path.abspath(__file__))
     
     return os.path.join(base_path, relative_path)
+
+def is_pyinstaller_onefile():
+    """Distingue OneFile de OneDir no PyInstaller 6+ (ambos definem _MEIPASS)."""
+    if not getattr(sys, 'frozen', False):
+        return False
+    internal_dir = os.path.join(os.path.dirname(sys.executable), '_internal')
+    return not os.path.isdir(internal_dir)
+
+def get_app_dir():
+    return os.path.dirname(get_resource_path("dashboard.py"))
 
 class AppOrchestrator:
     def __init__(self):
@@ -142,7 +154,8 @@ class AppOrchestrator:
 
     def run_streamlit(self):
         """Prepara e executa o Streamlit."""
-        dashboard_script = "dashboard.py"
+        app_dir = get_app_dir()
+        dashboard_script = get_resource_path("dashboard.py")
         
         if getattr(sys, 'frozen', False):
             # MODO EXECUTÁVEL
@@ -158,8 +171,11 @@ class AppOrchestrator:
         if os.name == 'nt':
             kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
 
-        # close_fds=True evita que o filho herde handles de arquivos abertos (importante para evitar travas)
-        self.streamlit_process = subprocess.Popen(cmd, close_fds=True, **kwargs)
+        # cwd=app_dir garante que o Streamlit encontre dashboard.py e productivity.db
+        # mesmo quando o app é iniciado fora da pasta do projeto (atalho, startup, etc.)
+        self.streamlit_process = subprocess.Popen(
+            cmd, cwd=app_dir, close_fds=True, **kwargs
+        )
 
     def create_image(self):
         width = 64
@@ -204,14 +220,14 @@ if __name__ == "__main__":
             
             dashboard_path = get_resource_path("dashboard.py")
             
-            # Em OneDir, o dashboard.py já está na pasta, não precisa copiar para temp
-            # Mas mantemos a lógica caso você ainda queira usar onefile no futuro
-            if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-                 temp_dir = os.path.join(os.getenv('TEMP'), "timetracker_app")
-                 os.makedirs(temp_dir, exist_ok=True)
-                 temp_path = os.path.join(temp_dir, "dashboard.py")
-                 shutil.copy2(dashboard_path, temp_path)
-                 dashboard_path = temp_path
+            # OneFile: copia scripts para TEMP (Streamlit não lê bem do _MEIPASS).
+            # OneDir: roda direto de _internal/ para manter imports (tracker, settings_ui).
+            if is_pyinstaller_onefile():
+                temp_dir = os.path.join(os.getenv('TEMP'), "timetracker_app")
+                os.makedirs(temp_dir, exist_ok=True)
+                for script in ("dashboard.py", "tracker.py", "settings_ui.py"):
+                    shutil.copy2(get_resource_path(script), os.path.join(temp_dir, script))
+                dashboard_path = os.path.join(temp_dir, "dashboard.py")
 
             sys.argv = [
                 "streamlit",
@@ -223,8 +239,10 @@ if __name__ == "__main__":
             ]
             sys.exit(stcli.main())
         except Exception as e:
-            with open("streamlit_error.log", "w") as f:
-                f.write(str(e))
+            import traceback
+            log_path = os.path.join(get_app_dir(), "streamlit_error.log")
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write(traceback.format_exc())
             sys.exit(1)
 
     app = AppOrchestrator()
