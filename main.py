@@ -22,6 +22,12 @@ def get_app_dir():
     return os.path.dirname(os.path.abspath(__file__))
 
 
+def get_pythonw_executable():
+    python_dir = os.path.dirname(sys.executable)
+    pythonw_exe = os.path.join(python_dir, "pythonw.exe")
+    return pythonw_exe if os.path.exists(pythonw_exe) else sys.executable
+
+
 class AppOrchestrator:
     def __init__(self):
         self.tracker_stop_event = threading.Event()
@@ -73,7 +79,7 @@ class AppOrchestrator:
             bat_path = os.path.join(startup_folder, f"{APP_NAME}.bat")
             app_dir = get_app_dir()
             main_script = os.path.join(app_dir, "main.py")
-            python_exe = sys.executable
+            python_exe = get_pythonw_executable()
 
             bat_content = (
                 "@echo off\r\n"
