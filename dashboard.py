@@ -9,7 +9,12 @@ from dashboard_filters import render_date_filter
 from dashboard_overview import render_overview_tab
 from dashboard_utils import build_color_map
 
-st.set_page_config(page_title="Monitor de Produtividade", layout="wide", page_icon="⏱️")
+st.set_page_config(
+    page_title="Monitor de Produtividade",
+    layout="wide",
+    page_icon="⏱️",
+    initial_sidebar_state="collapsed",
+)
 
 
 def main():
