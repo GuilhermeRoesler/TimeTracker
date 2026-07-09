@@ -1,7 +1,6 @@
 import sqlite3
 import time
 import os
-import shutil
 import datetime
 import logging
 from typing import Optional, Tuple
@@ -9,6 +8,8 @@ import win32gui
 import win32process
 import win32api
 import win32con
+
+from app_config import get_app_settings, update_app_setting, load_config
 
 # Configuração de Logging
 logging.basicConfig(
@@ -45,64 +46,15 @@ class ProductivityTracker:
                     duration_seconds REAL
                 )
             """)
-            
-            # --- MIGRAÇÃO DE ESQUEMA (Remover icon_path, renomear pretty_name) ---
-            # Verifica colunas existentes na tabela app_settings
-            cursor.execute("PRAGMA table_info(app_settings)")
-            columns_info = cursor.fetchall()
-            column_names = [info[1] for info in columns_info]
-            
-            # Se a tabela existe e tem as colunas antigas, faz a migração
-            if 'pretty_name' in column_names or 'icon_path' in column_names:
-                logging.info("Iniciando migração de banco de dados (Schema Update)...")
-                try:
-                    # 1. Renomear tabela antiga
-                    cursor.execute("ALTER TABLE app_settings RENAME TO app_settings_old")
-                    
-                    # 2. Criar nova tabela com esquema limpo
-                    cursor.execute("""
-                        CREATE TABLE app_settings (
-                            app_name TEXT PRIMARY KEY,
-                            display_name TEXT,
-                            hex_color TEXT,
-                            category TEXT
-                        )
-                    """)
-                    
-                    # 3. Copiar dados (Mapeando pretty_name -> display_name)
-                    # Verifica se hex_color e category existiam na antiga para evitar erros no SELECT
-                    cols_old = ", ".join(column_names)
-                    has_color = 'hex_color' in column_names
-                    has_cat = 'category' in column_names
-                    
-                    # Monta query de migração segura
-                    sel_color = "hex_color" if has_color else "NULL"
-                    sel_cat = "category" if has_cat else "'Sem Categoria'"
-                    
-                    cursor.execute(f"""
-                        INSERT INTO app_settings (app_name, display_name, hex_color, category)
-                        SELECT app_name, pretty_name, {sel_color}, {sel_cat}
-                        FROM app_settings_old
-                    """)
-                    
-                    # 4. Apagar tabela velha
-                    cursor.execute("DROP TABLE app_settings_old")
-                    conn.commit()
-                    logging.info("Migração concluída com sucesso!")
-                    
-                except sqlite3.Error as e:
-                    logging.error(f"Erro durante a migração: {e}")
-                    conn.rollback()
-            else:
-                # Criação padrão se não existir ou se já estiver no novo formato
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS app_settings (
-                        app_name TEXT PRIMARY KEY,
-                        display_name TEXT,
-                        hex_color TEXT,
-                        category TEXT
-                    )
-                """)
+
+            load_config()
+
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='app_settings'"
+            )
+            if cursor.fetchone():
+                cursor.execute("DROP TABLE app_settings")
+                logging.info("Tabela app_settings removida (configurações migradas para JSON).")
 
             conn.commit()
             conn.close()
@@ -183,38 +135,11 @@ class ProductivityTracker:
 
     def get_app_settings(self):
         """Retorna dicionário com configurações dos apps."""
-        settings = {}
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            # Esquema novo: display_name, hex_color, category
-            cursor.execute("SELECT app_name, display_name, hex_color, category FROM app_settings")
-            for row in cursor.fetchall():
-                settings[row[0]] = {
-                    "display_name": row[1], 
-                    "hex_color": row[2],
-                    "category": row[3]
-                }
-            conn.close()
-        except sqlite3.Error:
-            pass
-        return settings
+        return get_app_settings()
 
     def update_app_setting(self, app_name, display_name, hex_color=None, category=None):
-        """Atualiza configurações de um app (sem ícone)."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT OR REPLACE INTO app_settings (app_name, display_name, hex_color, category)
-                VALUES (?, ?, ?, ?)
-            """, (app_name, display_name, hex_color, category))
-            conn.commit()
-            conn.close()
-            return True
-        except sqlite3.Error as e:
-            logging.error(f"Erro ao atualizar settings: {e}")
-            return False
+        """Atualiza configurações de um app."""
+        return update_app_setting(app_name, display_name, hex_color, category)
 
     def run(self):
         """Loop principal de monitoramento."""

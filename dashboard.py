@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
 from tracker import ProductivityTracker
+from app_config import get_app_settings
 import settings_ui
 
 # Configuração da Página
@@ -60,23 +61,24 @@ def save_journal_entry(date_obj, content):
 def load_data():
     """Carrega dados do SQLite e faz pré-processamento."""
     try:
-        # Abre conexão em modo leitura
         conn = sqlite3.connect(DB_NAME)
-        
-        # Query unificada
-        query = """
-            SELECT l.*, 
-                   COALESCE(s.display_name, l.app_name) as display_name,
-                   s.hex_color,
-                   s.category
-            FROM activity_log l
-            LEFT JOIN app_settings s ON l.app_name = s.app_name
-        """
-        df = pd.read_sql_query(query, conn)
+        df = pd.read_sql_query("SELECT * FROM activity_log", conn)
         conn.close()
 
         if df.empty:
             return pd.DataFrame()
+
+        app_settings = get_app_settings()
+
+        df['display_name'] = df['app_name'].map(
+            lambda name: app_settings.get(name, {}).get("display_name", name)
+        )
+        df['hex_color'] = df['app_name'].map(
+            lambda name: app_settings.get(name, {}).get("hex_color")
+        )
+        df['category'] = df['app_name'].map(
+            lambda name: app_settings.get(name, {}).get("category", "Sem Categoria")
+        )
 
         df['start_time'] = pd.to_datetime(df['start_time'], format='mixed', errors='coerce')
         df['end_time'] = pd.to_datetime(df['end_time'], format='mixed', errors='coerce')

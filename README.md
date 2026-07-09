@@ -63,7 +63,9 @@ Isto irá:
 - `tracker.py`: O "motor" que captura a janela ativa e grava no SQLite.
 - `dashboard.py`: A interface visual construída em Streamlit.
 - `settings_ui.py`: Módulo da interface para gerir configurações das apps.
-- `productivity.db`: Base de dados SQLite (gerada automaticamente na primeira execução).
+- `app_config.py`: Leitura e gravação das configurações de apps em JSON.
+- `app_settings.json`: Configurações personalizadas dos apps (nome, cor, categoria).
+- `productivity.db`: Base de dados SQLite com registos de atividade (gerada automaticamente na primeira execução).
 
 ## 📝 Notas
 
