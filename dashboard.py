@@ -17,47 +17,6 @@ DB_NAME = "productivity.db"
 
 # --- Funções do Banco de Dados ---
 
-def init_journal_db():
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS journal_entries (
-                entry_date TEXT PRIMARY KEY,
-                content TEXT
-            )
-        """)
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        pass 
-
-def get_journal_entry(date_obj):
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        cursor.execute("SELECT content FROM journal_entries WHERE entry_date = ?", (str(date_obj),))
-        row = cursor.fetchone()
-        conn.close()
-        return row[0] if row else ""
-    except Exception:
-        return ""
-
-def save_journal_entry(date_obj, content):
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT OR REPLACE INTO journal_entries (entry_date, content)
-            VALUES (?, ?)
-        """, (str(date_obj), content))
-        conn.commit()
-        conn.close()
-        return True
-    except Exception as e:
-        st.error(f"Erro ao salvar: {e}")
-        return False
-
 def load_data():
     """Carrega dados do SQLite e faz pré-processamento."""
     try:
@@ -193,7 +152,6 @@ def main():
         st.session_state['limit_apps'] = 5
 
     tracker = ProductivityTracker()
-    init_journal_db()
 
     df_raw = load_data()
 
@@ -228,40 +186,6 @@ def main():
 
     if st.sidebar.button("Atualizar Dados"):
         st.rerun()
-
-    # --- Diário ---
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("📔 Diário de Feitos")
-    
-    journal_content = get_journal_entry(selected_date)
-    edit_key = f"edit_mode_{selected_date}"
-    
-    if edit_key not in st.session_state:
-        st.session_state[edit_key] = False if journal_content else True
-
-    if st.session_state[edit_key]:
-        with st.sidebar.form(key=f"frm_journal_{selected_date}"):
-            new_text = st.text_area(
-                "O que você realizou hoje?",
-                value=journal_content,
-                height=200,
-                placeholder="- Finalizei o projeto X..."
-            )
-            st.caption("Suporta Markdown")
-            
-            if st.form_submit_button("💾 Salvar"):
-                if save_journal_entry(selected_date, new_text):
-                    st.session_state[edit_key] = False
-                    st.rerun()
-    else:
-        if journal_content.strip():
-            st.sidebar.markdown(journal_content)
-        else:
-            st.sidebar.info("*Nenhum registro.*")
-            
-        if st.sidebar.button("✏️ Editar", key=f"btn_edit_{selected_date}"):
-            st.session_state[edit_key] = True
-            st.rerun()
 
     # =========================================================================
     # ÁREA DE ABAS (Tabs)
