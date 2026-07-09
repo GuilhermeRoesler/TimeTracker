@@ -1,7 +1,7 @@
 import streamlit as st
 
 from tracker import ProductivityTracker
-import settings_ui
+import dashboard_settings
 
 from dashboard_data import load_activity_data
 from dashboard_details import render_details_tab
@@ -52,7 +52,7 @@ def main():
         render_details_tab(df)
 
     with tab_customize:
-        settings_ui.render_settings_tab(tracker)
+        dashboard_settings.render_settings_tab(tracker)
 
 
 if __name__ == "__main__":

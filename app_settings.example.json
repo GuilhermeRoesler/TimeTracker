@@ -1,0 +1,14 @@
+{
+  "apps": {
+    "chrome.exe": {
+      "display_name": "Google Chrome",
+      "hex_color": "#4285F4",
+      "category": "Navegação"
+    },
+    "Code.exe": {
+      "display_name": "VS Code",
+      "hex_color": "#007ACC",
+      "category": "Desenvolvimento"
+    }
+  }
+}

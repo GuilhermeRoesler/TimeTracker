@@ -104,34 +104,7 @@ class AppOrchestrator:
 
     def run_tracker(self):
         tracker = ProductivityTracker()
-        tracker.start_time = time.time()
-        last_app = None
-        last_title = None
-
-        while not self.tracker_stop_event.is_set():
-            try:
-                current_app, current_title = tracker.get_active_window_info()
-
-                if current_app != last_app or current_title != last_title:
-                    end_time = time.time()
-                    if last_app is not None:
-                        tracker.save_activity(last_app, last_title, tracker.start_time, end_time)
-
-                    tracker.start_time = end_time
-                    last_app = current_app
-                    last_title = current_title
-
-                for _ in range(50):
-                    if self.tracker_stop_event.is_set():
-                        break
-                    time.sleep(0.1)
-
-            except Exception as e:
-                print(f"Erro no tracker: {e}")
-                time.sleep(5)
-
-        if last_app:
-            tracker.save_activity(last_app, last_title, tracker.start_time, time.time())
+        tracker.run(stop_event=self.tracker_stop_event)
 
     def run_streamlit(self):
         app_dir = get_app_dir()

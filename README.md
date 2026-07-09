@@ -1,6 +1,6 @@
 # TimeTracker - Monitor de Produtividade Pessoal
 
-O **TimeTracker** é uma aplicação para Windows desenvolvida em Python que monitoriza automaticamente a janela ativa do computador, registando quanto tempo é gasto em cada aplicação e site. O projeto inclui um dashboard interativo para análise de dados, gestão de categorias e um diário de produtividade.
+O **TimeTracker** é uma aplicação para Windows desenvolvida em Python que monitoriza automaticamente a janela ativa do computador, registando quanto tempo é gasto em cada aplicação e site. O projeto inclui um dashboard interativo para análise de dados e gestão de categorias.
 
 ![](images/dashboard.png)
 
@@ -8,13 +8,11 @@ O **TimeTracker** é uma aplicação para Windows desenvolvida em Python que mon
 
 - **Rastreio Automático**: Monitoriza a janela ativa em segundo plano e regista o tempo de uso na base de dados SQLite local.
 - **Dashboard Interativo**: Interface web construída com Streamlit que oferece:
-- Métricas de tempo total e foco.
-- Gráficos de distribuição (Pizza) e linha do tempo (Barras) usando Plotly.
-- Ranking detalhado de aplicações mais usadas.
-- Análise específica por abas (ex: detalhar tempo gasto em abas do Opera/Chrome).
-
+  - Métricas de tempo total e foco.
+  - Gráficos de distribuição (Pizza) e linha do tempo (Barras) usando Plotly.
+  - Ranking detalhado de aplicações mais usadas.
+  - Análise específica por abas (ex: detalhar tempo gasto em abas do Opera/Chrome).
 - **Personalização**: Permite renomear aplicações, atribuir cores e definir categorias (ex: Trabalho, Estudo, Lazer).
-- **Diário de Feitos**: Uma secção integrada para registar anotações diárias sobre o que foi realizado.
 - **System Tray**: A aplicação corre minimizada na bandeja do sistema, permitindo abrir o dashboard ou encerrar o processo facilmente.
 - **Inicialização Automática**: Cria um script `.vbs` oculto na pasta de startup do Windows para iniciar com o sistema.
 
@@ -31,6 +29,8 @@ O **TimeTracker** é uma aplicação para Windows desenvolvida em Python que mon
 ```bash
 pip install -r requirements.txt
 ```
+
+3. (Opcional) Copie `app_settings.example.json` para `app_settings.json` para começar com configurações de exemplo. O ficheiro é criado automaticamente na primeira personalização de apps.
 
 > **Nota**: As principais bibliotecas incluem `streamlit`, `pandas`, `pywin32`, `plotly`, `pystray` e `Pillow`.
 
@@ -52,18 +52,25 @@ Isto irá:
 
 ### Funcionalidades do Dashboard
 
-- **Visão Geral**: Veja onde gastou o seu tempo hoje.
+- **Visão Geral**: Veja onde gastou o seu tempo no dia selecionado.
 - **Filtros**: Selecione datas anteriores na barra lateral.
-- **Definições**: Na barra lateral, expanda "Personalizar Apps" para mudar cores ou categorias.
-- **Detalhes**: Na aba "Detalhes por App", selecione um navegador para ver em quais sites passou mais tempo.
+- **Detalhes por App**: Selecione um navegador para ver em quais sites passou mais tempo.
+- **Personalizar Apps**: Na aba dedicada, mude nomes de exibição, cores e categorias.
 
 ## 📂 Estrutura do Projeto
 
-- `main.py`: O orquestrador principal. Inicia o tracker, o dashboard e o ícone da bandeja.
+- `main.py`: Orquestrador principal. Inicia o tracker, o dashboard e o ícone da bandeja.
 - `tracker.py`: Captura a janela ativa, grava atividades no SQLite e gere `app_settings.json`.
-- `dashboard.py`: A interface visual construída em Streamlit.
-- `settings_ui.py`: Módulo da interface para gerir configurações das apps.
-- `app_settings.json`: Configurações personalizadas dos apps (nome, cor, categoria).
+- `dashboard.py`: Ponto de entrada do dashboard Streamlit.
+- `dashboard_data.py`: Carregamento e pré-processamento dos dados.
+- `dashboard_filters.py`: Filtros da barra lateral.
+- `dashboard_overview.py`: Aba de visão geral.
+- `dashboard_details.py`: Aba de detalhes por app.
+- `dashboard_charts.py`: Gráficos Plotly reutilizáveis.
+- `dashboard_utils.py`: Funções auxiliares de formatação e cores.
+- `dashboard_settings.py`: Aba de personalização de apps.
+- `app_settings.example.json`: Exemplo de configurações de apps.
+- `app_settings.json`: Configurações personalizadas dos apps (nome, cor, categoria) — local, não versionado.
 - `productivity.db`: Base de dados SQLite com registos de atividade (gerada automaticamente na primeira execução).
 
 ## 📝 Notas

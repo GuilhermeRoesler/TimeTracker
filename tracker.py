@@ -180,26 +180,46 @@ class ProductivityTracker:
         }
         return _save_settings_file(config)
 
-    def run(self):
-        """Loop principal de monitoramento."""
+    def run(self, stop_event=None, poll_interval: float = 5.0):
+        """Loop principal de monitoramento.
+
+        Args:
+            stop_event: Evento opcional para encerrar o loop (ex.: threading.Event).
+            poll_interval: Intervalo em segundos entre verificações da janela ativa.
+        """
         logging.info("Iniciando monitoramento...")
         self.start_time = time.time()
         last_app = None
         last_title = None
-        
+
         try:
-            while True:
-                current_app, current_title = self.get_active_window_info()
-                if current_app != last_app or current_title != last_title:
-                    end_time = time.time()
-                    if last_app is not None:
-                        self.save_activity(last_app, last_title, self.start_time, end_time)
-                    self.start_time = end_time
-                    last_app = current_app
-                    last_title = current_title
-                time.sleep(5)
+            while stop_event is None or not stop_event.is_set():
+                try:
+                    current_app, current_title = self.get_active_window_info()
+
+                    if current_app != last_app or current_title != last_title:
+                        end_time = time.time()
+                        if last_app is not None:
+                            self.save_activity(last_app, last_title, self.start_time, end_time)
+
+                        self.start_time = end_time
+                        last_app = current_app
+                        last_title = current_title
+
+                    elapsed = 0.0
+                    while elapsed < poll_interval and (stop_event is None or not stop_event.is_set()):
+                        time.sleep(0.1)
+                        elapsed += 0.1
+
+                except Exception as e:
+                    logging.error(f"Erro no tracker: {e}")
+                    time.sleep(5)
+
+            if last_app:
+                self.save_activity(last_app, last_title, self.start_time, time.time())
         except KeyboardInterrupt:
-            pass
+            if last_app:
+                self.save_activity(last_app, last_title, self.start_time, time.time())
 
 if __name__ == "__main__":
     tracker = ProductivityTracker()
