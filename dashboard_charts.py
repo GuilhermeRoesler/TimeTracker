@@ -54,7 +54,8 @@ def create_hourly_timeline(df, color_map, height=None):
     )
     fig.update_xaxes(tickmode="linear", dtick=1, range=[-0.5, 23.5])
     fig.update_traces(
-        hovertemplate="<b>%{data.name}</b><br>🕒 Hora: %{x}h<br>⏱️ Tempo: %{customdata[0]}<extra></extra>"
+        width=0.8,
+        hovertemplate="<b>%{data.name}</b><br>🕒 Hora: %{x}h<br>⏱️ Tempo: %{customdata[0]}<extra></extra>",
     )
 
     layout_kwargs = {"margin": dict(l=0, r=0, t=30 if height else 10, b=0)}
