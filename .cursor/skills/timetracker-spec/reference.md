@@ -87,13 +87,98 @@ Pillow>=11.1.0
 - `app_settings.json` — personalizações do usuário
 - `venv/`, `__pycache__/`
 
-## Pontos de extensão futuros (não implementados)
+## Roadmap
 
-Registrar aqui quando planejado ou implementado:
+Prioridade sugerida. Mover para "Implementado" ao concluir e atualizar o changelog do spec.
 
-- Filtro por categoria na sidebar
-- Exportação CSV/JSON
-- Metas diárias / alertas
-- Suporte multi-monitor ou Linux/macOS
-- API REST para dados externos
-- Testes automatizados
+| Prioridade | Feature | Notas |
+|------------|---------|-------|
+| Alta | Filtro por categoria na sidebar | Reutiliza coluna `category` já existente no DataFrame |
+| Alta | Exportação CSV/JSON | Dados do dia filtrado ou intervalo customizado |
+| Média | Metas diárias / alertas | Requer novo schema ou tabela de metas |
+| Média | Detecção de idle (AFK) | Pausar tracking quando sem input por N minutos |
+| Baixa | Suporte Linux/macOS | Substituir `pywin32` por APIs nativas por SO |
+| Baixa | API REST local | Expor dados para integrações externas |
+| Baixa | Empacotamento `.exe` | PyInstaller ou cx_Freeze para distribuição sem Python |
+
+### Implementado
+
+- (nenhum item do roadmap ainda)
+
+## Testes
+
+**Estado atual:** sem suite automatizada. Testes manuais são o fluxo principal.
+
+### Checklist manual — tracker
+
+- [ ] `python tracker.py` grava em `productivity.db` ao trocar de janela
+- [ ] Sessões < 1s não aparecem no banco
+- [ ] Sessão que cruza hora cheia gera múltiplos registros
+- [ ] `stop_event` faz flush da sessão ativa ao encerrar
+
+### Checklist manual — dashboard
+
+- [ ] Dashboard carrega com DB populado; aviso quando vazio
+- [ ] Filtro de data: atalhos, ◀/▶, calendário
+- [ ] Gráficos renderizam sem erro com e sem `hex_color` configurado
+- [ ] Aba Detalhes: títulos limpos (`clean_window_title`)
+- [ ] Personalizar Apps: salvar persiste em `app_settings.json`
+
+### Checklist manual — app completa
+
+- [ ] `python main.py` inicia tracker + Streamlit + ícone na bandeja
+- [ ] "Abrir Dashboard" abre `http://localhost:8501`
+- [ ] "Sair" encerra tracker e subprocess Streamlit
+- [ ] VBS criado em Startup com `pythonw.exe`
+
+### Diretrizes para testes automatizados (futuro)
+
+- **Framework sugerido:** `pytest`
+- **Priorizar:** funções puras em `dashboard_utils.py` e `dashboard_charts.py` (sem Streamlit/win32)
+- **Tracker:** mockar `win32gui`/`win32process`; testar `save_activity` com timestamps controlados
+- **Integração:** DB em memória (`:memory:`) para queries de `dashboard_data`
+- **Evitar:** testes que dependam de janela ativa real ou bandeja do sistema
+
+## Deploy e distribuição
+
+**Estado atual:** execução via código-fonte + `pip install -r requirements.txt`.
+
+### Uso pessoal (atual)
+
+```bash
+pip install -r requirements.txt
+python main.py
+```
+
+O startup automático é gerenciado por `main.py` via script `.vbs` oculto.
+
+### Deploy manual em outra máquina
+
+1. Copiar pasta do projeto (sem `venv/`, `productivity.db`, `app_settings.json`)
+2. Instalar Python 3.8+ no Windows
+3. `pip install -r requirements.txt`
+4. Executar `python main.py` uma vez para registrar startup
+
+### Empacotamento futuro (não implementado)
+
+Opções a avaliar:
+
+| Ferramenta | Prós | Contras |
+|------------|------|---------|
+| PyInstaller | Maduro, one-folder/one-file | Tamanho grande, antivírus sensível |
+| cx_Freeze | Simples para apps Python | Menos flexível que PyInstaller |
+
+Requisitos do pacote:
+
+- Incluir `dashboard.py` e todos os módulos `dashboard_*.py`
+- Bundlar ícone da bandeja (gerado em runtime hoje)
+- Manter `productivity.db` e `app_settings.json` **fora** do executável (dados do usuário)
+- Startup VBS deve apontar para o `.exe` empacotado, não `pythonw.exe`
+
+### Atualização de versão
+
+Sem versionamento formal ainda. Ao adotar releases:
+
+- Tag git semântica (`v1.0.0`)
+- Changelog no README ou `CHANGELOG.md`
+- Migrar schema SQLite com script de migração se necessário

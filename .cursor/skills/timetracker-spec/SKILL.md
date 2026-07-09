@@ -181,8 +181,10 @@ streamlit run dashboard.py  # apenas dashboard (requer DB com dados)
 | Data | Mudança |
 |------|---------|
 | 2026-07-09 | Spec inicial criada a partir do estado atual do repositório |
+| 2026-07-09 | Regra `.cursor/rules/timetracker-spec.mdc` + seções roadmap, testes e deploy em `reference.md` |
 
 ## Recursos adicionais
 
-- Detalhes de API por função: [reference.md](reference.md)
+- Detalhes de API, **roadmap**, **testes** e **deploy**: [reference.md](reference.md)
 - README do usuário: [README.md](../../README.md)
+- Regra Cursor que aponta para este spec: [.cursor/rules/timetracker-spec.mdc](../../rules/timetracker-spec.mdc)

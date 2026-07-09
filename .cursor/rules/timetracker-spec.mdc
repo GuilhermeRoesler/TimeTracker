@@ -1,0 +1,24 @@
+---
+description: Consultar e manter as especificações vivas do TimeTracker Pro antes de implementar mudanças
+alwaysApply: true
+---
+
+# TimeTracker — Especificações do Projeto
+
+Antes de implementar features, corrigir bugs ou refatorar neste repositório:
+
+1. **Leia** `.cursor/skills/timetracker-spec/SKILL.md` (arquitetura, contratos, convenções).
+2. **Consulte** `.cursor/skills/timetracker-spec/reference.md` para API, roadmap, testes e deploy.
+3. **Mantenha o spec vivo** — após mudanças em arquitetura, schema, UI ou decisões técnicas, atualize o skill e o changelog.
+
+## Regras inegociáveis
+
+- Plataforma **Windows-only**; não introduzir abstrações cross-platform sem decisão explícita.
+- Persistência em `tracker.py`; gráficos em `dashboard_charts.py`; UI Streamlit nas abas.
+- UI e mensagens em **português**.
+- `app_settings.json` e `productivity.db` são locais — nunca versionar.
+- Respeitar contratos: schema `activity_log`, formato JSON de apps, colunas do DataFrame.
+
+## Ao concluir uma tarefa
+
+Se a mudança alterou comportamento documentado, atualize `SKILL.md` e registre em **Changelog do spec**.
