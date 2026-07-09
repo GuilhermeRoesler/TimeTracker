@@ -7,7 +7,6 @@ import plotly.graph_objects as go
 from datetime import date, datetime, timedelta
 
 from tracker import ProductivityTracker
-from app_config import get_app_settings
 import settings_ui
 
 # Configuração da Página
@@ -17,7 +16,7 @@ DB_NAME = "productivity.db"
 
 # --- Funções do Banco de Dados ---
 
-def load_data():
+def load_data(tracker: ProductivityTracker):
     """Carrega dados do SQLite e faz pré-processamento."""
     try:
         conn = sqlite3.connect(DB_NAME)
@@ -27,7 +26,7 @@ def load_data():
         if df.empty:
             return pd.DataFrame()
 
-        app_settings = get_app_settings()
+        app_settings = tracker.get_app_settings()
 
         df['display_name'] = df['app_name'].map(
             lambda name: app_settings.get(name, {}).get("display_name", name)
@@ -153,7 +152,7 @@ def main():
 
     tracker = ProductivityTracker()
 
-    df_raw = load_data()
+    df_raw = load_data(tracker)
 
     if df_raw.empty:
         st.warning("Nenhum dado encontrado. Certifique-se de que o 'tracker.py' está rodando.")

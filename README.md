@@ -60,10 +60,9 @@ Isto irá:
 ## 📂 Estrutura do Projeto
 
 - `main.py`: O orquestrador principal. Inicia o tracker, o dashboard e o ícone da bandeja.
-- `tracker.py`: O "motor" que captura a janela ativa e grava no SQLite.
+- `tracker.py`: Captura a janela ativa, grava atividades no SQLite e gere `app_settings.json`.
 - `dashboard.py`: A interface visual construída em Streamlit.
 - `settings_ui.py`: Módulo da interface para gerir configurações das apps.
-- `app_config.py`: Leitura e gravação das configurações de apps em JSON.
 - `app_settings.json`: Configurações personalizadas dos apps (nome, cor, categoria).
 - `productivity.db`: Base de dados SQLite com registos de atividade (gerada automaticamente na primeira execução).
 

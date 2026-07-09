@@ -1,15 +1,14 @@
 import sqlite3
 import time
 import os
+import json
 import datetime
 import logging
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 import win32gui
 import win32process
 import win32api
 import win32con
-
-from app_config import get_app_settings, update_app_setting, load_config
 
 # Configuração de Logging
 logging.basicConfig(
@@ -19,6 +18,42 @@ logging.basicConfig(
 )
 
 DB_NAME = "productivity.db"
+SETTINGS_FILE = "app_settings.json"
+DEFAULT_SETTINGS: Dict[str, Any] = {"apps": {}}
+
+
+def _get_settings_path() -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), SETTINGS_FILE)
+
+
+def _load_settings_file() -> Dict[str, Any]:
+    path = _get_settings_path()
+    if not os.path.exists(path):
+        return dict(DEFAULT_SETTINGS)
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        logging.error(f"Erro ao ler {SETTINGS_FILE}: {e}")
+        return dict(DEFAULT_SETTINGS)
+
+    if isinstance(data, dict) and isinstance(data.get("apps"), dict):
+        return {"apps": data["apps"]}
+
+    logging.error(f"{SETTINGS_FILE} inválido: esperado objeto com chave 'apps'.")
+    return dict(DEFAULT_SETTINGS)
+
+
+def _save_settings_file(config: Dict[str, Any]) -> bool:
+    try:
+        with open(_get_settings_path(), "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+        return True
+    except OSError as e:
+        logging.error(f"Erro ao salvar {SETTINGS_FILE}: {e}")
+        return False
 
 class ProductivityTracker:
     def __init__(self, db_path: str = DB_NAME):
@@ -46,15 +81,6 @@ class ProductivityTracker:
                     duration_seconds REAL
                 )
             """)
-
-            load_config()
-
-            cursor.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='app_settings'"
-            )
-            if cursor.fetchone():
-                cursor.execute("DROP TABLE app_settings")
-                logging.info("Tabela app_settings removida (configurações migradas para JSON).")
 
             conn.commit()
             conn.close()
@@ -133,13 +159,26 @@ class ProductivityTracker:
         except sqlite3.Error:
             return []
 
-    def get_app_settings(self):
-        """Retorna dicionário com configurações dos apps."""
-        return get_app_settings()
+    def get_app_settings(self) -> Dict[str, Dict[str, Optional[str]]]:
+        """Retorna configurações dos apps a partir do JSON."""
+        return _load_settings_file().get("apps", {})
 
-    def update_app_setting(self, app_name, display_name, hex_color=None, category=None):
-        """Atualiza configurações de um app."""
-        return update_app_setting(app_name, display_name, hex_color, category)
+    def update_app_setting(
+        self,
+        app_name: str,
+        display_name: str,
+        hex_color: Optional[str] = None,
+        category: Optional[str] = None,
+    ) -> bool:
+        """Atualiza configurações de um app no JSON."""
+        config = _load_settings_file()
+        config.setdefault("apps", {})
+        config["apps"][app_name] = {
+            "display_name": display_name,
+            "hex_color": hex_color,
+            "category": category,
+        }
+        return _save_settings_file(config)
 
     def run(self):
         """Loop principal de monitoramento."""
