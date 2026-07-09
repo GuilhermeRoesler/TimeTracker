@@ -132,8 +132,7 @@ def main():
         st.session_state['limit_apps'] = 5
 
     tracker = ProductivityTracker()
-    init_journal_db() 
-    settings_ui.render_settings_ui(tracker)
+    init_journal_db()
 
     df_raw = load_data()
 
@@ -208,7 +207,11 @@ def main():
     # ÁREA DE ABAS (Tabs)
     # =========================================================================
     
-    tab_overview, tab_details = st.tabs(["🏠 Visão Geral", "🔍 Detalhes por App (Abas)"])
+    tab_overview, tab_details, tab_customize = st.tabs([
+        "🏠 Visão Geral",
+        "🔍 Detalhes por App (Abas)",
+        "⚙️ Personalizar Apps",
+    ])
 
     # --- ABA 1: Visão Geral (Seu Dashboard Original) ---
     with tab_overview:
@@ -469,6 +472,9 @@ def main():
                     hide_index=True,
                     height=500
                 )
+
+    with tab_customize:
+        settings_ui.render_settings_tab(tracker)
 
 if __name__ == "__main__":
     main()
