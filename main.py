@@ -69,38 +69,46 @@ class AppOrchestrator:
                 except Exception:
                     pass
 
-    def create_startup_script(self):
-        """Cria script .vbs oculto na pasta de inicialização do Windows."""
+    def create_startup_shortcut(self):
+        """Cria atalho na pasta de inicialização do Windows."""
         try:
+            import win32com.client
+
             startup_folder = os.path.join(
                 os.getenv("APPDATA"),
                 r"Microsoft\Windows\Start Menu\Programs\Startup",
             )
-            vbs_path = os.path.join(startup_folder, f"{APP_NAME}.vbs")
+            shortcut_path = os.path.join(startup_folder, f"{APP_NAME}.lnk")
             app_dir = get_app_dir()
             main_script = os.path.join(app_dir, "main.py")
             python_exe = get_pythonw_executable()
+            arguments = f'"{main_script}"'
 
-            vbs_content = (
-                'Set WshShell = CreateObject("WScript.Shell")\r\n'
-                f'WshShell.CurrentDirectory = "{app_dir}"\r\n'
-                f'WshShell.Run """{python_exe}"" ""{main_script}""", 0, False\r\n'
-            )
-
+            shell = win32com.client.Dispatch("WScript.Shell")
             needs_write = True
-            if os.path.exists(vbs_path):
-                with open(vbs_path, "r", encoding="utf-8") as f:
-                    needs_write = f.read() != vbs_content
-            if needs_write:
-                with open(vbs_path, "w", encoding="utf-8") as f:
-                    f.write(vbs_content)
+            if os.path.exists(shortcut_path):
+                shortcut = shell.CreateShortCut(shortcut_path)
+                needs_write = not (
+                    os.path.normcase(shortcut.Targetpath) == os.path.normcase(python_exe)
+                    and shortcut.Arguments == arguments
+                    and os.path.normcase(shortcut.WorkingDirectory) == os.path.normcase(app_dir)
+                )
 
-            for legacy_name in (f"{APP_NAME}.bat", f"{APP_NAME}.lnk"):
+            if needs_write:
+                shortcut = shell.CreateShortCut(shortcut_path)
+                shortcut.Targetpath = python_exe
+                shortcut.Arguments = arguments
+                shortcut.WorkingDirectory = app_dir
+                shortcut.WindowStyle = 7
+                shortcut.Description = APP_NAME
+                shortcut.save()
+
+            for legacy_name in (f"{APP_NAME}.vbs", f"{APP_NAME}.bat"):
                 legacy_path = os.path.join(startup_folder, legacy_name)
                 if os.path.exists(legacy_path):
                     os.remove(legacy_path)
         except Exception as e:
-            print(f"Erro ao criar script de inicialização: {e}")
+            print(f"Erro ao criar atalho de inicialização: {e}")
 
     def run_tracker(self):
         tracker = ProductivityTracker()
@@ -151,7 +159,7 @@ class AppOrchestrator:
         sys.exit(0)
 
     def start(self):
-        self.create_startup_script()
+        self.create_startup_shortcut()
 
         self.tracker_thread = threading.Thread(target=self.run_tracker, daemon=True)
         self.tracker_thread.start()

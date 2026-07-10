@@ -14,7 +14,7 @@ O **TimeTracker** é uma aplicação para Windows desenvolvida em Python que mon
   - Análise específica por abas (ex: detalhar tempo gasto em abas do Opera/Chrome).
 - **Personalização**: Permite renomear aplicações, atribuir cores e definir categorias (ex: Trabalho, Estudo, Lazer).
 - **System Tray**: A aplicação corre minimizada na bandeja do sistema, permitindo abrir o dashboard ou encerrar o processo facilmente.
-- **Inicialização Automática**: Cria um script `.vbs` oculto na pasta de startup do Windows para iniciar com o sistema.
+- **Inicialização Automática**: Cria um atalho na pasta de startup do Windows para iniciar com o sistema.
 
 ## 🛠️ Requisitos
 
@@ -47,7 +47,7 @@ Isto irá:
 1. Iniciar o processo de rastreio (`tracker.py`) em segundo plano.
 2. Lançar o servidor Streamlit (`dashboard.py`).
 3. Adicionar um ícone à bandeja do sistema (perto do relógio).
-4. Registar um script `.vbs` oculto na pasta de startup do Windows (se ainda não existir).
+4. Registar um atalho na pasta de startup do Windows (se ainda não existir).
 5. O dashboard fica disponível em `http://localhost:8501` (abra pelo ícone na bandeja do sistema).
 
 ### Funcionalidades do Dashboard

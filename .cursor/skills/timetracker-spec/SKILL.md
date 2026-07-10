@@ -12,7 +12,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Item | Valor |
 |------|-------|
 | Nome | TimeTracker Pro |
-| Plataforma | **Windows apenas** (`pywin32`, system tray, startup `.vbs`) |
+| Plataforma | **Windows apenas** (`pywin32`, system tray, startup `.lnk`) |
 | Linguagem | Python 3.8+ |
 | Entry point | `main.py` |
 | Dashboard | Streamlit em `http://localhost:8501` |
@@ -127,7 +127,7 @@ Colunas esperadas após `load_activity_data()`:
 
 | Decisão | Motivo |
 |---------|--------|
-| Windows-only | `win32gui`, `win32process`, startup VBS, `CREATE_NO_WINDOW` |
+| Windows-only | `win32gui`, `win32process`, startup `.lnk`, `CREATE_NO_WINDOW` |
 | SQLite local | Privacidade, zero infra, concorrência via WAL |
 | Streamlit headless | Subprocess sem janela de terminal |
 | `pythonw.exe` no startup | Execução oculta na bandeja |
@@ -182,6 +182,7 @@ streamlit run dashboard.py  # apenas dashboard (requer DB com dados)
 |------|---------|
 | 2026-07-09 | Spec inicial criada a partir do estado atual do repositório |
 | 2026-07-09 | Regra `.cursor/rules/timetracker-spec.mdc` + seções roadmap, testes e deploy em `reference.md` |
+| 2026-07-09 | Startup Windows: atalho `.lnk` em vez de script `.vbs` (`create_startup_shortcut`) |
 
 ## Recursos adicionais
 

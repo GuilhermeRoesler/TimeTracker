@@ -56,7 +56,7 @@
 
 ## `AppOrchestrator` — ciclo de vida
 
-1. `create_startup_script()` — escreve `.vbs` em `%APPDATA%/.../Startup/`
+1. `create_startup_shortcut()` — cria `.lnk` em `%APPDATA%/.../Startup/`
 2. Inicia thread daemon do tracker
 3. `Popen` Streamlit headless
 4. `pystray.Icon.run()` bloqueia thread principal
@@ -64,11 +64,12 @@
 
 **Shutdown Windows:** handler `CTRL_SHUTDOWN/LOGOFF/CLOSE` chama `cleanup()`.
 
-## Startup Windows (VBS)
+## Startup Windows (atalho)
 
-- Path: `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\TimeTracker Pro.vbs`
-- Usa `pythonw.exe` quando disponível (execução sem console).
-- Remove legados `.bat` e `.lnk` com mesmo prefixo.
+- Path: `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\TimeTracker Pro.lnk`
+- Destino: `pythonw.exe` quando disponível (execução sem console).
+- Argumentos: caminho absoluto de `main.py`; diretório de trabalho = pasta do projeto.
+- Remove legados `.vbs` e `.bat` com mesmo prefixo.
 
 ## Dependências (`requirements.txt`)
 
@@ -129,7 +130,7 @@ Prioridade sugerida. Mover para "Implementado" ao concluir e atualizar o changel
 - [ ] `python main.py` inicia tracker + Streamlit + ícone na bandeja
 - [ ] "Abrir Dashboard" abre `http://localhost:8501`
 - [ ] "Sair" encerra tracker e subprocess Streamlit
-- [ ] VBS criado em Startup com `pythonw.exe`
+- [ ] Atalho `.lnk` criado em Startup com `pythonw.exe`
 
 ### Diretrizes para testes automatizados (futuro)
 
@@ -150,7 +151,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-O startup automático é gerenciado por `main.py` via script `.vbs` oculto.
+O startup automático é gerenciado por `main.py` via atalho `.lnk` na pasta Startup.
 
 ### Deploy manual em outra máquina
 
@@ -173,7 +174,7 @@ Requisitos do pacote:
 - Incluir `dashboard.py` e todos os módulos `dashboard_*.py`
 - Bundlar ícone da bandeja (gerado em runtime hoje)
 - Manter `productivity.db` e `app_settings.json` **fora** do executável (dados do usuário)
-- Startup VBS deve apontar para o `.exe` empacotado, não `pythonw.exe`
+- Atalho de startup deve apontar para o `.exe` empacotado, não `pythonw.exe`
 
 ### Atualização de versão
 
