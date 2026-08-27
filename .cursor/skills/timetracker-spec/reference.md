@@ -100,11 +100,11 @@ Prioridade sugerida. Mover para "Implementado" ao concluir e atualizar o changel
 | Média | Detecção de idle (AFK) | Pausar tracking quando sem input por N minutos |
 | Baixa | Suporte Linux/macOS | Substituir `pywin32` por APIs nativas por SO |
 | Baixa | API REST local | Expor dados para integrações externas |
-| Baixa | Empacotamento `.exe` | PyInstaller ou cx_Freeze para distribuição sem Python |
+| Baixa | Empacotamento `.exe` | ~~PyInstaller~~ → ver Implementado |
 
 ### Implementado
 
-- (nenhum item do roadmap ainda)
+- Empacotamento Windows com PyInstaller (`timetracker.spec`) + release via GitHub Actions
 
 ## Testes
 
@@ -160,26 +160,43 @@ O startup automático é gerenciado por `main.py` via atalho `.lnk` na pasta Sta
 3. `pip install -r requirements.txt`
 4. Executar `python main.py` uma vez para registrar startup
 
-### Empacotamento futuro (não implementado)
+### Empacotamento Windows (PyInstaller)
 
-Opções a avaliar:
+Build local:
 
-| Ferramenta | Prós | Contras |
-|------------|------|---------|
-| PyInstaller | Maduro, one-folder/one-file | Tamanho grande, antivírus sensível |
-| cx_Freeze | Simples para apps Python | Menos flexível que PyInstaller |
+```bash
+pip install -r requirements-build.txt
+pyinstaller timetracker.spec --noconfirm --clean
+```
 
-Requisitos do pacote:
+Saída: pasta `dist/TimeTrackerPro/` com `TimeTrackerPro.exe` (modo onedir).
 
-- Incluir `dashboard.py` e todos os módulos `dashboard_*.py`
-- Bundlar ícone da bandeja (gerado em runtime hoje)
-- Manter `productivity.db` e `app_settings.json` **fora** do executável (dados do usuário)
-- Atalho de startup deve apontar para o `.exe` empacotado, não `pythonw.exe`
+Contratos do pacote:
+
+- `app_paths.get_app_dir()` — pasta do `.exe` (gravável); dados do usuário ficam ao lado do exe
+- `productivity.db` e `app_settings.json` **fora** do bundle (criados em runtime)
+- Dashboard: exe reinicia a si mesmo com `--timetracker-streamlit` (subprocess Streamlit)
+- Startup `.lnk` aponta para o `.exe` quando `sys.frozen`
+- Spec: `timetracker.spec`; hooks em `hooks/`; config em `.streamlit/config.toml`
+
+### CI — GitHub Actions Releases
+
+Workflow: `.github/workflows/release.yml`
+
+| Trigger | Comportamento |
+|---------|---------------|
+| Push de tag `v*` (ex.: `v1.0.0`) | Build Windows + cria/atualiza GitHub Release com o zip |
+| `workflow_dispatch` | Só gera artifact (sem Release) |
+
+Artefato: `TimeTrackerPro-<tag>-windows-amd64.zip` (conteúdo de `dist/TimeTrackerPro/`).
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
 
 ### Atualização de versão
 
-Sem versionamento formal ainda. Ao adotar releases:
-
-- Tag git semântica (`v1.0.0`)
-- Changelog no README ou `CHANGELOG.md`
+- Tag git semântica (`v1.0.0`) dispara o release automático
+- Preferir changelog nas notes geradas pelo Actions / README
 - Migrar schema SQLite com script de migração se necessário

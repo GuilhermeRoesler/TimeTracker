@@ -10,6 +10,8 @@ import win32process
 import win32api
 import win32con
 
+from app_paths import get_app_dir
+
 # Configuração de Logging
 logging.basicConfig(
     level=logging.INFO,
@@ -22,8 +24,12 @@ SETTINGS_FILE = "app_settings.json"
 DEFAULT_SETTINGS: Dict[str, Any] = {"apps": {}}
 
 
+def get_db_path() -> str:
+    return os.path.join(get_app_dir(), DB_NAME)
+
+
 def _get_settings_path() -> str:
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), SETTINGS_FILE)
+    return os.path.join(get_app_dir(), SETTINGS_FILE)
 
 
 def _load_settings_file() -> Dict[str, Any]:
@@ -56,8 +62,8 @@ def _save_settings_file(config: Dict[str, Any]) -> bool:
         return False
 
 class ProductivityTracker:
-    def __init__(self, db_path: str = DB_NAME):
-        self.db_path = db_path
+    def __init__(self, db_path: Optional[str] = None):
+        self.db_path = db_path or get_db_path()
         self._init_db()
         self.current_window = None
         self.start_time = None

@@ -10,22 +10,28 @@ from PIL import Image, ImageDraw
 import pystray
 from pystray import MenuItem as item
 
+from app_paths import get_app_dir, get_resource_path
 from tracker import ProductivityTracker
 
 DASHBOARD_PORT = 8501
 DASHBOARD_HOST = "localhost"
 DASHBOARD_URL = f"http://{DASHBOARD_HOST}:{DASHBOARD_PORT}"
 APP_NAME = "TimeTracker Pro"
-
-
-def get_app_dir():
-    return os.path.dirname(os.path.abspath(__file__))
+STREAMLIT_FLAG = "--timetracker-streamlit"
 
 
 def get_pythonw_executable():
     python_dir = os.path.dirname(sys.executable)
     pythonw_exe = os.path.join(python_dir, "pythonw.exe")
     return pythonw_exe if os.path.exists(pythonw_exe) else sys.executable
+
+
+def _run_as_streamlit_cli(argv: list) -> None:
+    """Reentrada do exe empacotado para servir o dashboard Streamlit."""
+    sys.argv = [sys.argv[0], "run", *argv]
+    from streamlit.web import cli as stcli
+
+    raise SystemExit(stcli.main())
 
 
 class AppOrchestrator:
@@ -80,23 +86,26 @@ class AppOrchestrator:
             )
             shortcut_path = os.path.join(startup_folder, f"{APP_NAME}.lnk")
             app_dir = get_app_dir()
-            main_script = os.path.join(app_dir, "main.py")
-            python_exe = get_pythonw_executable()
-            arguments = f'"{main_script}"'
+            if getattr(sys, "frozen", False):
+                target = sys.executable
+                arguments = ""
+            else:
+                target = get_pythonw_executable()
+                arguments = f'"{os.path.join(app_dir, "main.py")}"'
 
             shell = win32com.client.Dispatch("WScript.Shell")
             needs_write = True
             if os.path.exists(shortcut_path):
                 shortcut = shell.CreateShortCut(shortcut_path)
                 needs_write = not (
-                    os.path.normcase(shortcut.Targetpath) == os.path.normcase(python_exe)
+                    os.path.normcase(shortcut.Targetpath) == os.path.normcase(target)
                     and shortcut.Arguments == arguments
                     and os.path.normcase(shortcut.WorkingDirectory) == os.path.normcase(app_dir)
                 )
 
             if needs_write:
                 shortcut = shell.CreateShortCut(shortcut_path)
-                shortcut.Targetpath = python_exe
+                shortcut.Targetpath = target
                 shortcut.Arguments = arguments
                 shortcut.WorkingDirectory = app_dir
                 shortcut.WindowStyle = 7
@@ -116,19 +125,21 @@ class AppOrchestrator:
 
     def run_streamlit(self):
         app_dir = get_app_dir()
-        dashboard_script = os.path.join(app_dir, "dashboard.py")
-
-        cmd = [
-            sys.executable,
-            "-m",
-            "streamlit",
-            "run",
+        dashboard_script = get_resource_path("dashboard.py")
+        streamlit_args = [
             dashboard_script,
             "--server.port",
             str(DASHBOARD_PORT),
             "--server.headless",
             "true",
+            "--global.developmentMode",
+            "false",
         ]
+
+        if getattr(sys, "frozen", False):
+            cmd = [sys.executable, STREAMLIT_FLAG, *streamlit_args]
+        else:
+            cmd = [sys.executable, "-m", "streamlit", "run", *streamlit_args]
 
         kwargs = {}
         if os.name == "nt":
@@ -176,5 +187,8 @@ class AppOrchestrator:
 
 
 if __name__ == "__main__":
-    app = AppOrchestrator()
-    app.start()
+    if len(sys.argv) > 1 and sys.argv[1] == STREAMLIT_FLAG:
+        _run_as_streamlit_cli(sys.argv[2:])
+    else:
+        app = AppOrchestrator()
+        app.start()

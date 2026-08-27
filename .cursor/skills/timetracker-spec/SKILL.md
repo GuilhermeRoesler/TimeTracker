@@ -33,7 +33,8 @@ main.py (AppOrchestrator)
 
 | Módulo | Responsabilidade |
 |--------|------------------|
-| `main.py` | Orquestração, shutdown graceful, startup Windows, ícone bandeja |
+| `main.py` | Orquestração, shutdown graceful, startup Windows, ícone bandeja; modo frozen PyInstaller |
+| `app_paths.py` | `get_app_dir` / `get_resource_path` (código-fonte ou exe) |
 | `tracker.py` | Captura `app_name` + `window_title`, loop de polling, CRUD settings |
 | `dashboard.py` | Entry Streamlit, tabs, wiring de filtros e dados |
 | `dashboard_data.py` | Query SQLite → DataFrame com colunas derivadas |
@@ -180,6 +181,7 @@ streamlit run dashboard.py  # apenas dashboard (requer DB com dados)
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-27 | Release CI: PyInstaller onedir + workflow `.github/workflows/release.yml`; `app_paths.py` e suporte `sys.frozen` |
 | 2026-07-09 | Spec inicial criada a partir do estado atual do repositório |
 | 2026-07-09 | Regra `.cursor/rules/timetracker-spec.mdc` + seções roadmap, testes e deploy em `reference.md` |
 | 2026-07-09 | Startup Windows: atalho `.lnk` em vez de script `.vbs` (`create_startup_shortcut`) |

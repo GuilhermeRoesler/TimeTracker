@@ -3,13 +3,13 @@ import sqlite3
 import pandas as pd
 import streamlit as st
 
-from tracker import DB_NAME, ProductivityTracker
+from tracker import ProductivityTracker
 
 
 def load_activity_data(tracker: ProductivityTracker) -> pd.DataFrame:
     """Carrega dados do SQLite e faz pré-processamento."""
     try:
-        conn = sqlite3.connect(DB_NAME)
+        conn = sqlite3.connect(tracker.db_path)
         df = pd.read_sql_query("SELECT * FROM activity_log", conn)
         conn.close()
 
