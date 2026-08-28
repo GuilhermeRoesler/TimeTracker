@@ -156,9 +156,10 @@ O startup automático é gerenciado por `main.py` via atalho `.lnk` na pasta Sta
 ### Deploy manual em outra máquina
 
 1. Copiar pasta do projeto (sem `venv/`, `productivity.db`, `app_settings.json`)
-2. Instalar Python 3.8+ no Windows
-3. `pip install -r requirements.txt`
-4. Executar `python main.py` uma vez para registrar startup
+2. Instalar Python 3.8+ no Windows (marcar “Add to PATH”)
+3. Duplo clique em `run.bat` — cria `venv`, instala deps e inicia o app
+
+Alternativa manual: `pip install -r requirements.txt` e `python main.py` (registra startup na primeira execução).
 
 ### Empacotamento Windows (PyInstaller)
 

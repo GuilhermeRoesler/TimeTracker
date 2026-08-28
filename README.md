@@ -36,7 +36,11 @@ pip install -r requirements.txt
 
 ## ▶️ Como Usar
 
-Para iniciar a aplicação em modo de desenvolvimento:
+Para iniciar a aplicação, dê **duplo clique** em `run.bat` na pasta do projeto.
+
+O script cria o ambiente virtual (`venv/`), instala as dependências e inicia o app. Na primeira execução pode demorar um pouco mais.
+
+Alternativa manual:
 
 ```bash
 python main.py
@@ -59,6 +63,7 @@ Isto irá:
 
 ## 📂 Estrutura do Projeto
 
+- `run.bat`: Atalho Windows — cria `venv`, instala dependências e inicia o app (duplo clique).
 - `main.py`: Orquestrador principal. Inicia o tracker, o dashboard e o ícone da bandeja.
 - `tracker.py`: Captura a janela ativa, grava atividades no SQLite e gere `app_settings.json`.
 - `app_paths.py`: Caminhos da aplicação (código-fonte ou executável PyInstaller).

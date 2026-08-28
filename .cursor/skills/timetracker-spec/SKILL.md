@@ -14,7 +14,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Nome | TimeTracker Pro |
 | Plataforma | **Windows apenas** (`pywin32`, system tray, startup `.lnk`) |
 | Linguagem | Python 3.8+ |
-| Entry point | `main.py` |
+| Entry point | `main.py` (ou duplo clique em `run.bat`) |
 | Dashboard | Streamlit em `http://localhost:8501` |
 | Dados locais | `productivity.db` (SQLite WAL) + `app_settings.json` |
 
@@ -160,8 +160,9 @@ Colunas esperadas após `load_activity_data()`:
 
 ```bash
 pip install -r requirements.txt
-python main.py          # app completa (tracker + dashboard + bandeja)
-python tracker.py       # apenas tracker (dev isolado)
+run.bat                   # Windows: venv + deps + app (duplo clique)
+python main.py            # app completa (tracker + dashboard + bandeja)
+python tracker.py         # apenas tracker (dev isolado)
 streamlit run dashboard/app.py  # apenas dashboard (requer DB com dados)
 ```
 
@@ -181,6 +182,7 @@ streamlit run dashboard/app.py  # apenas dashboard (requer DB com dados)
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | `run.bat` Windows: venv, dependências e launch por duplo clique |
 | 2026-08-28 | Dashboard reorganizado em pacote `dashboard/` (`app.py`, `charts.py`, etc.) |
 | 2026-08-27 | Release CI: PyInstaller onedir + workflow `.github/workflows/release.yml`; `app_paths.py` e suporte `sys.frozen` |
 | 2026-07-09 | Spec inicial criada a partir do estado atual do repositório |
