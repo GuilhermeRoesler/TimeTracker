@@ -9,6 +9,10 @@
     <ApplicationIcon>..\..\assets\app.ico</ApplicationIcon>
     <ApplicationTitle>TimeTracker Pro</ApplicationTitle>
     <AssemblyName>TimeTracker</AssemblyName>
+    <Version>2.1.1</Version>
+    <AssemblyVersion>2.1.1.0</AssemblyVersion>
+    <FileVersion>2.1.1.0</FileVersion>
+    <InformationalVersion>2.1.1</InformationalVersion>
     <!-- Evita conflito com entry WinForms (não usar top-level Program do template Web) -->
     <EnableDefaultContentItems>true</EnableDefaultContentItems>
   </PropertyGroup>

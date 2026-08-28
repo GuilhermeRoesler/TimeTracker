@@ -37,7 +37,7 @@ TimeTracker.sln
 | Módulo | Responsabilidade |
 |--------|------------------|
 | `src/TimeTracker.Core` | Contratos de dados, `ActivityRepository`, `SettingsStore`, `TrackingEngine`, `ActivityQueryService` |
-| `src/TimeTracker.Tracker` | Win32, bandeja WinForms, startup `.lnk`, worker, **hospeda dashboard na mesma processo** |
+| `src/TimeTracker.Tracker` | Win32, bandeja WinForms, startup `.lnk`, worker, Kestrel in-process, auto-update GitHub |
 | `src/TimeTracker.Dashboard` | `DashboardWeb` (Minimal API) + `wwwroot` Chart.js; `run-dashboard.bat` para dev isolado |
 
 ## Contratos de dados
@@ -168,6 +168,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Auto-update: verifica GitHub Releases, notifica na bandeja e instala Setup |
 | 2026-08-28 | Removido `MIGRATION.md` (migração Python→C# concluída; histórico no changelog) |
 | 2026-08-28 | Ícone do produto (`assets/app.ico`): exe, bandeja, WebView2, favicon, Setup Inno; CI verifica presença |
 | 2026-08-28 | Processo único: Tracker hospeda Kestrel/dashboard in-process; exe publicado `TimeTracker.exe` |

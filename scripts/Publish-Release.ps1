@@ -27,8 +27,21 @@ New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
 New-Item -ItemType Directory -Force -Path $installerOut | Out-Null
 
 Write-Host ">> Publicando TimeTracker (processo unico, framework-dependent)..."
+$semver = $Version.Trim()
+if ($semver.StartsWith("v") -or $semver.StartsWith("V")) {
+    $semver = $semver.Substring(1)
+}
+if ($semver.Contains("-")) {
+    $semver = $semver.Split("-")[0]
+}
+Write-Host ">> Versao do assembly: $semver (tag/input: $Version)"
+
 dotnet publish "src\TimeTracker.Tracker\TimeTracker.Tracker.csproj" `
     -c Release -r win-x64 --self-contained false `
+    -p:Version=$semver `
+    -p:AssemblyVersion="$semver.0" `
+    -p:FileVersion="$semver.0" `
+    -p:InformationalVersion=$Version `
     -o $publishDir
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

@@ -21,7 +21,8 @@
 | `ActivityQueryService` | Load enriquecido, dates, apps com settings |
 | `ActivityTextHelper` | `FormatDurationClean`, `CleanWindowTitle` |
 | `Win32ActiveWindowProvider` | Captura janela ativa (projeto Tracker) |
-| `DashboardWeb` | Minimal API + static files (hospedado pelo Tracker ou standalone) |
+| `AppUpdateService` | Consulta GitHub Releases, baixa Setup e inicia upgrade |
+| `AppVersion` | Parse de tags `vX.Y.Z` |
 | `StartupShortcutService` | Atalho `.lnk` na pasta Startup |
 | `AppCategories` | Categorias válidas para personalização |
 
@@ -43,8 +44,16 @@
 1. `StartupShortcutService.EnsureStartupShortcut()` — cria/atualiza `.lnk` em Startup
 2. `Host` inicia `TrackingBackgroundService` → `TrackingEngine.RunAsync()`
 3. `WebApplication.Start()` — Kestrel + `TrackingBackgroundService` no **mesmo processo**
-4. `TrayApplicationContext` — bandeja bloqueia thread principal
+4. `TrayApplicationContext` — bandeja; check silencioso de update (~12s) via GitHub Releases
 5. Shutdown via "Sair" ou `SystemEvents.SessionEnding` — flush sessão e para Kestrel
+
+### Auto-update
+
+- Fonte: `GET /repos/GuilhermeRoesler/TimeTracker/releases/latest`
+- Asset esperado: `*setup-win-x64.exe`
+- Menu bandeja: **Verificar atualizações...**
+- Ao iniciar: se houver versão maior, balão na bandeja; clique abre o fluxo de download
+- Download → executa Setup → encerra o app (upgrade in-place)
 
 ## Startup Windows (atalho)
 
@@ -78,6 +87,7 @@
 - Processo único `TimeTracker.exe` (bandeja + Kestrel)
 - Instalador Inno Setup + publish framework-dependent
 - WebView2 + testes xUnit + CI build/test/release
+- Auto-update via GitHub Releases (bandeja + check silencioso ao iniciar)
 ## Testes
 
 **Estado atual:** suite xUnit em `tests/TimeTracker.Core.Tests` (Core). CI em `.github/workflows/ci.yml`.
