@@ -33,7 +33,18 @@ jobs:
 
       - name: Install Inno Setup
         shell: pwsh
-        run: choco install innosetup --version=6.4.1 -y --no-progress
+        run: |
+          $iscc = @(
+            "${env:LocalAppData}\Programs\Inno Setup 6\ISCC.exe",
+            "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+            "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          ) | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+          if ($iscc) {
+            Write-Host "Inno Setup já disponível: $iscc"
+          } else {
+            choco install innosetup -y --no-progress
+          }
 
       - name: Publish framework-dependent + installer
         shell: pwsh
