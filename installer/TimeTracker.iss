@@ -7,7 +7,7 @@
 
 #define MyAppName "TimeTracker Pro"
 #define MyAppPublisher "TimeTracker"
-#define MyAppExeName "TimeTracker.Tracker.exe"
+#define MyAppExeName "TimeTracker.exe"
 #define MyAppId "{{A7C3E9F1-4B2D-4E8A-9C1F-6D5A8B0E2F34}"
 
 [Setup]

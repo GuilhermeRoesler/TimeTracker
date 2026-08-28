@@ -21,7 +21,7 @@
 | `ActivityQueryService` | Load enriquecido, dates, apps com settings |
 | `ActivityTextHelper` | `FormatDurationClean`, `CleanWindowTitle` |
 | `Win32ActiveWindowProvider` | Captura janela ativa (projeto Tracker) |
-| `DashboardProcessService` | Sobe dashboard ASP.NET como subprocesso |
+| `DashboardWeb` | Minimal API + static files (hospedado pelo Tracker ou standalone) |
 | `StartupShortcutService` | Atalho `.lnk` na pasta Startup |
 | `AppCategories` | Categorias válidas para personalização |
 
@@ -42,14 +42,14 @@
 
 1. `StartupShortcutService.EnsureStartupShortcut()` — cria/atualiza `.lnk` em Startup
 2. `Host` inicia `TrackingBackgroundService` → `TrackingEngine.RunAsync()`
-3. `DashboardProcessService.Start()` — subprocess dashboard (dev ou exe publicado)
+3. `WebApplication.Start()` — Kestrel + `TrackingBackgroundService` no **mesmo processo**
 4. `TrayApplicationContext` — bandeja bloqueia thread principal
-5. Shutdown via "Sair" ou `SystemEvents.SessionEnding` — flush sessão, para dashboard e host
+5. Shutdown via "Sair" ou `SystemEvents.SessionEnding` — flush sessão e para Kestrel
 
 ## Startup Windows (atalho)
 
 - Path: `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\TimeTracker Pro.lnk`
-- Destino: `TimeTracker.Tracker.exe` (publicado) ou exe do `dotnet run` (dev).
+- Destino: `TimeTracker.exe` (publicado) ou exe do `dotnet run` (dev).
 - Diretório de trabalho: pasta do app (raiz do repo em dev; pasta do exe em prod).
 - Remove legados `.vbs` e `.bat` com mesmo prefixo.
 
@@ -175,10 +175,10 @@ Pré-requisitos de runtime (instalados pelo Setup se faltarem):
 | Dados | `%LocalAppData%\TimeTracker Pro\` (`productivity.db`, `app_settings.json`) |
 | Dev (com `TimeTracker.sln`) | raiz do repositório |
 
-- `AppPaths.GetInstallDir()` — pasta dos exes
+- `AppPaths.GetInstallDir()` — pasta do exe
 - `AppPaths.GetDataDir()` — pasta de dados do usuário
-- Dashboard recebe `TIMETRACKER_DATA_DIR` do tracker
-- Startup `.lnk` aponta para `TimeTracker.Tracker.exe`
+- Um único processo: `TimeTracker.exe` (bandeja + Kestrel + wwwroot)
+- Startup `.lnk` aponta para `TimeTracker.exe`
 
 ### CI — GitHub Actions Releases
 

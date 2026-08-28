@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using TimeTracker.Core;
+using TimeTracker.Dashboard;
 using TimeTracker.Tracker.Services;
 
 namespace TimeTracker.Tracker;
@@ -10,14 +11,11 @@ namespace TimeTracker.Tracker;
 internal sealed class TrayApplicationContext : ApplicationContext
 {
     private readonly NotifyIcon _notifyIcon;
-    private readonly IHost _host;
-    private readonly DashboardProcessService _dashboardProcess;
-    private readonly CancellationTokenSource _shutdownCts = new();
+    private readonly WebApplication _webApp;
 
-    public TrayApplicationContext(IHost host, DashboardProcessService dashboardProcess)
+    public TrayApplicationContext(WebApplication webApp)
     {
-        _host = host;
-        _dashboardProcess = dashboardProcess;
+        _webApp = webApp;
 
         _notifyIcon = new NotifyIcon
         {
@@ -36,12 +34,9 @@ internal sealed class TrayApplicationContext : ApplicationContext
         {
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
-            _shutdownCts.Cancel();
             DashboardWindowService.Close();
-            _dashboardProcess.Stop();
-            _host.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
-            _host.Dispose();
-            _shutdownCts.Dispose();
+            _webApp.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+            (_webApp as IAsyncDisposable)?.DisposeAsync().AsTask().GetAwaiter().GetResult();
         }
 
         base.Dispose(disposing);
@@ -55,7 +50,6 @@ internal sealed class TrayApplicationContext : ApplicationContext
         menu.Items.Add("Sair", null, (_, _) => ExitThread());
         return menu;
     }
-
 }
 
 internal static class Program
@@ -70,18 +64,27 @@ internal static class Program
         ResolveAndConfigurePaths();
         var installDir = AppPaths.GetInstallDir();
 
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureServices(services => services.AddTrackerServices())
-            .Build();
+        var webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+        {
+            Args = [],
+            ContentRootPath = AppContext.BaseDirectory,
+            WebRootPath = webRoot,
+        });
 
-        host.Start();
+        builder.Logging.ClearProviders();
+        builder.Logging.AddDebug();
 
-        var dashboardProcess = new DashboardProcessService(
-            host.Services.GetRequiredService<ILogger<DashboardProcessService>>());
-        dashboardProcess.Start(installDir);
+        builder.WebHost.UseUrls($"http://{AppConstants.DashboardHost}:{AppConstants.DashboardPort}");
+        builder.Services.AddTrackerServices();
+        builder.Services.AddDashboardServices();
+
+        var app = builder.Build();
+        app.MapDashboard();
+        app.Start();
 
         var startupService = new StartupShortcutService(
-            host.Services.GetRequiredService<ILogger<StartupShortcutService>>());
+            app.Services.GetRequiredService<ILogger<StartupShortcutService>>());
         startupService.EnsureStartupShortcut(installDir, Environment.ProcessPath ?? Application.ExecutablePath);
 
         SystemEvents.SessionEnding += (_, e) =>
@@ -90,7 +93,7 @@ internal static class Program
             e.Cancel = false;
         };
 
-        _trayContext = new TrayApplicationContext(host, dashboardProcess);
+        _trayContext = new TrayApplicationContext(app);
         Application.Run(_trayContext);
     }
 

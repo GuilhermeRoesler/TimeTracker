@@ -90,6 +90,7 @@ jobs:
             ## Instalação recomendada
             Baixe e execute **`TimeTrackerPro-*-setup-win-x64.exe`**.
             O instalador verifica e, se necessário, baixa o **.NET 8 Desktop Runtime** e o **ASP.NET Core Runtime**.
+            Um único processo: `TimeTracker.exe` (bandeja + dashboard).
 
             ## Portable (avançado)
             O zip `*-portable-win-x64.zip` também exige .NET 8 Desktop + ASP.NET Core Runtime instalados no sistema.

@@ -32,24 +32,23 @@ O stack Python foi excelente para **validar o produto** (~900 linhas, dashboard 
 │  • NotifyIcon — bandeja                 │
 │  • Startup .lnk                         │
 │  • BackgroundService — polling 5s       │
-│  • DashboardProcessService — subprocess │
-└──────────────────┬──────────────────────┘
-                   │ productivity.db
-                   │ app_settings.json
-┌──────────────────▼──────────────────────┐
-│  TimeTracker.Dashboard (ASP.NET Core)   │
-│  • Minimal API — REST                   │
-│  • wwwroot — HTML + CSS + Chart.js      │
-└─────────────────────────────────────────┘
+│  • Kestrel — dashboard in-process (porta 8501)     │
+│  • WebView2 — janela nativa do dashboard          │
+└──────────────────┬──────────────────────────────┘
+                   │ productivity.db / app_settings.json
+                   │ (dados em LocalAppData na instalação)
+┌──────────────────▼──────────────────────────────┐
+│  wwwroot + DashboardWeb (Minimal API / Chart.js)│
+└─────────────────────────────────────────────────┘
 
 TimeTracker.Core — biblioteca compartilhada (SQLite, JSON, TrackingEngine)
+TimeTracker.Dashboard — endpoints + wwwroot (também rodável isolado em dev)
 ```
 
 | Camada | Tecnologia | Status |
 |--------|------------|--------|
-| Tracker | C# .NET 8 + WinForms (tray) | ✅ |
+| Tracker + Dashboard | C# .NET 8 WinForms + Kestrel (um processo) | ✅ |
 | Core | C# class library | ✅ |
-| Dashboard API | ASP.NET Core Minimal API | ✅ |
 | Dashboard UI | HTML + Chart.js (vanilla) | ✅ |
 | Dados | SQLite WAL + JSON | ✅ contrato mantido |
 
@@ -143,7 +142,7 @@ TimeTracker/
 
 | Item | Status |
 |------|--------|
-| Tracker inicia dashboard ASP.NET como subprocesso | ✅ `DashboardProcessService` |
+| Tracker inicia dashboard ASP.NET **in-process** (Kestrel) | ✅ (unificado; substitui subprocess) |
 | Porta única `8501` | ✅ |
 | WebView2 — janela nativa sem browser externo | ✅ |
 | CI release: `dotnet publish` substitui PyInstaller | ✅ |
@@ -166,7 +165,7 @@ TimeTracker/
 | `app_paths.py` | `AppPaths` (walk up até `TimeTracker.sln`) | 0 | ✅ |
 | `main.py` → tray | `TrayApplicationContext` | 0 | ✅ |
 | `main.py` → startup shortcut | `StartupShortcutService` | 0 | ✅ |
-| `main.py` → spawn Streamlit | `DashboardProcessService` | 3 | ✅ |
+| `main.py` → spawn Streamlit | Kestrel in-process (`DashboardWeb`) | 3+ | ✅ |
 | `main.py` → shutdown handler | `SystemEvents.SessionEnding` | 3 | ✅ |
 | `dashboard/data.py` | `ActivityQueryService` | 2 | ✅ |
 | `dashboard/utils.py` | `ActivityTextHelper` + `wwwroot/js/utils.js` | 2 | ✅ |
@@ -246,7 +245,7 @@ Marcar conforme for testando.
 | 2026-08-28 | Chart.js vanilla (sem React/Vue) | Dashboard local simples; evita toolchain frontend pesada |
 | 2026-08-28 | Monorepo (não repo novo) | Histórico, spec, convivência incremental |
 | 2026-08-28 | Remover Python na Fase 3 | Stack única C#; CI com `dotnet publish` |
-| 2026-08-28 | Release framework-dependent + Inno Setup | Runtime .NET compartilhado do sistema; Setup pequeno |
+| 2026-08-28 | Processo único Tracker+Kestrel | Elimina 2º exe; publish/instalação mais simples |
 | 2026-08-28 | Porta 8501 reservada ao dashboard .NET | Substitui Streamlit definitivamente |
 
 ---

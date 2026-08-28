@@ -59,7 +59,7 @@ Zip `*-portable-win-x64.zip` — exige .NET 8 Desktop + ASP.NET Core Runtime já
 
 ## ▶️ Como Usar
 
-Duplo clique em **`run.bat`** na pasta do projeto (ou `TimeTracker.Tracker.exe` na release).
+Duplo clique em **`run.bat`** na pasta do projeto (ou `TimeTracker.exe` na release).
 
 Isto irá:
 
@@ -85,8 +85,8 @@ TimeTracker/
 ├── run-dashboard.bat            # só dashboard (dev)
 ├── src/
 │   ├── TimeTracker.Core/        # SQLite, settings JSON, TrackingEngine
-│   ├── TimeTracker.Tracker/     # Win32, bandeja, startup, subprocess dashboard
-│   └── TimeTracker.Dashboard/   # ASP.NET Core + wwwroot (Chart.js)
+│   ├── TimeTracker.Tracker/     # Win32, bandeja, Kestrel in-process, WebView2
+│   └── TimeTracker.Dashboard/   # API + wwwroot (também isolado via run-dashboard.bat)
 ├── app_settings.example.json
 ├── productivity.db              # gerado em runtime (não versionado)
 └── app_settings.json            # personalizações (não versionado)

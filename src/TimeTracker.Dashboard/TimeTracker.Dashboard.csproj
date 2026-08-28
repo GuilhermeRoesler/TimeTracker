@@ -10,6 +10,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>..\..\assets\app.ico</ApplicationIcon>
     <ApplicationTitle>TimeTracker Pro</ApplicationTitle>
+    <!-- Evita empacotar wwwroot como RCL (_content/...); o Tracker copia wwwroot na raiz. -->
+    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
   </PropertyGroup>
 
 </Project>

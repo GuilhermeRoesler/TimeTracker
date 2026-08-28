@@ -28,8 +28,8 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 ```
 TimeTracker.sln
 ├── src/TimeTracker.Core/       → SQLite, settings JSON, TrackingEngine
-├── src/TimeTracker.Tracker/  → Win32, bandeja, startup .lnk, worker, subprocess dashboard
-└── src/TimeTracker.Dashboard/ → ASP.NET Minimal API + wwwroot (Chart.js)
+├── src/TimeTracker.Tracker/  → Win32, bandeja, startup, Kestrel in-process + WebView2
+└── src/TimeTracker.Dashboard/ → API endpoints + wwwroot (Chart.js); também rodável isolado em dev
 ```
 
 ### Responsabilidades por módulo
@@ -37,8 +37,8 @@ TimeTracker.sln
 | Módulo | Responsabilidade |
 |--------|------------------|
 | `src/TimeTracker.Core` | Contratos de dados, `ActivityRepository`, `SettingsStore`, `TrackingEngine`, `ActivityQueryService` |
-| `src/TimeTracker.Tracker` | Win32, bandeja WinForms, startup `.lnk`, hospeda worker, `DashboardProcessService` |
-| `src/TimeTracker.Dashboard` | API REST + frontend Chart.js (3 abas) |
+| `src/TimeTracker.Tracker` | Win32, bandeja WinForms, startup `.lnk`, worker, **hospeda dashboard na mesma processo** |
+| `src/TimeTracker.Dashboard` | `DashboardWeb` (Minimal API) + `wwwroot` Chart.js; `run-dashboard.bat` para dev isolado |
 
 ## Contratos de dados
 
@@ -87,7 +87,7 @@ Campos expostos por `ActivityQueryService`:
 - **Troca de foco:** salva sessão anterior e reinicia `start_time`.
 - **Shutdown:** `CancellationToken` ou `SystemEvents.SessionEnding` → flush da sessão ativa.
 - **Janelas protegidas:** fallback `app_name = "System/Protected"`.
-- **Dashboard:** `DashboardProcessService` inicia `TimeTracker.Dashboard` (dev: `dotnet run`; prod: exe publicado). UI abre em **WebView2** (fallback: browser externo).
+- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 (fallback: browser). `run-dashboard.bat` sobe só a API em dev.
 
 ## Comportamento do dashboard
 
@@ -169,6 +169,7 @@ dotnet build TimeTracker.sln
 | Data | Mudança |
 |------|---------|
 | 2026-08-28 | Ícone do produto (`assets/app.ico`): exe, bandeja, WebView2, favicon, Setup Inno; CI verifica presença |
+| 2026-08-28 | Processo único: Tracker hospeda Kestrel/dashboard in-process; exe publicado `TimeTracker.exe` |
 | 2026-08-28 | Instalador Inno Setup + publish framework-dependent; dados em `%LocalAppData%\TimeTracker Pro` |
 | 2026-08-28 | WebView2: janela nativa do dashboard; testes xUnit (`TimeTracker.Core.Tests`); CI build+test |
 | 2026-08-28 | Fase 3: remoção Python legado, CI `dotnet publish`, entry point único C#, handler shutdown Windows |

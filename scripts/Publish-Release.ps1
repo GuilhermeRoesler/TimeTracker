@@ -26,14 +26,8 @@ if (Test-Path $publishDir) {
 New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
 New-Item -ItemType Directory -Force -Path $installerOut | Out-Null
 
-Write-Host ">> Publicando Tracker (framework-dependent)..."
+Write-Host ">> Publicando TimeTracker (processo unico, framework-dependent)..."
 dotnet publish "src\TimeTracker.Tracker\TimeTracker.Tracker.csproj" `
-    -c Release -r win-x64 --self-contained false `
-    -o $publishDir
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-Write-Host ">> Publicando Dashboard (framework-dependent)..."
-dotnet publish "src\TimeTracker.Dashboard\TimeTracker.Dashboard.csproj" `
     -c Release -r win-x64 --self-contained false `
     -o $publishDir
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -45,6 +39,14 @@ if (Test-Path $devSettings) { Remove-Item $devSettings -Force }
 # WebView2 WPF não é usado (só WinForms)
 $wpf = Join-Path $publishDir "Microsoft.Web.WebView2.Wpf.dll"
 if (Test-Path $wpf) { Remove-Item $wpf -Force }
+# Apphost do projeto Dashboard (referência) — processo único é o Tracker
+@(
+    "TimeTracker.Dashboard.exe",
+    "TimeTracker.Dashboard.runtimeconfig.json"
+) | ForEach-Object {
+    $path = Join-Path $publishDir $_
+    if (Test-Path $path) { Remove-Item $path -Force }
+}
 
 $sizeMb = [math]::Round(((Get-ChildItem $publishDir -Recurse -File | Measure-Object Length -Sum).Sum / 1MB), 2)
 Write-Host ">> Publish OK: $publishDir ($sizeMb MB)"

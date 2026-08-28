@@ -1,13 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\TimeTracker.Core\TimeTracker.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
-  </ItemGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -17,10 +8,35 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>..\..\assets\app.ico</ApplicationIcon>
     <ApplicationTitle>TimeTracker Pro</ApplicationTitle>
+    <AssemblyName>TimeTracker</AssemblyName>
+    <!-- Evita conflito com entry WinForms (não usar top-level Program do template Web) -->
+    <EnableDefaultContentItems>true</EnableDefaultContentItems>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\assets\app.ico" Link="app.ico" CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="..\TimeTracker.Core\TimeTracker.Core.csproj" />
+    <ProjectReference Include="..\TimeTracker.Dashboard\TimeTracker.Dashboard.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\assets\app.ico" Link="app.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\TimeTracker.Dashboard\wwwroot\**\*">
+      <Link>wwwroot\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- Referência ao Dashboard copia o apphost; o release usa um único processo (Tracker). -->
+  <Target Name="RemoveDashboardAppHost" AfterTargets="Build">
+    <Delete Files="$(OutputPath)TimeTracker.Dashboard.exe;$(OutputPath)TimeTracker.Dashboard.runtimeconfig.json" TreatErrorsAsWarnings="true" />
+  </Target>
+  <Target Name="RemoveDashboardAppHostOnPublish" AfterTargets="Publish">
+    <Delete Files="$(PublishDir)TimeTracker.Dashboard.exe;$(PublishDir)TimeTracker.Dashboard.runtimeconfig.json" TreatErrorsAsWarnings="true" />
+  </Target>
 
 </Project>
