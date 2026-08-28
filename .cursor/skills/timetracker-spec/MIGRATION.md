@@ -145,12 +145,14 @@ TimeTracker/
 |------|--------|
 | Tracker inicia dashboard ASP.NET como subprocesso | ✅ `DashboardProcessService` |
 | Porta única `8501` | ✅ |
-| WebView2 (opcional) — janela nativa sem browser externo | ⬜ |
+| WebView2 — janela nativa sem browser externo | ✅ |
 | CI release: `dotnet publish` substitui PyInstaller | ✅ |
 | Remover `main.py`, `tracker.py`, `dashboard/`, `requirements.txt`, hooks Streamlit | ✅ |
 | Mover/atualizar README para stack final | ✅ |
 | Atualizar startup `.lnk` para exe C# publicado | ✅ |
 | Handler shutdown Windows (logoff/reboot) | ✅ |
+| Testes automatizados xUnit (`TimeTracker.Core.Tests`) | ✅ |
+| CI build + test (`.github/workflows/ci.yml`) | ✅ |
 
 ---
 
@@ -248,9 +250,8 @@ Marcar conforme for testando.
 
 ## Próximos passos (pós-migração)
 
-1. **WebView2** (opcional) — janela nativa sem browser externo
-2. Features de produto (export CSV, idle detection, etc.)
-3. Testes automatizados (`pytest` → xUnit para Core)
+1. Features de produto (export CSV, idle detection, filtro por categoria)
+2. Expandir cobertura de testes (API dashboard, integração end-to-end)
 
 ---
 

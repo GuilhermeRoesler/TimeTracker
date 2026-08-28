@@ -86,7 +86,7 @@ Campos expostos por `ActivityQueryService`:
 - **Troca de foco:** salva sessão anterior e reinicia `start_time`.
 - **Shutdown:** `CancellationToken` ou `SystemEvents.SessionEnding` → flush da sessão ativa.
 - **Janelas protegidas:** fallback `app_name = "System/Protected"`.
-- **Dashboard:** `DashboardProcessService` inicia `TimeTracker.Dashboard` (dev: `dotnet run`; prod: exe publicado).
+- **Dashboard:** `DashboardProcessService` inicia `TimeTracker.Dashboard` (dev: `dotnet run`; prod: exe publicado). UI abre em **WebView2** (fallback: browser externo).
 
 ## Comportamento do dashboard
 
@@ -167,6 +167,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | WebView2: janela nativa do dashboard; testes xUnit (`TimeTracker.Core.Tests`); CI build+test |
 | 2026-08-28 | Fase 3: remoção Python legado, CI `dotnet publish`, entry point único C#, handler shutdown Windows |
 | 2026-08-28 | Fase 2: dashboard ASP.NET + Chart.js (paridade Streamlit), `ActivityQueryService`, API REST |
 | 2026-08-28 | Documento de migração: `MIGRATION.md` (fases, progresso, mapa Python→C#, decisões) |

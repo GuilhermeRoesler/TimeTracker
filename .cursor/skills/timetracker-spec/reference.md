@@ -70,7 +70,7 @@ Documento completo: [MIGRATION.md](MIGRATION.md) — **Fase 3 concluída.**
 | 0 | Solution .NET, Core, tracker scaffold, dashboard esqueleto | ✅ |
 | 1 | Tracker C# no uso diário | ✅ |
 | 2 | Dashboard ASP.NET + Chart.js com paridade Streamlit | ✅ |
-| 3 | Integração única, CI .NET, remoção Python | ✅ |
+| 3 | Integração única, CI .NET, remoção Python, WebView2, testes | ✅ |
 
 ### Features de produto (pós-migração)
 
@@ -81,17 +81,32 @@ Documento completo: [MIGRATION.md](MIGRATION.md) — **Fase 3 concluída.**
 | Média | Metas diárias / alertas | Requer novo schema ou tabela de metas |
 | Média | Detecção de idle (AFK) | Pausar tracking quando sem input por N minutos |
 | Baixa | Suporte Linux/macOS | Fora do escopo Windows-only atual |
-| Baixa | WebView2 para dashboard | Janela nativa sem browser externo |
+| Baixa | WebView2 para dashboard | ✅ Janela nativa com fallback para browser |
 
 ### Implementado
 
 - Migração completa Python → C# (.NET 8)
 - Dashboard ASP.NET + Chart.js (3 abas, paridade Streamlit)
 - CI release: `dotnet publish` self-contained win-x64
+- WebView2 para dashboard + testes xUnit + CI build/test
 
 ## Testes
 
-**Estado atual:** sem suite automatizada. Testes manuais são o fluxo principal. Checklist em [MIGRATION.md](MIGRATION.md).
+**Estado atual:** suite xUnit em `tests/TimeTracker.Core.Tests` (Core). CI em `.github/workflows/ci.yml`.
+
+### Executar localmente
+
+```bash
+dotnet test TimeTracker.sln
+```
+
+### Cobertura atual
+
+- `ActivityTextHelper` — formatação e limpeza de títulos
+- `ActivityRepository` — filtro ≥1s, partição horária, queries
+- `SettingsStore` — persistência JSON snake_case, batch
+- `ActivityQueryService` — enriquecimento e filtros por data
+- `TrackingEngine` — flush em cancelamento e troca de janela
 
 ### Checklist manual — app completa
 
@@ -111,11 +126,10 @@ Documento completo: [MIGRATION.md](MIGRATION.md) — **Fase 3 concluída.**
 - [ ] Aba Detalhes: títulos limpos (`CleanWindowTitle`)
 - [ ] Personalizar Apps: salvar persiste em `app_settings.json`
 
-### Diretrizes para testes automatizados (futuro)
+### Expandir cobertura (futuro)
 
-- **Framework sugerido:** xUnit + testes de integração SQLite in-memory
-- **Priorizar:** `ActivityTextHelper`, `ActivityQueryService`, `TrackingEngine` (timestamps controlados)
-- **Evitar:** testes que dependam de janela ativa real ou bandeja do sistema
+- API dashboard (Minimal API end-to-end)
+- Evitar testes que dependam de janela ativa real, bandeja ou WebView2
 
 ## Deploy e distribuição
 

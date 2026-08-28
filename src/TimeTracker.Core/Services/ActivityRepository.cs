@@ -177,7 +177,7 @@ public sealed class ActivityRepository
 
     private SqliteConnection OpenConnection()
     {
-        var connection = new SqliteConnection($"Data Source={_dbPath}");
+        var connection = new SqliteConnection($"Data Source={_dbPath};Pooling=false");
         connection.Open();
         return connection;
     }

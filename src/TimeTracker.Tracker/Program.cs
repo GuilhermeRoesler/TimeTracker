@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -28,7 +27,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
             ContextMenuStrip = BuildMenu(),
         };
 
-        _notifyIcon.DoubleClick += (_, _) => OpenDashboard();
+        _notifyIcon.DoubleClick += (_, _) => DashboardWindowService.Open();
     }
 
     protected override void Dispose(bool disposing)
@@ -38,6 +37,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
             _shutdownCts.Cancel();
+            DashboardWindowService.Close();
             _dashboardProcess.Stop();
             _host.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
             _host.Dispose();
@@ -50,19 +50,10 @@ internal sealed class TrayApplicationContext : ApplicationContext
     private ContextMenuStrip BuildMenu()
     {
         var menu = new ContextMenuStrip();
-        menu.Items.Add("Abrir Dashboard", null, (_, _) => OpenDashboard());
+        menu.Items.Add("Abrir Dashboard", null, (_, _) => DashboardWindowService.Open());
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Sair", null, (_, _) => ExitThread());
         return menu;
-    }
-
-    private static void OpenDashboard()
-    {
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = AppConstants.DashboardUrl,
-            UseShellExecute = true,
-        });
     }
 
     private static Icon CreateTrayIcon()
