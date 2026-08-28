@@ -36,6 +36,7 @@ internal sealed class StartupShortcutService
             if (File.Exists(shortcutPath))
             {
                 dynamic existing = shell.CreateShortcut(shortcutPath);
+                var expectedIcon = $"{target},0";
                 needsWrite = !string.Equals(
                     NormalizePath(existing.Targetpath),
                     NormalizePath(target),
@@ -44,6 +45,10 @@ internal sealed class StartupShortcutService
                     || !string.Equals(
                         NormalizePath(existing.WorkingDirectory),
                         NormalizePath(appDir),
+                        StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(
+                        (string)existing.IconLocation,
+                        expectedIcon,
                         StringComparison.OrdinalIgnoreCase);
             }
 
@@ -55,6 +60,7 @@ internal sealed class StartupShortcutService
                 shortcut.WorkingDirectory = appDir;
                 shortcut.WindowStyle = 7;
                 shortcut.Description = AppConstants.AppDisplayName;
+                shortcut.IconLocation = $"{target},0";
                 shortcut.Save();
             }
 

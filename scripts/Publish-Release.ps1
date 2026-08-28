@@ -12,6 +12,11 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
+$appIcon = Join-Path $root "assets\app.ico"
+if (-not (Test-Path $appIcon)) {
+    throw "Icone do app nao encontrado: $appIcon (gere com scripts\Convert-AppIcon.ps1)"
+}
+
 $publishDir = Join-Path $root "artifacts\publish"
 $installerOut = Join-Path $root "artifacts\installer"
 

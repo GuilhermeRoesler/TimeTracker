@@ -21,8 +21,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
         _notifyIcon = new NotifyIcon
         {
-            Icon = CreateTrayIcon(),
-            Text = "Time Tracker",
+            Icon = AppIconLoader.Load(),
+            Text = AppConstants.AppDisplayName,
             Visible = true,
             ContextMenuStrip = BuildMenu(),
         };
@@ -56,18 +56,6 @@ internal sealed class TrayApplicationContext : ApplicationContext
         return menu;
     }
 
-    private static Icon CreateTrayIcon()
-    {
-        const int size = 64;
-        using var bitmap = new Bitmap(size, size);
-        using var graphics = Graphics.FromImage(bitmap);
-
-        graphics.Clear(Color.FromArgb(0, 128, 255));
-        graphics.FillRectangle(Brushes.White, size / 2, 0, size / 2, size / 2);
-        graphics.FillRectangle(Brushes.White, 0, size / 2, size / 2, size / 2);
-
-        return Icon.FromHandle(bitmap.GetHicon());
-    }
 }
 
 internal static class Program

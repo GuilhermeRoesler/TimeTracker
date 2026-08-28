@@ -10,6 +10,7 @@ internal sealed class DashboardWindow : Form
     public DashboardWindow()
     {
         Text = AppConstants.AppDisplayName;
+        Icon = AppIconLoader.Load();
         Width = 1280;
         Height = 800;
         StartPosition = FormStartPosition.CenterScreen;

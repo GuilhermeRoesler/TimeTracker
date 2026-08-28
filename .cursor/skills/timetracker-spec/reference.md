@@ -149,6 +149,14 @@ Startup automático via `StartupShortcutService` na primeira execução.
 .\scripts\Publish-Release.ps1 -Version "1.0.0"
 ```
 
+Ícone do produto (`assets/app.ico`, fonte `assets/app-icon.png`):
+
+- Embutido nos exes via `ApplicationIcon` (Tracker + Dashboard)
+- Bandeja e janela WebView2 (`AppIconLoader`)
+- Favicon do dashboard (`wwwroot/favicon.ico`)
+- `SetupIconFile` do Inno Setup
+- Regenerar: `powershell.exe -File .\scripts\Convert-AppIcon.ps1`
+
 Saída:
 
 - `artifacts/publish/` — apps framework-dependent (sem runtime embutido)

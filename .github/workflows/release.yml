@@ -31,6 +31,13 @@ jobs:
             echo "tag=dev-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Verify app icon
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "assets/app.ico")) {
+            throw "assets/app.ico ausente — rode scripts/Convert-AppIcon.ps1"
+          }
+
       - name: Install Inno Setup
         shell: pwsh
         run: |

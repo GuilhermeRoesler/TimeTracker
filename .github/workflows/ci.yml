@@ -18,6 +18,13 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Verify app icon
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "assets/app.ico")) {
+            throw "assets/app.ico ausente — rode scripts/Convert-AppIcon.ps1"
+          }
+
       - name: Restore
         run: dotnet restore TimeTracker.sln
 

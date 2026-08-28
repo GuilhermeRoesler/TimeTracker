@@ -17,6 +17,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Entry point | `run.bat` / `run-tracker.bat` → `src/TimeTracker.Tracker` |
 | Dashboard | ASP.NET + Chart.js em `http://localhost:8501` |
 | Dados locais | Dev: raiz do repo · Instalado: `%LocalAppData%\TimeTracker Pro\` |
+| Ícone | `assets/app.ico` (fonte `app-icon.png`) — exe, bandeja, favicon, Setup |
 
 **Propósito:** monitorar a janela ativa do Windows, registrar tempo por app/título, e exibir análises em dashboard web com personalização de apps.
 
@@ -167,6 +168,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Ícone do produto (`assets/app.ico`): exe, bandeja, WebView2, favicon, Setup Inno; CI verifica presença |
 | 2026-08-28 | Instalador Inno Setup + publish framework-dependent; dados em `%LocalAppData%\TimeTracker Pro` |
 | 2026-08-28 | WebView2: janela nativa do dashboard; testes xUnit (`TimeTracker.Core.Tests`); CI build+test |
 | 2026-08-28 | Fase 3: remoção Python legado, CI `dotnet publish`, entry point único C#, handler shutdown Windows |
