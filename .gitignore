@@ -8,3 +8,11 @@ productivity.db
 *.db
 
 app_settings.json
+
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+publish/

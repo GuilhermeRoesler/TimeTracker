@@ -1,0 +1,40 @@
+:root {
+  color-scheme: light dark;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  padding: 2rem;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+header h1 {
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  margin: 0 0 2rem;
+  color: #94a3b8;
+}
+
+.card {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+  max-width: 720px;
+}
+
+.hint {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+code {
+  background: #334155;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}

@@ -12,15 +12,31 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Item | Valor |
 |------|-------|
 | Nome | TimeTracker Pro |
-| Plataforma | **Windows apenas** (`pywin32`, system tray, startup `.lnk`) |
-| Linguagem | Python 3.8+ |
-| Entry point | `main.py` (ou duplo clique em `run.bat`) |
-| Dashboard | Streamlit em `http://localhost:8501` |
+| Plataforma | **Windows apenas** |
+| Stack alvo | C# (.NET 8) tracker + ASP.NET Core + HTML/Chart.js |
+| Stack legada (convivência) | Python 3.8+ (`tracker.py`, Streamlit) |
+| Entry point legado | `main.py` / `run.bat` |
+| Entry point C# | `run-tracker.bat` → `src/TimeTracker.Tracker` |
+| Dashboard legado | Streamlit em `http://localhost:8501` |
+| Dashboard alvo | ASP.NET em `src/TimeTracker.Dashboard` (esqueleto) |
 | Dados locais | `productivity.db` (SQLite WAL) + `app_settings.json` |
 
 **Propósito:** monitorar a janela ativa do Windows, registrar tempo por app/título, e exibir análises em dashboard web com personalização de apps.
 
 ## Arquitetura
+
+### Alvo (.NET — migração em andamento)
+
+```
+TimeTracker.sln
+├── src/TimeTracker.Core/       → SQLite, settings JSON, TrackingEngine
+├── src/TimeTracker.Tracker/  → Win32, bandeja, startup .lnk, worker
+└── src/TimeTracker.Dashboard/ → ASP.NET Minimal API + wwwroot (Chart.js)
+```
+
+**Contrato compartilhado:** `productivity.db` e `app_settings.json` na raiz do projeto (ou pasta do exe). Python e C# leem/escrevem o mesmo formato durante a transição.
+
+### Legado (Python)
 
 ```
 main.py (AppOrchestrator)
@@ -33,17 +49,13 @@ main.py (AppOrchestrator)
 
 | Módulo | Responsabilidade |
 |--------|------------------|
-| `main.py` | Orquestração, shutdown graceful, startup Windows, ícone bandeja; modo frozen PyInstaller |
-| `app_paths.py` | `get_app_dir` / `get_resource_path` (código-fonte ou exe) |
-| `tracker.py` | Captura `app_name` + `window_title`, loop de polling, CRUD settings |
-| `dashboard/app.py` | Entry Streamlit, tabs, wiring de filtros e dados |
-| `dashboard/data.py` | Query SQLite → DataFrame com colunas derivadas |
-| `dashboard/filters.py` | Filtro de data (atalhos, navegação, calendário) |
-| `dashboard/overview.py` | Métricas, gráficos, tabela histórica |
-| `dashboard/details.py` | Drill-down por app (abas/janelas) |
-| `dashboard/charts.py` | Funções Plotly puras (sem Streamlit) |
-| `dashboard/utils.py` | Formatação de tempo, limpeza de títulos, color map |
-| `dashboard/settings.py` | UI de personalização de apps |
+| `src/TimeTracker.Core` | Contratos de dados, `ActivityRepository`, `SettingsStore`, `TrackingEngine` |
+| `src/TimeTracker.Tracker` | Win32, bandeja WinForms, startup `.lnk`, hospeda worker |
+| `src/TimeTracker.Dashboard` | API REST (esqueleto) + frontend estático Chart.js |
+| `main.py` | *(legado)* Orquestração Python, shutdown graceful, startup Windows |
+| `app_paths.py` | *(legado)* `get_app_dir` / `get_resource_path` |
+| `tracker.py` | *(legado)* Captura, polling, CRUD settings |
+| `dashboard/` | *(legado)* Dashboard Streamlit |
 
 **Regra de separação:** lógica de gráfico em `dashboard/charts.py`; UI Streamlit nas abas; persistência em `tracker.py`.
 
@@ -158,6 +170,18 @@ Colunas esperadas após `load_activity_data()`:
 
 ### Testar localmente
 
+**C# (Fase 1 — tracker nativo):**
+
+```bash
+run-tracker.bat                              # bandeja + monitoramento C#
+dotnet run --project src/TimeTracker.Tracker # equivalente manual
+run-dashboard.bat                            # API + HTML esqueleto (porta dev)
+```
+
+Convivência com Python: rode `run-tracker.bat` **ou** `python main.py` (não os dois trackers ao mesmo tempo). O dashboard Streamlit continua em `run.bat` / `python main.py`.
+
+**Python (legado):**
+
 ```bash
 pip install -r requirements.txt
 run.bat                   # Windows: venv + deps + app (duplo clique)
@@ -182,6 +206,7 @@ streamlit run dashboard/app.py  # apenas dashboard (requer DB com dados)
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Migração Fase 0: `TimeTracker.sln`, `TimeTracker.Core`, `TimeTracker.Tracker`, esqueleto `TimeTracker.Dashboard` |
 | 2026-08-28 | `run.bat` Windows: venv, dependências e launch por duplo clique |
 | 2026-08-28 | Dashboard reorganizado em pacote `dashboard/` (`app.py`, `charts.py`, etc.) |
 | 2026-08-27 | Release CI: PyInstaller onedir + workflow `.github/workflows/release.yml`; `app_paths.py` e suporte `sys.frozen` |

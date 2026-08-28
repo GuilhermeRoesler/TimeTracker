@@ -18,10 +18,27 @@ O **TimeTracker** é uma aplicação para Windows desenvolvida em Python que mon
 
 ## 🛠️ Requisitos
 
-- **Sistema Operativo**: Windows (devido ao uso das bibliotecas `pywin32` para captura de janelas).
-- **Python**: Versão 3.8 ou superior recomendada.
+- **Sistema Operativo**: Windows.
+- **Python** (stack legada): 3.8+ — ver `requirements.txt`.
+- **.NET SDK** (stack nova): 8.0+ — [download](https://dotnet.microsoft.com/download).
 
 ## 📦 Instalação
+
+### Stack C# (migração — Fase 1)
+
+1. Instale o [.NET SDK 8](https://dotnet.microsoft.com/download).
+2. Na raiz do repositório:
+
+```bash
+dotnet build TimeTracker.sln
+```
+
+3. Execute o tracker nativo: duplo clique em `run-tracker.bat` (ícone na bandeja).
+4. Para o dashboard Streamlit (ainda completo), use `run.bat` ou inicie o Streamlit manualmente — ver secção abaixo.
+
+> Durante a migração, **não execute dois trackers em simultâneo** (`run-tracker.bat` e `python main.py`). Ambos gravam no mesmo `productivity.db`.
+
+### Stack Python (legada — ainda funcional)
 
 1. Clone o repositório ou descarregue os ficheiros.
 2. Instale as dependências listadas no `requirements.txt`:
@@ -62,6 +79,17 @@ Isto irá:
 - **Personalizar Apps**: Na aba dedicada, mude nomes de exibição, cores e categorias.
 
 ## 📂 Estrutura do Projeto
+
+### .NET (`src/`)
+
+- `TimeTracker.sln`: Solution com os três projetos abaixo.
+- `src/TimeTracker.Core/`: SQLite, settings JSON, motor de polling (`TrackingEngine`).
+- `src/TimeTracker.Tracker/`: Captura Win32, bandeja do sistema, atalho de startup.
+- `src/TimeTracker.Dashboard/`: ASP.NET Core + `wwwroot/` (esqueleto Chart.js).
+- `run-tracker.bat`: Inicia o tracker C# (duplo clique).
+- `run-dashboard.bat`: Inicia o dashboard web .NET (dev).
+
+### Python (legado)
 
 - `run.bat`: Atalho Windows — cria `venv`, instala dependências e inicia o app (duplo clique).
 - `main.py`: Orquestrador principal. Inicia o tracker, o dashboard e o ícone da bandeja.

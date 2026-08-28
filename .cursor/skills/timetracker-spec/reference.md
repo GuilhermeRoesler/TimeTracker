@@ -9,9 +9,25 @@
 | `DASHBOARD_PORT` | `main.py` | `8501` |
 | `DASHBOARD_HOST` | `main.py` | `"localhost"` |
 | `APP_NAME` | `main.py` | `"TimeTracker Pro"` |
-| `poll_interval` | `tracker.run()` | `5.0` (segundos) |
+| `poll_interval` | `tracker.run()` / `TrackingEngine` | `5.0` (segundos) |
 
-## API — `ProductivityTracker`
+### C# (`TimeTracker.Core`)
+
+| Constante | Classe | Valor |
+|-----------|--------|-------|
+| `DbFileName` | `AppConstants` | `"productivity.db"` |
+| `SettingsFileName` | `AppConstants` | `"app_settings.json"` |
+| `DefaultPollIntervalSeconds` | `AppConstants` | `5.0` |
+| `DashboardPort` | `AppConstants` | `8501` (Streamlit durante Fase 1) |
+
+| Classe | Responsabilidade |
+|--------|------------------|
+| `ActivityRepository` | Init WAL, `SaveActivity`, `GetAllApps` |
+| `SettingsStore` | Load/save `app_settings.json`, `UpdateAppSetting` |
+| `TrackingEngine` | Loop de polling via `IActiveWindowProvider` |
+| `Win32ActiveWindowProvider` | Captura janela ativa (projeto Tracker) |
+
+## API — `ProductivityTracker` *(Python legado)*
 
 | Método | Descrição |
 |--------|-----------|

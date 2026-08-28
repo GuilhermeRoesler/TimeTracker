@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TimeTracker Pro</title>
+  <link rel="stylesheet" href="css/site.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>TimeTracker Pro</h1>
+    <p class="subtitle">Dashboard web — migração em andamento</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Status</h2>
+      <p id="health-status">Verificando API...</p>
+      <p class="hint">
+        Durante a Fase 1, use o dashboard Streamlit (<code>run.bat</code> ou <code>python main.py</code>)
+        enquanto o tracker C# grava no mesmo <code>productivity.db</code>.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Próximos passos</h2>
+      <ul>
+        <li>Visão Geral — métricas, donut, timeline, ranking</li>
+        <li>Detalhes por App</li>
+        <li>Personalizar Apps</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
