@@ -1,6 +1,9 @@
 # TimeTracker - Monitor de Produtividade Pessoal
 
-O **TimeTracker** é uma aplicação para Windows desenvolvida em Python que monitoriza automaticamente a janela ativa do computador, registando quanto tempo é gasto em cada aplicação e site. O projeto inclui um dashboard interativo para análise de dados e gestão de categorias.
+O **TimeTracker** é uma aplicação para Windows que monitoriza automaticamente a janela ativa do computador, registando quanto tempo é gasto em cada aplicação e site. O projeto inclui um dashboard interativo para análise de dados e gestão de categorias.
+
+> **Migração de stack em andamento:** Python/Streamlit → C#/ASP.NET Core + Chart.js.  
+> Documento de fases, progresso e decisões: [`.cursor/skills/timetracker-spec/MIGRATION.md`](.cursor/skills/timetracker-spec/MIGRATION.md)
 
 ![](images/dashboard.png)
 
@@ -110,5 +113,7 @@ Isto irá:
 
 ## 📝 Notas
 
+- **Migração:** consulte [MIGRATION.md](.cursor/skills/timetracker-spec/MIGRATION.md) para fases, progresso e regras de convivência entre stacks.
+- Durante a Fase 1, use `run-tracker.bat` (C#) **ou** `run.bat` (Python) — nunca os dois trackers em simultâneo.
 - Ao fechar a aplicação pelo "X" do terminal, o processo pode continuar a correr na bandeja. Use a opção "Sair" no ícone da bandeja para encerrar completamente.
 - A base de dados utiliza o modo WAL (Write-Ahead Logging) para melhor performance e concorrência.

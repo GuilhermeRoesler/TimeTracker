@@ -106,6 +106,19 @@ Pillow>=11.1.0
 
 ## Roadmap
 
+### Migração de stack (prioridade atual)
+
+Documento completo: [MIGRATION.md](MIGRATION.md)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| 0 | Solution .NET, Core, tracker scaffold, dashboard esqueleto | ✅ |
+| 1 | Tracker C# no uso diário; Streamlit como dashboard | 🔶 |
+| 2 | Dashboard ASP.NET + Chart.js com paridade Streamlit | ⬜ |
+| 3 | Integração única, CI .NET, remoção Python | ⬜ |
+
+### Features de produto (pós-migração ou paralelo)
+
 Prioridade sugerida. Mover para "Implementado" ao concluir e atualizar o changelog do spec.
 
 | Prioridade | Feature | Notas |
@@ -114,21 +127,29 @@ Prioridade sugerida. Mover para "Implementado" ao concluir e atualizar o changel
 | Alta | Exportação CSV/JSON | Dados do dia filtrado ou intervalo customizado |
 | Média | Metas diárias / alertas | Requer novo schema ou tabela de metas |
 | Média | Detecção de idle (AFK) | Pausar tracking quando sem input por N minutos |
-| Baixa | Suporte Linux/macOS | Substituir `pywin32` por APIs nativas por SO |
-| Baixa | API REST local | Expor dados para integrações externas |
-| Baixa | Empacotamento `.exe` | ~~PyInstaller~~ → ver Implementado |
+| Baixa | Suporte Linux/macOS | Fora do escopo Windows-only atual |
+| Baixa | WebView2 para dashboard | Janela nativa sem browser externo |
 
 ### Implementado
 
 - Empacotamento Windows com PyInstaller (`timetracker.spec`) + release via GitHub Actions
+- Scaffold migração .NET: `TimeTracker.sln`, Core, Tracker, Dashboard esqueleto (Fase 0)
 
 ## Testes
 
-**Estado atual:** sem suite automatizada. Testes manuais são o fluxo principal.
+**Estado atual:** sem suite automatizada. Testes manuais são o fluxo principal. Checklists de migração em [MIGRATION.md](MIGRATION.md).
 
-### Checklist manual — tracker
+### Checklist manual — tracker C# (Fase 1)
 
-- [ ] `python tracker.py` grava em `productivity.db` ao trocar de janela
+Ver checklist completo em [MIGRATION.md](MIGRATION.md).
+
+- [ ] `run-tracker.bat` grava em `productivity.db` ao trocar de janela
+- [ ] Streamlit lê dados gravados pelo tracker C#
+- [ ] Sessões < 1s não aparecem no banco
+- [ ] Sessão que cruza hora cheia gera múltiplos registros
+- [ ] "Sair" na bandeja faz flush da sessão ativa
+
+### Checklist manual — tracker Python (legado)
 - [ ] Sessões < 1s não aparecem no banco
 - [ ] Sessão que cruza hora cheia gera múltiplos registros
 - [ ] `stop_event` faz flush da sessão ativa ao encerrar

@@ -1,6 +1,6 @@
 ---
 name: timetracker-spec
-description: Especificações vivas do TimeTracker Pro — monitor de produtividade Windows com tracker em segundo plano, SQLite e dashboard Streamlit. Use ao implementar features, corrigir bugs, refatorar ou revisar qualquer código deste repositório.
+description: Especificações vivas do TimeTracker Pro — monitor de produtividade Windows. Migração em andamento de Python/Streamlit para C#/ASP.NET Core. Use ao implementar features, corrigir bugs, refatorar ou revisar qualquer código deste repositório.
 ---
 
 # TimeTracker Pro — Especificações Vivas
@@ -22,6 +22,9 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Dados locais | `productivity.db` (SQLite WAL) + `app_settings.json` |
 
 **Propósito:** monitorar a janela ativa do Windows, registrar tempo por app/título, e exibir análises em dashboard web com personalização de apps.
+
+> **Migração de stack em andamento.** Progresso, fases e decisões: [MIGRATION.md](MIGRATION.md)  
+> **Fase atual:** 0 ✅ · Fase 1 🔶 (tracker C# operacional; dashboard ainda Streamlit)
 
 ## Arquitetura
 
@@ -206,6 +209,7 @@ streamlit run dashboard/app.py  # apenas dashboard (requer DB com dados)
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Documento de migração: `MIGRATION.md` (fases, progresso, mapa Python→C#, decisões) |
 | 2026-08-28 | Migração Fase 0: `TimeTracker.sln`, `TimeTracker.Core`, `TimeTracker.Tracker`, esqueleto `TimeTracker.Dashboard` |
 | 2026-08-28 | `run.bat` Windows: venv, dependências e launch por duplo clique |
 | 2026-08-28 | Dashboard reorganizado em pacote `dashboard/` (`app.py`, `charts.py`, etc.) |
@@ -216,6 +220,7 @@ streamlit run dashboard/app.py  # apenas dashboard (requer DB com dados)
 
 ## Recursos adicionais
 
+- **Migração de stack (fases, progresso, decisões):** [MIGRATION.md](MIGRATION.md)
 - Detalhes de API, **roadmap**, **testes** e **deploy**: [reference.md](reference.md)
 - README do usuário: [README.md](../../README.md)
 - Regra Cursor que aponta para este spec: [.cursor/rules/timetracker-spec.mdc](../../rules/timetracker-spec.mdc)
