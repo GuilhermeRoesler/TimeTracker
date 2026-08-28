@@ -15,11 +15,10 @@ Antes de implementar features, corrigir bugs ou refatorar neste repositório:
 ## Regras inegociáveis
 
 - Plataforma **Windows-only**; não introduzir abstrações cross-platform sem decisão explícita.
-- **Migração em andamento:** persistência em `TimeTracker.Core` (C#) e `tracker.py` (legado); gráficos alvo em Chart.js; legado em `dashboard/charts.py`.
+- Migração **concluída (Fase 3).** Persistência em `TimeTracker.Core` (C#). Gráficos em Chart.js.
 - UI e mensagens em **português**.
 - `app_settings.json` e `productivity.db` são locais — nunca versionar.
-- Respeitar contratos: schema `activity_log`, formato JSON de apps, colunas do DataFrame.
-- **Não rodar dois trackers** (C# + Python) ao mesmo tempo.
+- Respeitar contratos: schema `activity_log`, formato JSON de apps, colunas enriquecidas da API.
 
 ## Ao concluir uma tarefa
 

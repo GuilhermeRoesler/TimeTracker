@@ -2,17 +2,14 @@
 
 O **TimeTracker** é uma aplicação para Windows que monitoriza automaticamente a janela ativa do computador, registando quanto tempo é gasto em cada aplicação e site. O projeto inclui um dashboard interativo para análise de dados e gestão de categorias.
 
-> **Migração de stack em andamento:** Python/Streamlit → C#/ASP.NET Core + Chart.js.  
-> Documento de fases, progresso e decisões: [`.cursor/skills/timetracker-spec/MIGRATION.md`](.cursor/skills/timetracker-spec/MIGRATION.md)
-
 ![](images/dashboard.png)
 
 ## 🚀 Funcionalidades
 
 - **Rastreio Automático**: Monitoriza a janela ativa em segundo plano e regista o tempo de uso na base de dados SQLite local.
-- **Dashboard Interativo**: Interface web construída com Streamlit que oferece:
+- **Dashboard Interativo**: Interface web com Chart.js que oferece:
   - Métricas de tempo total e foco.
-  - Gráficos de distribuição (Pizza) e linha do tempo (Barras) usando Plotly.
+  - Gráficos de distribuição (donut) e linha do tempo (barras empilhadas).
   - Ranking detalhado de aplicações mais usadas.
   - Análise específica por abas (ex: detalhar tempo gasto em abas do Opera/Chrome).
 - **Personalização**: Permite renomear aplicações, atribuir cores e definir categorias (ex: Trabalho, Estudo, Lazer).
@@ -21,55 +18,38 @@ O **TimeTracker** é uma aplicação para Windows que monitoriza automaticamente
 
 ## 🛠️ Requisitos
 
-- **Sistema Operativo**: Windows.
-- **Python** (stack legada): 3.8+ — ver `requirements.txt`.
-- **.NET SDK** (stack nova): 8.0+ — [download](https://dotnet.microsoft.com/download).
+- **Sistema Operativo**: Windows 10 ou superior.
+- **.NET SDK 8.0+** (desenvolvimento) — [download](https://dotnet.microsoft.com/download).
+- **.NET Runtime 8.0+** (apenas se usar build framework-dependent; releases são self-contained).
 
 ## 📦 Instalação
 
-### Stack C# (recomendada)
+### Desenvolvimento (código-fonte)
 
 1. Instale o [.NET SDK 8](https://dotnet.microsoft.com/download).
-2. Duplo clique em **`run-tracker.bat`** — inicia tracker + dashboard em `http://localhost:8501`.
+2. Duplo clique em **`run.bat`** (ou `run-tracker.bat`) — inicia tracker + dashboard em `http://localhost:8501`.
 3. Use o ícone na bandeja do sistema para abrir o dashboard ou encerrar.
 
 ```bash
 dotnet build TimeTracker.sln
-dotnet run --project src/TimeTracker.Tracker   # equivalente ao run-tracker.bat
+dotnet run --project src/TimeTracker.Tracker   # equivalente ao run.bat
 dotnet run --project src/TimeTracker.Dashboard # só o dashboard (dev)
 ```
 
-> **Não execute** `run-tracker.bat` e `run.bat` (Python) ao mesmo tempo — ambos gravam no mesmo `productivity.db`.
+### Release (binário publicado)
 
-### Stack Python (legada)
-
-1. Clone o repositório ou descarregue os ficheiros.
-2. Instale as dependências listadas no `requirements.txt`:
-
-```bash
-pip install -r requirements.txt
-```
-
-3. (Opcional) Copie `app_settings.example.json` para `app_settings.json` para começar com configurações de exemplo. O ficheiro é criado automaticamente na primeira personalização de apps.
-
-> **Nota**: As principais bibliotecas incluem `streamlit`, `pandas`, `pywin32`, `plotly`, `pystray` e `Pillow`.
+1. Descarregue o zip da [última release](https://github.com/) (tag `v*`).
+2. Extraia numa pasta à sua escolha.
+3. Execute `TimeTracker.Tracker.exe` — o dashboard inicia automaticamente na porta 8501.
 
 ## ▶️ Como Usar
 
-Para iniciar a aplicação, dê **duplo clique** em `run.bat` na pasta do projeto.
-
-O script cria o ambiente virtual (`venv/`), instala as dependências e inicia o app. Na primeira execução pode demorar um pouco mais.
-
-Alternativa manual:
-
-```bash
-python main.py
-```
+Duplo clique em **`run.bat`** na pasta do projeto (ou `TimeTracker.Tracker.exe` na release).
 
 Isto irá:
 
-1. Iniciar o processo de rastreio (`tracker.py`) em segundo plano.
-2. Lançar o servidor Streamlit (`dashboard/app.py`).
+1. Iniciar o monitoramento de janelas ativas em segundo plano.
+2. Lançar o servidor do dashboard (ASP.NET Core).
 3. Adicionar um ícone à bandeja do sistema (perto do relógio).
 4. Registar um atalho na pasta de startup do Windows (se ainda não existir).
 5. O dashboard fica disponível em `http://localhost:8501` (abra pelo ícone na bandeja do sistema).
@@ -83,37 +63,22 @@ Isto irá:
 
 ## 📂 Estrutura do Projeto
 
-### .NET (`src/`)
-
-- `TimeTracker.sln`: Solution com os três projetos abaixo.
-- `src/TimeTracker.Core/`: SQLite, settings JSON, motor de polling (`TrackingEngine`).
-- `src/TimeTracker.Tracker/`: Captura Win32, bandeja do sistema, atalho de startup.
-- `src/TimeTracker.Dashboard/`: ASP.NET Core + `wwwroot/` (esqueleto Chart.js).
-- `run-tracker.bat`: Inicia o tracker C# (duplo clique).
-- `run-dashboard.bat`: Inicia o dashboard web .NET (dev).
-
-### Python (legado)
-
-- `run.bat`: Atalho Windows — cria `venv`, instala dependências e inicia o app (duplo clique).
-- `main.py`: Orquestrador principal. Inicia o tracker, o dashboard e o ícone da bandeja.
-- `tracker.py`: Captura a janela ativa, grava atividades no SQLite e gere `app_settings.json`.
-- `app_paths.py`: Caminhos da aplicação (código-fonte ou executável PyInstaller).
-- `dashboard/`: Pacote do dashboard Streamlit.
-  - `app.py`: Ponto de entrada do dashboard.
-  - `data.py`: Carregamento e pré-processamento dos dados.
-  - `filters.py`: Filtros da barra lateral.
-  - `overview.py`: Aba de visão geral.
-  - `details.py`: Aba de detalhes por app.
-  - `charts.py`: Gráficos Plotly reutilizáveis.
-  - `utils.py`: Funções auxiliares de formatação e cores.
-  - `settings.py`: Aba de personalização de apps.
-- `app_settings.example.json`: Exemplo de configurações de apps.
-- `app_settings.json`: Configurações personalizadas dos apps (nome, cor, categoria) — local, não versionado.
-- `productivity.db`: Base de dados SQLite com registos de atividade (gerada automaticamente na primeira execução).
+```
+TimeTracker/
+├── TimeTracker.sln
+├── run.bat / run-tracker.bat    # entry point (duplo clique)
+├── run-dashboard.bat            # só dashboard (dev)
+├── src/
+│   ├── TimeTracker.Core/        # SQLite, settings JSON, TrackingEngine
+│   ├── TimeTracker.Tracker/     # Win32, bandeja, startup, subprocess dashboard
+│   └── TimeTracker.Dashboard/   # ASP.NET Core + wwwroot (Chart.js)
+├── app_settings.example.json
+├── productivity.db              # gerado em runtime (não versionado)
+└── app_settings.json            # personalizações (não versionado)
+```
 
 ## 📝 Notas
 
-- **Migração:** consulte [MIGRATION.md](.cursor/skills/timetracker-spec/MIGRATION.md) para fases, progresso e regras de convivência entre stacks.
-- Durante a Fase 1, use `run-tracker.bat` (C#) **ou** `run.bat` (Python) — nunca os dois trackers em simultâneo.
-- Ao fechar a aplicação pelo "X" do terminal, o processo pode continuar a correr na bandeja. Use a opção "Sair" no ícone da bandeja para encerrar completamente.
 - A base de dados utiliza o modo WAL (Write-Ahead Logging) para melhor performance e concorrência.
+- Use a opção **"Sair"** no ícone da bandeja para encerrar completamente (tracker + dashboard).
+- Documentação técnica: [`.cursor/skills/timetracker-spec/`](.cursor/skills/timetracker-spec/).

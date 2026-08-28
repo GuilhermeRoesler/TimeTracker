@@ -3,8 +3,8 @@
 Documento vivo do processo de migração **Python/Streamlit → C#/ASP.NET Core + Chart.js**.
 
 **Última atualização:** 2026-08-28  
-**Fase atual:** Fase 2 concluída · Fase 3 em andamento  
-**Commit de referência:** Fase 2 — dashboard ASP.NET + Chart.js com paridade Streamlit
+**Fase atual:** Fase 3 concluída  
+**Commit de referência:** Fase 3 — remoção Python, CI dotnet publish, entry point único C#
 
 ---
 
@@ -32,6 +32,7 @@ O stack Python foi excelente para **validar o produto** (~900 linhas, dashboard 
 │  • NotifyIcon — bandeja                 │
 │  • Startup .lnk                         │
 │  • BackgroundService — polling 5s       │
+│  • DashboardProcessService — subprocess │
 └──────────────────┬──────────────────────┘
                    │ productivity.db
                    │ app_settings.json
@@ -58,32 +59,20 @@ TimeTracker.Core — biblioteca compartilhada (SQLite, JSON, TrackingEngine)
 
 ## Estratégia de repositório
 
-**Mesmo repo, monorepo.** Não criar repositório separado.
-
-| Motivo | Detalhe |
-|--------|---------|
-| Histórico | Issues, tags, CI existentes |
-| Spec | `.cursor/skills/timetracker-spec/` continua válido |
-| Convivência | Python e C# paralelos por fases |
-| Contrato | Mesmo `productivity.db` e `app_settings.json` |
+**Mesmo repo, monorepo.** Python legado removido na Fase 3.
 
 **Estrutura atual:**
 
 ```
 TimeTracker/
 ├── TimeTracker.sln
-├── run-tracker.bat              # tracker C#
+├── run.bat / run-tracker.bat    # entry point C#
 ├── run-dashboard.bat            # dashboard .NET (dev)
-├── run.bat                      # app Python legada (completa)
-├── main.py, tracker.py          # legado — remover na Fase 3
-├── dashboard/                   # legado Streamlit — remover na Fase 3
 └── src/
     ├── TimeTracker.Core/
     ├── TimeTracker.Tracker/
     └── TimeTracker.Dashboard/
 ```
-
-Python **não** foi movido para `legacy/` ainda — continua na raiz e funcional.
 
 ---
 
@@ -124,9 +113,9 @@ Python **não** foi movido para `legacy/` ainda — continua na raiz e funcional
 | Resolução de `AppDir` (dev: raiz do repo; prod: pasta do exe) | ✅ |
 | Bandeja abre dashboard (`localhost:8501`) | ✅ |
 | Shutdown graceful (flush sessão ativa) | ✅ via `CancellationToken` |
-| Handler shutdown Windows (logoff/reboot) | ⬜ |
+| Handler shutdown Windows (logoff/reboot) | ✅ via `SystemEvents.SessionEnding` |
 | Testes manuais documentados | 🔶 checklist abaixo |
-| CI: build .NET no GitHub Actions | ⬜ |
+| CI: build .NET no GitHub Actions | ✅ (via release workflow) |
 
 **Critério de done:** rodar `run-tracker.bat` no dia a dia; dados no mesmo `productivity.db`. ✅
 
@@ -148,7 +137,7 @@ Python **não** foi movido para `legacy/` ainda — continua na raiz e funcional
 
 **Critério de done:** feature parity; usuário não precisa mais do Streamlit. ✅
 
-### Fase 3 — Integração e limpeza 🔶
+### Fase 3 — Integração e limpeza ✅
 
 **Objetivo:** um único entry point C#; remover Python.
 
@@ -157,25 +146,26 @@ Python **não** foi movido para `legacy/` ainda — continua na raiz e funcional
 | Tracker inicia dashboard ASP.NET como subprocesso | ✅ `DashboardProcessService` |
 | Porta única `8501` | ✅ |
 | WebView2 (opcional) — janela nativa sem browser externo | ⬜ |
-| CI release: `dotnet publish` substitui PyInstaller | ⬜ |
-| Remover `main.py`, `tracker.py`, `dashboard/`, `requirements.txt`, hooks Streamlit | ⬜ |
-| Mover/atualizar README para stack final | 🔶 |
-| Atualizar startup `.lnk` para exe C# publicado | ✅ parcial |
+| CI release: `dotnet publish` substitui PyInstaller | ✅ |
+| Remover `main.py`, `tracker.py`, `dashboard/`, `requirements.txt`, hooks Streamlit | ✅ |
+| Mover/atualizar README para stack final | ✅ |
+| Atualizar startup `.lnk` para exe C# publicado | ✅ |
+| Handler shutdown Windows (logoff/reboot) | ✅ |
 
 ---
 
 ## Mapa de portabilidade (Python → C#)
 
-| Python | C# | Fase | Status |
-|--------|-----|------|--------|
+| Python (removido) | C# | Fase | Status |
+|-------------------|-----|------|--------|
 | `tracker.py` → `ProductivityTracker` | `TrackingEngine` + `ActivityRepository` | 0–1 | ✅ |
 | `tracker.py` → Win32 capture | `Win32ActiveWindowProvider` | 0 | ✅ |
 | `tracker.py` → settings JSON | `SettingsStore` | 0 | ✅ |
 | `app_paths.py` | `AppPaths` (walk up até `TimeTracker.sln`) | 0 | ✅ |
 | `main.py` → tray | `TrayApplicationContext` | 0 | ✅ |
 | `main.py` → startup shortcut | `StartupShortcutService` | 0 | ✅ |
-| `main.py` → spawn Streamlit | — (manual na Fase 1; integrado na Fase 3) | 3 | ⬜ |
-| `main.py` → shutdown handler | — | 1 | ⬜ |
+| `main.py` → spawn Streamlit | `DashboardProcessService` | 3 | ✅ |
+| `main.py` → shutdown handler | `SystemEvents.SessionEnding` | 3 | ✅ |
 | `dashboard/data.py` | `ActivityQueryService` | 2 | ✅ |
 | `dashboard/utils.py` | `ActivityTextHelper` + `wwwroot/js/utils.js` | 2 | ✅ |
 | `dashboard/charts.py` | `wwwroot/js/charts.js` (Chart.js) | 2 | ✅ |
@@ -183,7 +173,6 @@ Python **não** foi movido para `legacy/` ainda — continua na raiz e funcional
 | `dashboard/overview.py` | `wwwroot/js/app.js` (Visão Geral) | 2 | ✅ |
 | `dashboard/details.py` | `wwwroot/js/app.js` (Detalhes) | 2 | ✅ |
 | `dashboard/settings.py` | `wwwroot/js/app.js` (Personalizar) + `AppCategories` | 2 | ✅ |
-| `main.py` → spawn Streamlit | `DashboardProcessService` | 3 | ✅ |
 
 ---
 
@@ -209,52 +198,38 @@ Inalterado. Chaves snake_case: `display_name`, `hex_color`, `category`.
 
 ---
 
-## Como trabalhar durante a migração
-
-### Regra de ouro
-
-> **Nunca rode dois trackers simultaneamente** (`run-tracker.bat` + `python main.py` / `python tracker.py`).
-
-Ambos gravam no mesmo `productivity.db` — concorrência WAL tolera leitura, mas dois writers de tracking corrompem a lógica de sessão.
-
-### Fluxos de dev
+## Fluxos de dev
 
 | Objetivo | Comando |
 |----------|---------|
-| **App completa (recomendado)** | `run-tracker.bat` — tracker + dashboard na porta 8501 |
+| **App completa (recomendado)** | `run.bat` ou `run-tracker.bat` — tracker + dashboard na porta 8501 |
 | Dashboard isolado (dev) | `run-dashboard.bat` |
-| App Python legada | `run.bat` — **não** usar junto com tracker C# |
 | Build .NET | `dotnet build TimeTracker.sln` |
-| Publish tracker | `dotnet publish src/TimeTracker.Tracker -c Release` |
+| Publish local | ver `reference.md` → Deploy |
 
 ### Onde ficam os dados
 
-Em desenvolvimento, `AppPaths` sobe diretórios até encontrar `TimeTracker.sln` ou `main.py` → grava na **raiz do repo**.
+Em desenvolvimento, `AppPaths` sobe diretórios até encontrar `TimeTracker.sln` → grava na **raiz do repo**.
 
 Em produção (exe publicado), grava na **pasta do executável**.
 
 ---
 
-## Checklist de validação — Fase 1
+## Checklist de validação
 
 Marcar conforme for testando.
 
-### Tracker C#
+### App completa C#
 
-- [ ] `run-tracker.bat` — ícone aparece na bandeja
+- [ ] `run.bat` — ícone aparece na bandeja
 - [ ] Trocar janela gera registros em `productivity.db`
 - [ ] Sessões < 1s não são gravadas
 - [ ] Sessão cruzando hora cheia gera múltiplos registros
 - [ ] Janela protegida registra `System/Protected`
 - [ ] "Abrir Dashboard" abre `http://localhost:8501`
-- [ ] "Sair" encerra tracker e faz flush da sessão
+- [ ] "Sair" encerra tracker, dashboard e faz flush da sessão
 - [ ] Atalho Startup aponta para exe C# correto
-- [ ] Streamlit lê dados gravados pelo tracker C# sem erro
-
-### Regressão Python (legado)
-
-- [ ] `run.bat` continua funcional até Fase 3
-- [ ] Dashboard Streamlit inalterado para o usuário
+- [ ] Logoff/reboot encerra gracefully
 
 ---
 
@@ -266,16 +241,16 @@ Marcar conforme for testando.
 | 2026-08-28 | ASP.NET Core em vez de FastAPI para dashboard | Consolidar em um runtime; mesmo ecossistema do tracker |
 | 2026-08-28 | Chart.js vanilla (sem React/Vue) | Dashboard local simples; evita toolchain frontend pesada |
 | 2026-08-28 | Monorepo (não repo novo) | Histórico, spec, convivência incremental |
-| 2026-08-28 | Manter Python na raiz até Fase 3 | Não quebrar fluxo existente durante transição |
-| 2026-08-28 | Porta 8501 reservada ao Streamlit na Fase 1 | Dashboard .NET usa porta dev (`5205`) até Fase 3 |
+| 2026-08-28 | Remover Python na Fase 3 | Stack única C#; CI com `dotnet publish` |
+| 2026-08-28 | Porta 8501 reservada ao dashboard .NET | Substitui Streamlit definitivamente |
 
 ---
 
-## Próximos passos (ordem sugerida)
+## Próximos passos (pós-migração)
 
-1. **Fase 3** — CI .NET, remover Python legado, handler shutdown Windows
-2. **WebView2** (opcional) — janela nativa
-3. Features de produto (export CSV, idle detection, etc.)
+1. **WebView2** (opcional) — janela nativa sem browser externo
+2. Features de produto (export CSV, idle detection, etc.)
+3. Testes automatizados (`pytest` → xUnit para Core)
 
 ---
 
@@ -286,6 +261,5 @@ Marcar conforme for testando.
 - Concluir um item de fase (marcar ✅)
 - Tomar decisão arquitetural nova (tabela de decisões)
 - Mudar contrato de dados, portas ou entry points
-- Remover código Python (Fase 3)
 
 **Também atualizar:** `SKILL.md` (changelog), `reference.md` (API/checklists), `README.md` (instruções de uso).

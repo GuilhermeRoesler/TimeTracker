@@ -117,8 +117,7 @@ static string ResolveAppDirectory(WebApplicationBuilder webBuilder)
     var directory = new DirectoryInfo(contentRoot);
     while (directory is not null)
     {
-        if (File.Exists(Path.Combine(directory.FullName, "TimeTracker.sln")) ||
-            File.Exists(Path.Combine(directory.FullName, "main.py")))
+        if (File.Exists(Path.Combine(directory.FullName, "TimeTracker.sln")))
         {
             return directory.FullName;
         }

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using TimeTracker.Core;
 using TimeTracker.Tracker.Services;
 
@@ -80,6 +81,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
 internal static class Program
 {
+    private static TrayApplicationContext? _trayContext;
+
     [STAThread]
     private static void Main()
     {
@@ -102,7 +105,14 @@ internal static class Program
             host.Services.GetRequiredService<ILogger<StartupShortcutService>>());
         startupService.EnsureStartupShortcut(appDir, Environment.ProcessPath ?? Application.ExecutablePath);
 
-        Application.Run(new TrayApplicationContext(host, dashboardProcess));
+        SystemEvents.SessionEnding += (_, e) =>
+        {
+            _trayContext?.ExitThread();
+            e.Cancel = false;
+        };
+
+        _trayContext = new TrayApplicationContext(host, dashboardProcess);
+        Application.Run(_trayContext);
     }
 
     private static string ResolveAppDirectory()
@@ -110,8 +120,7 @@ internal static class Program
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "TimeTracker.sln")) ||
-                File.Exists(Path.Combine(directory.FullName, "main.py")))
+            if (File.Exists(Path.Combine(directory.FullName, "TimeTracker.sln")))
             {
                 return directory.FullName;
             }

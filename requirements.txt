@@ -1,6 +1,0 @@
-streamlit>=1.56.0
-pandas>=3.0.3
-pywin32>=311
-plotly>=6.7.0
-pystray>=0.19.5
-Pillow>=11.1.0
