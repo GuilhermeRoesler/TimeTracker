@@ -61,18 +61,7 @@
 
 ## Roadmap
 
-### Migração de stack
-
-Documento completo: [MIGRATION.md](MIGRATION.md) — **Fase 3 concluída.**
-
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| 0 | Solution .NET, Core, tracker scaffold, dashboard esqueleto | ✅ |
-| 1 | Tracker C# no uso diário | ✅ |
-| 2 | Dashboard ASP.NET + Chart.js com paridade Streamlit | ✅ |
-| 3 | Integração única, CI .NET, remoção Python, WebView2, testes | ✅ |
-
-### Features de produto (pós-migração)
+### Features de produto
 
 | Prioridade | Feature | Notas |
 |------------|---------|-------|
@@ -81,15 +70,14 @@ Documento completo: [MIGRATION.md](MIGRATION.md) — **Fase 3 concluída.**
 | Média | Metas diárias / alertas | Requer novo schema ou tabela de metas |
 | Média | Detecção de idle (AFK) | Pausar tracking quando sem input por N minutos |
 | Baixa | Suporte Linux/macOS | Fora do escopo Windows-only atual |
-| Baixa | WebView2 para dashboard | ✅ Janela nativa com fallback para browser |
 
 ### Implementado
 
-- Migração completa Python → C# (.NET 8)
-- Dashboard ASP.NET + Chart.js (3 abas, paridade Streamlit)
-- CI release: `dotnet publish` self-contained win-x64
-- WebView2 para dashboard + testes xUnit + CI build/test
-
+- Stack C#/.NET 8 (migração Python concluída)
+- Dashboard ASP.NET + Chart.js (3 abas)
+- Processo único `TimeTracker.exe` (bandeja + Kestrel)
+- Instalador Inno Setup + publish framework-dependent
+- WebView2 + testes xUnit + CI build/test/release
 ## Testes
 
 **Estado atual:** suite xUnit em `tests/TimeTracker.Core.Tests` (Core). CI em `.github/workflows/ci.yml`.

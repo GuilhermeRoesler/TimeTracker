@@ -21,7 +21,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 
 **Propósito:** monitorar a janela ativa do Windows, registrar tempo por app/título, e exibir análises em dashboard web com personalização de apps.
 
-> **Migração concluída (Fase 3).** Histórico e decisões: [MIGRATION.md](MIGRATION.md)
+> Stack C#/.NET 8 estável. Spec vivo: este skill + [reference.md](reference.md).
 
 ## Arquitetura
 
@@ -168,24 +168,22 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Removido `MIGRATION.md` (migração Python→C# concluída; histórico no changelog) |
 | 2026-08-28 | Ícone do produto (`assets/app.ico`): exe, bandeja, WebView2, favicon, Setup Inno; CI verifica presença |
 | 2026-08-28 | Processo único: Tracker hospeda Kestrel/dashboard in-process; exe publicado `TimeTracker.exe` |
 | 2026-08-28 | Instalador Inno Setup + publish framework-dependent; dados em `%LocalAppData%\TimeTracker Pro` |
 | 2026-08-28 | WebView2: janela nativa do dashboard; testes xUnit (`TimeTracker.Core.Tests`); CI build+test |
 | 2026-08-28 | Fase 3: remoção Python legado, CI `dotnet publish`, entry point único C#, handler shutdown Windows |
 | 2026-08-28 | Fase 2: dashboard ASP.NET + Chart.js (paridade Streamlit), `ActivityQueryService`, API REST |
-| 2026-08-28 | Documento de migração: `MIGRATION.md` (fases, progresso, mapa Python→C#, decisões) |
-| 2026-08-28 | Migração Fase 0: `TimeTracker.sln`, `TimeTracker.Core`, `TimeTracker.Tracker`, esqueleto `TimeTracker.Dashboard` |
-| 2026-08-28 | `run.bat` Windows: launch por duplo clique (agora C#) |
-| 2026-08-28 | Dashboard reorganizado em pacote `dashboard/` (`app.py`, `charts.py`, etc.) — *removido na Fase 3* |
-| 2026-08-27 | Release CI: PyInstaller — *substituído por dotnet publish na Fase 3* |
+| 2026-08-28 | Migração Fase 0–3: solution .NET, Core, Tracker, Dashboard, limpeza Python |
+| 2026-08-28 | `run.bat` Windows: launch por duplo clique (C#) |
+| 2026-08-27 | Release CI: PyInstaller — *substituído por dotnet publish / Inno Setup* |
 | 2026-07-09 | Spec inicial criada a partir do estado atual do repositório |
 | 2026-07-09 | Regra `.cursor/rules/timetracker-spec.mdc` + seções roadmap, testes e deploy em `reference.md` |
 | 2026-07-09 | Startup Windows: atalho `.lnk` em vez de script `.vbs` |
 
 ## Recursos adicionais
 
-- **Migração de stack (histórico):** [MIGRATION.md](MIGRATION.md)
 - Detalhes de API, **roadmap**, **testes** e **deploy**: [reference.md](reference.md)
 - README do usuário: [README.md](../../README.md)
 - Regra Cursor que aponta para este spec: [.cursor/rules/timetracker-spec.mdc](../../rules/timetracker-spec.mdc)

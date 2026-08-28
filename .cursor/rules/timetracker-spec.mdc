@@ -8,18 +8,17 @@ alwaysApply: true
 Antes de implementar features, corrigir bugs ou refatorar neste repositório:
 
 1. **Leia** `.cursor/skills/timetracker-spec/SKILL.md` (arquitetura, contratos, convenções).
-2. **Consulte** `.cursor/skills/timetracker-spec/MIGRATION.md` para fases da migração Python→C#, progresso e decisões.
-3. **Consulte** `.cursor/skills/timetracker-spec/reference.md` para API, roadmap, testes e deploy.
-4. **Mantenha o spec vivo** — após mudanças em arquitetura, schema, UI ou decisões técnicas, atualize o skill, `MIGRATION.md` (se afetar a migração) e o changelog.
+2. **Consulte** `.cursor/skills/timetracker-spec/reference.md` para API, roadmap, testes e deploy.
+3. **Mantenha o spec vivo** — após mudanças em arquitetura, schema, UI ou decisões técnicas, atualize o skill e o changelog.
 
 ## Regras inegociáveis
 
 - Plataforma **Windows-only**; não introduzir abstrações cross-platform sem decisão explícita.
-- Migração **concluída (Fase 3).** Persistência em `TimeTracker.Core` (C#). Gráficos em Chart.js.
+- Stack **C#/.NET 8** (tracker + ASP.NET Core + Chart.js). Persistência em `TimeTracker.Core`.
 - UI e mensagens em **português**.
 - `app_settings.json` e `productivity.db` são locais — nunca versionar.
 - Respeitar contratos: schema `activity_log`, formato JSON de apps, colunas enriquecidas da API.
 
 ## Ao concluir uma tarefa
 
-Se a mudança alterou comportamento documentado, atualize `SKILL.md` e registre em **Changelog do spec**. Se concluiu item de fase da migração, atualize também `MIGRATION.md`.
+Se a mudança alterou comportamento documentado, atualize `SKILL.md` e registre em **Changelog do spec**.
