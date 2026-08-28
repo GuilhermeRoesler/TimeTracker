@@ -25,7 +25,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 ```
 main.py (AppOrchestrator)
 ├── tracker.py (thread daemon)     → captura janela, grava SQLite
-├── dashboard.py (subprocess)      → Streamlit na porta 8501
+├── dashboard/app.py (subprocess)  → Streamlit na porta 8501
 └── pystray (thread principal)     → bandeja: Abrir Dashboard / Sair
 ```
 
@@ -36,16 +36,16 @@ main.py (AppOrchestrator)
 | `main.py` | Orquestração, shutdown graceful, startup Windows, ícone bandeja; modo frozen PyInstaller |
 | `app_paths.py` | `get_app_dir` / `get_resource_path` (código-fonte ou exe) |
 | `tracker.py` | Captura `app_name` + `window_title`, loop de polling, CRUD settings |
-| `dashboard.py` | Entry Streamlit, tabs, wiring de filtros e dados |
-| `dashboard_data.py` | Query SQLite → DataFrame com colunas derivadas |
-| `dashboard_filters.py` | Filtro de data (atalhos, navegação, calendário) |
-| `dashboard_overview.py` | Métricas, gráficos, tabela histórica |
-| `dashboard_details.py` | Drill-down por app (abas/janelas) |
-| `dashboard_charts.py` | Funções Plotly puras (sem Streamlit) |
-| `dashboard_utils.py` | Formatação de tempo, limpeza de títulos, color map |
-| `dashboard_settings.py` | UI de personalização de apps |
+| `dashboard/app.py` | Entry Streamlit, tabs, wiring de filtros e dados |
+| `dashboard/data.py` | Query SQLite → DataFrame com colunas derivadas |
+| `dashboard/filters.py` | Filtro de data (atalhos, navegação, calendário) |
+| `dashboard/overview.py` | Métricas, gráficos, tabela histórica |
+| `dashboard/details.py` | Drill-down por app (abas/janelas) |
+| `dashboard/charts.py` | Funções Plotly puras (sem Streamlit) |
+| `dashboard/utils.py` | Formatação de tempo, limpeza de títulos, color map |
+| `dashboard/settings.py` | UI de personalização de apps |
 
-**Regra de separação:** lógica de gráfico em `dashboard_charts.py`; UI Streamlit nas abas; persistência em `tracker.py`.
+**Regra de separação:** lógica de gráfico em `dashboard/charts.py`; UI Streamlit nas abas; persistência em `tracker.py`.
 
 ## Contratos de dados
 
@@ -80,7 +80,7 @@ duration_seconds REAL
 
 - Chave: `app_name` exato do executável (case-sensitive).
 - Não versionado (`.gitignore`). Exemplo em `app_settings.example.json`.
-- Categorias válidas: ver `CATEGORIES` em `dashboard_settings.py`.
+- Categorias válidas: ver `CATEGORIES` em `dashboard/settings.py`.
 
 ### DataFrame do dashboard (pós-processamento)
 
@@ -139,21 +139,21 @@ Colunas esperadas após `load_activity_data()`:
 
 ### Adicionar novo gráfico
 
-1. Criar função em `dashboard_charts.py` (retorna `go.Figure | None`).
+1. Criar função em `dashboard/charts.py` (retorna `go.Figure | None`).
 2. Consumir em aba correspondente (`overview` ou `details`).
 3. Usar `color_map` e `format_duration_clean` existentes.
 
 ### Adicionar campo de personalização de app
 
 1. Estender schema em `tracker.update_app_setting()` e `_load_settings_file`.
-2. Mapear coluna em `dashboard_data.load_activity_data()`.
-3. Adicionar controle em `dashboard_settings.render_settings_tab()`.
+2. Mapear coluna em `dashboard/data.load_activity_data()`.
+3. Adicionar controle em `dashboard/settings.render_settings_tab()`.
 4. Atualizar `app_settings.example.json`.
 5. **Atualizar este skill** (seção Contratos de dados).
 
 ### Adicionar categoria
 
-1. Incluir em `CATEGORIES` (`dashboard_settings.py`).
+1. Incluir em `CATEGORIES` (`dashboard/settings.py`).
 2. Documentar aqui se houver regra de negócio associada.
 
 ### Testar localmente
@@ -162,7 +162,7 @@ Colunas esperadas após `load_activity_data()`:
 pip install -r requirements.txt
 python main.py          # app completa (tracker + dashboard + bandeja)
 python tracker.py       # apenas tracker (dev isolado)
-streamlit run dashboard.py  # apenas dashboard (requer DB com dados)
+streamlit run dashboard/app.py  # apenas dashboard (requer DB com dados)
 ```
 
 ## Manutenção deste documento vivo
@@ -181,6 +181,7 @@ streamlit run dashboard.py  # apenas dashboard (requer DB com dados)
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Dashboard reorganizado em pacote `dashboard/` (`app.py`, `charts.py`, etc.) |
 | 2026-08-27 | Release CI: PyInstaller onedir + workflow `.github/workflows/release.yml`; `app_paths.py` e suporte `sys.frozen` |
 | 2026-07-09 | Spec inicial criada a partir do estado atual do repositório |
 | 2026-07-09 | Regra `.cursor/rules/timetracker-spec.mdc` + seções roadmap, testes e deploy em `reference.md` |

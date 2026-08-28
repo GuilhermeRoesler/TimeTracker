@@ -14,7 +14,7 @@ Antes de implementar features, corrigir bugs ou refatorar neste repositório:
 ## Regras inegociáveis
 
 - Plataforma **Windows-only**; não introduzir abstrações cross-platform sem decisão explícita.
-- Persistência em `tracker.py`; gráficos em `dashboard_charts.py`; UI Streamlit nas abas.
+- Persistência em `tracker.py`; gráficos em `dashboard/charts.py`; UI Streamlit nas abas.
 - UI e mensagens em **português**.
 - `app_settings.json` e `productivity.db` são locais — nunca versionar.
 - Respeitar contratos: schema `activity_log`, formato JSON de apps, colunas do DataFrame.

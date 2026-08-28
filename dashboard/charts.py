@@ -1,6 +1,6 @@
 import plotly.express as px
 
-from dashboard_utils import format_duration_clean
+from dashboard.utils import format_duration_clean
 
 
 def create_top_apps_donut(df, color_map):

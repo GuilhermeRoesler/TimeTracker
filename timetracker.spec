@@ -5,20 +5,25 @@ from PyInstaller.utils.hooks import collect_all, copy_metadata
 
 block_cipher = None
 
+_DASHBOARD_MODULES = (
+    "__init__.py",
+    "app.py",
+    "charts.py",
+    "data.py",
+    "details.py",
+    "filters.py",
+    "overview.py",
+    "settings.py",
+    "utils.py",
+)
+
 datas = [
-    ("dashboard.py", "."),
-    ("dashboard_charts.py", "."),
-    ("dashboard_data.py", "."),
-    ("dashboard_details.py", "."),
-    ("dashboard_filters.py", "."),
-    ("dashboard_overview.py", "."),
-    ("dashboard_settings.py", "."),
-    ("dashboard_utils.py", "."),
     ("tracker.py", "."),
     ("app_paths.py", "."),
     ("app_settings.example.json", "."),
     (".streamlit", ".streamlit"),
 ]
+datas += [(f"dashboard/{name}", "dashboard") for name in _DASHBOARD_MODULES]
 
 binaries = []
 hiddenimports = [
@@ -26,6 +31,15 @@ hiddenimports = [
     "win32com.client",
     "pythoncom",
     "pkg_resources",
+    "dashboard",
+    "dashboard.app",
+    "dashboard.charts",
+    "dashboard.data",
+    "dashboard.details",
+    "dashboard.filters",
+    "dashboard.overview",
+    "dashboard.settings",
+    "dashboard.utils",
 ]
 
 for package in ("streamlit", "plotly", "pystray", "PIL"):

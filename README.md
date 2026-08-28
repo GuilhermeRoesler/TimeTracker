@@ -45,7 +45,7 @@ python main.py
 Isto irá:
 
 1. Iniciar o processo de rastreio (`tracker.py`) em segundo plano.
-2. Lançar o servidor Streamlit (`dashboard.py`).
+2. Lançar o servidor Streamlit (`dashboard/app.py`).
 3. Adicionar um ícone à bandeja do sistema (perto do relógio).
 4. Registar um atalho na pasta de startup do Windows (se ainda não existir).
 5. O dashboard fica disponível em `http://localhost:8501` (abra pelo ícone na bandeja do sistema).
@@ -61,14 +61,16 @@ Isto irá:
 
 - `main.py`: Orquestrador principal. Inicia o tracker, o dashboard e o ícone da bandeja.
 - `tracker.py`: Captura a janela ativa, grava atividades no SQLite e gere `app_settings.json`.
-- `dashboard.py`: Ponto de entrada do dashboard Streamlit.
-- `dashboard_data.py`: Carregamento e pré-processamento dos dados.
-- `dashboard_filters.py`: Filtros da barra lateral.
-- `dashboard_overview.py`: Aba de visão geral.
-- `dashboard_details.py`: Aba de detalhes por app.
-- `dashboard_charts.py`: Gráficos Plotly reutilizáveis.
-- `dashboard_utils.py`: Funções auxiliares de formatação e cores.
-- `dashboard_settings.py`: Aba de personalização de apps.
+- `app_paths.py`: Caminhos da aplicação (código-fonte ou executável PyInstaller).
+- `dashboard/`: Pacote do dashboard Streamlit.
+  - `app.py`: Ponto de entrada do dashboard.
+  - `data.py`: Carregamento e pré-processamento dos dados.
+  - `filters.py`: Filtros da barra lateral.
+  - `overview.py`: Aba de visão geral.
+  - `details.py`: Aba de detalhes por app.
+  - `charts.py`: Gráficos Plotly reutilizáveis.
+  - `utils.py`: Funções auxiliares de formatação e cores.
+  - `settings.py`: Aba de personalização de apps.
 - `app_settings.example.json`: Exemplo de configurações de apps.
 - `app_settings.json`: Configurações personalizadas dos apps (nome, cor, categoria) — local, não versionado.
 - `productivity.db`: Base de dados SQLite com registos de atividade (gerada automaticamente na primeira execução).

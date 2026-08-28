@@ -1,7 +1,7 @@
 import streamlit as st
 
-from dashboard_charts import create_window_titles_chart
-from dashboard_utils import clean_window_title, format_duration_clean
+from dashboard.charts import create_window_titles_chart
+from dashboard.utils import clean_window_title, format_duration_clean
 
 
 def _default_app_index(apps_list):

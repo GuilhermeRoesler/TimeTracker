@@ -1,12 +1,12 @@
 import streamlit as st
 
-from dashboard_charts import (
+from dashboard.charts import (
     create_app_ranking,
     create_category_pie,
     create_hourly_timeline,
     create_top_apps_donut,
 )
-from dashboard_utils import format_duration_clean
+from dashboard.utils import format_duration_clean
 
 
 def render_overview_tab(df, color_map):

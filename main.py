@@ -125,7 +125,7 @@ class AppOrchestrator:
 
     def run_streamlit(self):
         app_dir = get_app_dir()
-        dashboard_script = get_resource_path("dashboard.py")
+        dashboard_script = get_resource_path("dashboard", "app.py")
         streamlit_args = [
             dashboard_script,
             "--server.port",

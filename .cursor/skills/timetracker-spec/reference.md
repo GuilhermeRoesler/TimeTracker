@@ -24,19 +24,19 @@
 
 ## API — Dashboard
 
-### `dashboard_data.load_activity_data(tracker) → DataFrame`
+### `dashboard.data.load_activity_data(tracker) → DataFrame`
 
 - Lê `SELECT * FROM activity_log`.
 - Enriquece com settings; default `category = "Sem Categoria"`.
 - Deriva `date` e `hour` de `start_time`.
 - Em erro: `st.error()` + DataFrame vazio.
 
-### `dashboard_filters.render_date_filter(available_dates) → (date, has_data)`
+### `dashboard.filters.render_date_filter(available_dates) → (date, has_data)`
 
 - `available_dates`: lista ordenada decrescente.
 - Retorna data selecionada e flag se há registros nessa data.
 
-### `dashboard_charts` — assinaturas
+### `dashboard.charts` — assinaturas
 
 | Função | Retorno |
 |--------|---------|
@@ -46,7 +46,7 @@
 | `create_category_pie(df)` | Pie por categoria |
 | `create_window_titles_chart(title_usage_df)` | Bar horizontal de títulos |
 
-### `dashboard_utils`
+### `dashboard.utils`
 
 | Função | Comportamento |
 |--------|---------------|
@@ -135,9 +135,9 @@ Prioridade sugerida. Mover para "Implementado" ao concluir e atualizar o changel
 ### Diretrizes para testes automatizados (futuro)
 
 - **Framework sugerido:** `pytest`
-- **Priorizar:** funções puras em `dashboard_utils.py` e `dashboard_charts.py` (sem Streamlit/win32)
+- **Priorizar:** funções puras em `dashboard/utils.py` e `dashboard/charts.py` (sem Streamlit/win32)
 - **Tracker:** mockar `win32gui`/`win32process`; testar `save_activity` com timestamps controlados
-- **Integração:** DB em memória (`:memory:`) para queries de `dashboard_data`
+- **Integração:** DB em memória (`:memory:`) para queries de `dashboard/data`
 - **Evitar:** testes que dependam de janela ativa real ou bandeja do sistema
 
 ## Deploy e distribuição
@@ -175,7 +175,7 @@ Contratos do pacote:
 
 - `app_paths.get_app_dir()` — pasta do `.exe` (gravável); dados do usuário ficam ao lado do exe
 - `productivity.db` e `app_settings.json` **fora** do bundle (criados em runtime)
-- Dashboard: exe reinicia a si mesmo com `--timetracker-streamlit` (subprocess Streamlit)
+- Dashboard: entry `dashboard/app.py`; exe reinicia a si mesmo com `--timetracker-streamlit` (subprocess Streamlit)
 - Startup `.lnk` aponta para o `.exe` quando `sys.frozen`
 - Spec: `timetracker.spec`; hooks em `hooks/`; config em `.streamlit/config.toml`
 

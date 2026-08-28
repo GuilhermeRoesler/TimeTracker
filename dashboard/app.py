@@ -1,13 +1,20 @@
+import sys
+from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
 import streamlit as st
 
 from tracker import ProductivityTracker
-import dashboard_settings
 
-from dashboard_data import load_activity_data
-from dashboard_details import render_details_tab
-from dashboard_filters import render_date_filter
-from dashboard_overview import render_overview_tab
-from dashboard_utils import build_color_map
+from dashboard.data import load_activity_data
+from dashboard.details import render_details_tab
+from dashboard.filters import render_date_filter
+from dashboard.overview import render_overview_tab
+from dashboard.settings import render_settings_tab
+from dashboard.utils import build_color_map
 
 st.set_page_config(
     page_title="Monitor de Produtividade",
@@ -57,7 +64,7 @@ def main():
         render_details_tab(df)
 
     with tab_customize:
-        dashboard_settings.render_settings_tab(tracker)
+        render_settings_tab(tracker)
 
 
 if __name__ == "__main__":
