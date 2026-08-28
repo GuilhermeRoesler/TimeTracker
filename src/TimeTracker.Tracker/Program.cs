@@ -79,8 +79,8 @@ internal static class Program
     {
         ApplicationConfiguration.Initialize();
 
-        AppPaths.SetAppDir(ResolveAppDirectory());
-        var appDir = AppPaths.GetAppDir();
+        ResolveAndConfigurePaths();
+        var installDir = AppPaths.GetInstallDir();
 
         var host = Host.CreateDefaultBuilder()
             .ConfigureServices(services => services.AddTrackerServices())
@@ -90,11 +90,11 @@ internal static class Program
 
         var dashboardProcess = new DashboardProcessService(
             host.Services.GetRequiredService<ILogger<DashboardProcessService>>());
-        dashboardProcess.Start(appDir);
+        dashboardProcess.Start(installDir);
 
         var startupService = new StartupShortcutService(
             host.Services.GetRequiredService<ILogger<StartupShortcutService>>());
-        startupService.EnsureStartupShortcut(appDir, Environment.ProcessPath ?? Application.ExecutablePath);
+        startupService.EnsureStartupShortcut(installDir, Environment.ProcessPath ?? Application.ExecutablePath);
 
         SystemEvents.SessionEnding += (_, e) =>
         {
@@ -106,19 +106,21 @@ internal static class Program
         Application.Run(_trayContext);
     }
 
-    private static string ResolveAppDirectory()
+    private static void ResolveAndConfigurePaths()
     {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null)
-        {
-            if (File.Exists(Path.Combine(directory.FullName, "TimeTracker.sln")))
-            {
-                return directory.FullName;
-            }
+        var baseDir = Path.GetFullPath(
+            AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        var solutionRoot = AppPaths.FindSolutionRoot(baseDir);
 
-            directory = directory.Parent;
+        if (solutionRoot is not null)
+        {
+            AppPaths.Configure(solutionRoot, solutionRoot);
+            return;
         }
 
-        return AppContext.BaseDirectory;
+        var dataDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            AppConstants.AppDisplayName);
+        AppPaths.Configure(dataDir, baseDir);
     }
 }

@@ -19,10 +19,19 @@ O **TimeTracker** é uma aplicação para Windows que monitoriza automaticamente
 ## 🛠️ Requisitos
 
 - **Sistema Operativo**: Windows 10 ou superior.
-- **.NET SDK 8.0+** (desenvolvimento) — [download](https://dotnet.microsoft.com/download).
-- **.NET Runtime 8.0+** (apenas se usar build framework-dependent; releases são self-contained).
+- **Desenvolvimento**: [.NET SDK 8](https://dotnet.microsoft.com/download).
+- **Uso (instalador)**: o Setup baixa automaticamente o .NET 8 Desktop Runtime e o ASP.NET Core Runtime se faltarem.
+- **WebView2**: incluído na maioria dos Windows 10/11 modernos.
 
 ## 📦 Instalação
+
+### Instalador (recomendado)
+
+1. Descarregue `TimeTrackerPro-*-setup-win-x64.exe` da [release](https://github.com/).
+2. Execute o Setup (instala em `Program Files` e cria atalhos).
+3. Inicie pelo menu Iniciar ou pela área de trabalho.
+
+Dados ficam em `%LocalAppData%\TimeTracker Pro\` (não em Program Files).
 
 ### Desenvolvimento (código-fonte)
 
@@ -37,11 +46,16 @@ dotnet run --project src/TimeTracker.Dashboard # só o dashboard (dev)
 dotnet test TimeTracker.sln                   # testes automatizados
 ```
 
-### Release (binário publicado)
+### Publish local
 
-1. Descarregue o zip da [última release](https://github.com/) (tag `v*`).
-2. Extraia numa pasta à sua escolha.
-3. Execute `TimeTracker.Tracker.exe` — o dashboard inicia automaticamente na porta 8501.
+```powershell
+.\scripts\Publish-Release.ps1 -Version "1.0.0"
+# requer Inno Setup 6 para gerar o Setup.exe
+```
+
+### Portable (avançado)
+
+Zip `*-portable-win-x64.zip` — exige .NET 8 Desktop + ASP.NET Core Runtime já instalados.
 
 ## ▶️ Como Usar
 

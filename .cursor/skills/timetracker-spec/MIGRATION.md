@@ -213,7 +213,9 @@ Inalterado. Chaves snake_case: `display_name`, `hex_color`, `category`.
 
 Em desenvolvimento, `AppPaths` sobe diretórios até encontrar `TimeTracker.sln` → grava na **raiz do repo**.
 
-Em produção (exe publicado), grava na **pasta do executável**.
+Em produção (instalado / publish sem `.sln`), dados em **`%LocalAppData%\TimeTracker Pro\`**; executáveis em `GetInstallDir()`.
+
+Release: publish **framework-dependent** + instalador **Inno Setup** (`installer/TimeTracker.iss`, `scripts/Publish-Release.ps1`).
 
 ---
 
@@ -244,6 +246,7 @@ Marcar conforme for testando.
 | 2026-08-28 | Chart.js vanilla (sem React/Vue) | Dashboard local simples; evita toolchain frontend pesada |
 | 2026-08-28 | Monorepo (não repo novo) | Histórico, spec, convivência incremental |
 | 2026-08-28 | Remover Python na Fase 3 | Stack única C#; CI com `dotnet publish` |
+| 2026-08-28 | Release framework-dependent + Inno Setup | Runtime .NET compartilhado do sistema; Setup pequeno |
 | 2026-08-28 | Porta 8501 reservada ao dashboard .NET | Substitui Streamlit definitivamente |
 
 ---

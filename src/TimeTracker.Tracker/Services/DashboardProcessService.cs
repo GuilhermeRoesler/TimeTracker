@@ -59,6 +59,7 @@ internal sealed class DashboardProcessService : IDisposable
                 };
             }
 
+            startInfo.Environment[AppPaths.DataDirEnvironmentVariable] = AppPaths.GetDataDir();
             _process = Process.Start(startInfo);
             _logger.LogInformation("Dashboard iniciado em {Url}.", AppConstants.DashboardUrl);
         }

@@ -5,7 +5,7 @@ using TimeTracker.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-AppPaths.SetAppDir(ResolveAppDirectory(builder));
+AppPaths.InitializeFromEnvironmentOrDefaults(builder.Environment.ContentRootPath);
 builder.WebHost.UseUrls($"http://{AppConstants.DashboardHost}:{AppConstants.DashboardPort}");
 
 builder.Services.AddSingleton<ActivityRepository>(sp =>
@@ -110,23 +110,6 @@ app.MapPost("/api/settings/batch", (BatchSettingsRequest request, SettingsStore 
 app.MapFallbackToFile("index.html");
 
 app.Run();
-
-static string ResolveAppDirectory(WebApplicationBuilder webBuilder)
-{
-    var contentRoot = webBuilder.Environment.ContentRootPath;
-    var directory = new DirectoryInfo(contentRoot);
-    while (directory is not null)
-    {
-        if (File.Exists(Path.Combine(directory.FullName, "TimeTracker.sln")))
-        {
-            return directory.FullName;
-        }
-
-        directory = directory.Parent;
-    }
-
-    return contentRoot;
-}
 
 internal sealed class AppSettingUpdateRequest
 {

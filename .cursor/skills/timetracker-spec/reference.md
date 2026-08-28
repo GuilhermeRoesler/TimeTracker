@@ -142,23 +142,34 @@ run.bat   # ou run-tracker.bat
 
 Startup automático via `StartupShortcutService` na primeira execução.
 
-### Publish local
+### Publish local (framework-dependent + instalador)
 
-```bash
-dotnet publish src/TimeTracker.Tracker/TimeTracker.Tracker.csproj `
-  -c Release -r win-x64 --self-contained true `
-  -p:PublishSingleFile=true -o publish/
-dotnet publish src/TimeTracker.Dashboard/TimeTracker.Dashboard.csproj `
-  -c Release -r win-x64 --self-contained true -o publish/
+```powershell
+# Requer Inno Setup 6 para gerar Setup.exe (opcional: -SkipInstaller)
+.\scripts\Publish-Release.ps1 -Version "1.0.0"
 ```
 
-Saída: pasta `publish/` com `TimeTracker.Tracker.exe`, `TimeTracker.Dashboard.exe`, `wwwroot/` e runtime.
+Saída:
 
-Contratos do pacote:
+- `artifacts/publish/` — apps framework-dependent (sem runtime embutido)
+- `artifacts/installer/TimeTrackerPro-<ver>-setup-win-x64.exe` — instalador Inno Setup
 
-- `AppPaths.GetAppDir()` — pasta do exe (gravável); dados do usuário ficam ao lado do exe
-- `productivity.db` e `app_settings.json` criados em runtime
-- Dashboard: `DashboardProcessService` lança `TimeTracker.Dashboard.exe` no mesmo diretório
+Pré-requisitos de runtime (instalados pelo Setup se faltarem):
+
+- .NET 8 **Desktop** Runtime (WinForms / Tracker)
+- .NET 8 **ASP.NET Core** Runtime (Dashboard)
+
+### Contratos do pacote instalado
+
+| Conceito | Caminho |
+|----------|---------|
+| Executáveis | `{autopf}\TimeTracker Pro\` |
+| Dados | `%LocalAppData%\TimeTracker Pro\` (`productivity.db`, `app_settings.json`) |
+| Dev (com `TimeTracker.sln`) | raiz do repositório |
+
+- `AppPaths.GetInstallDir()` — pasta dos exes
+- `AppPaths.GetDataDir()` — pasta de dados do usuário
+- Dashboard recebe `TIMETRACKER_DATA_DIR` do tracker
 - Startup `.lnk` aponta para `TimeTracker.Tracker.exe`
 
 ### CI — GitHub Actions Releases
@@ -167,10 +178,13 @@ Workflow: `.github/workflows/release.yml`
 
 | Trigger | Comportamento |
 |---------|---------------|
-| Push de tag `v*` (ex.: `v1.0.0`) | Build .NET + cria/atualiza GitHub Release com zip |
-| `workflow_dispatch` | Só gera artifact (sem Release) |
+| Push de tag `v*` | Publish framework-dependent + Inno Setup + Release |
+| `workflow_dispatch` | Artifact (Setup.exe + zip portable slim) |
 
-Artefato: `TimeTrackerPro-<tag>-windows-amd64.zip` (conteúdo de `publish/`).
+Artefatos:
+
+- `TimeTrackerPro-<tag>-setup-win-x64.exe` (recomendado)
+- `TimeTrackerPro-<tag>-portable-win-x64.zip` (exige runtimes no sistema)
 
 ```bash
 git tag v1.0.0
