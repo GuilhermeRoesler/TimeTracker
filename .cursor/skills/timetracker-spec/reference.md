@@ -18,14 +18,30 @@
 | `DbFileName` | `AppConstants` | `"productivity.db"` |
 | `SettingsFileName` | `AppConstants` | `"app_settings.json"` |
 | `DefaultPollIntervalSeconds` | `AppConstants` | `5.0` |
-| `DashboardPort` | `AppConstants` | `8501` (Streamlit durante Fase 1) |
+| `DashboardPort` | `AppConstants` | `8501` |
 
 | Classe | Responsabilidade |
 |--------|------------------|
-| `ActivityRepository` | Init WAL, `SaveActivity`, `GetAllApps` |
-| `SettingsStore` | Load/save `app_settings.json`, `UpdateAppSetting` |
+| `ActivityRepository` | Init WAL, `SaveActivity`, `GetAllApps`, `GetAllActivities` |
+| `SettingsStore` | Load/save JSON, `UpdateAppSetting`, batch |
 | `TrackingEngine` | Loop de polling via `IActiveWindowProvider` |
+| `ActivityQueryService` | Load enriquecido, dates, apps com settings |
+| `ActivityTextHelper` | `FormatDurationClean`, `CleanWindowTitle` |
 | `Win32ActiveWindowProvider` | Captura janela ativa (projeto Tracker) |
+| `DashboardProcessService` | Sobe dashboard ASP.NET como subprocesso |
+
+## API — Dashboard .NET
+
+| Endpoint | Descrição |
+|----------|-----------|
+| `GET /api/health` | Status do serviço |
+| `GET /api/meta` | Categorias válidas, porta |
+| `GET /api/dates` | Datas com registros (desc) |
+| `GET /api/activity?date=yyyy-MM-dd` | Registros do dia + summary |
+| `GET /api/apps` | Apps do log com settings |
+| `GET /api/settings` | Mapa de settings (JSON legado) |
+| `PUT /api/settings/{appName}` | Atualiza um app |
+| `POST /api/settings/batch` | Salva alterações em lote |
 
 ## API — `ProductivityTracker` *(Python legado)*
 
@@ -38,7 +54,7 @@
 | `update_app_setting(app, display, color, category)` | Upsert no JSON; retorna `bool` |
 | `run(stop_event, poll_interval)` | Loop principal |
 
-## API — Dashboard
+## API — Dashboard Streamlit *(legado)*
 
 ### `dashboard.data.load_activity_data(tracker) → DataFrame`
 
@@ -113,9 +129,9 @@ Documento completo: [MIGRATION.md](MIGRATION.md)
 | Fase | Objetivo | Status |
 |------|----------|--------|
 | 0 | Solution .NET, Core, tracker scaffold, dashboard esqueleto | ✅ |
-| 1 | Tracker C# no uso diário; Streamlit como dashboard | 🔶 |
-| 2 | Dashboard ASP.NET + Chart.js com paridade Streamlit | ⬜ |
-| 3 | Integração única, CI .NET, remoção Python | ⬜ |
+| 1 | Tracker C# no uso diário | ✅ |
+| 2 | Dashboard ASP.NET + Chart.js com paridade Streamlit | ✅ |
+| 3 | Integração única, CI .NET, remoção Python | 🔶 |
 
 ### Features de produto (pós-migração ou paralelo)
 

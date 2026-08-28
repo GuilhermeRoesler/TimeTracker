@@ -17,14 +17,14 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Stack legada (convivência) | Python 3.8+ (`tracker.py`, Streamlit) |
 | Entry point legado | `main.py` / `run.bat` |
 | Entry point C# | `run-tracker.bat` → `src/TimeTracker.Tracker` |
-| Dashboard legado | Streamlit em `http://localhost:8501` |
-| Dashboard alvo | ASP.NET em `src/TimeTracker.Dashboard` (esqueleto) |
+| Dashboard legado | Streamlit em `http://localhost:8501` *(legado — conflita com dashboard .NET)* |
+| Dashboard alvo | ASP.NET + Chart.js em `http://localhost:8501` |
 | Dados locais | `productivity.db` (SQLite WAL) + `app_settings.json` |
 
 **Propósito:** monitorar a janela ativa do Windows, registrar tempo por app/título, e exibir análises em dashboard web com personalização de apps.
 
 > **Migração de stack em andamento.** Progresso, fases e decisões: [MIGRATION.md](MIGRATION.md)  
-> **Fase atual:** 0 ✅ · Fase 1 🔶 (tracker C# operacional; dashboard ainda Streamlit)
+> **Fase atual:** Fase 2 ✅ · Fase 3 🔶 (dashboard .NET ativo; Python legado a remover)
 
 ## Arquitetura
 
@@ -54,7 +54,7 @@ main.py (AppOrchestrator)
 |--------|------------------|
 | `src/TimeTracker.Core` | Contratos de dados, `ActivityRepository`, `SettingsStore`, `TrackingEngine` |
 | `src/TimeTracker.Tracker` | Win32, bandeja WinForms, startup `.lnk`, hospeda worker |
-| `src/TimeTracker.Dashboard` | API REST (esqueleto) + frontend estático Chart.js |
+| `src/TimeTracker.Dashboard` | API REST + frontend Chart.js (3 abas) |
 | `main.py` | *(legado)* Orquestração Python, shutdown graceful, startup Windows |
 | `app_paths.py` | *(legado)* `get_app_dir` / `get_resource_path` |
 | `tracker.py` | *(legado)* Captura, polling, CRUD settings |
@@ -209,6 +209,7 @@ streamlit run dashboard/app.py  # apenas dashboard (requer DB com dados)
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Fase 2: dashboard ASP.NET + Chart.js (paridade Streamlit), `ActivityQueryService`, API REST |
 | 2026-08-28 | Documento de migração: `MIGRATION.md` (fases, progresso, mapa Python→C#, decisões) |
 | 2026-08-28 | Migração Fase 0: `TimeTracker.sln`, `TimeTracker.Core`, `TimeTracker.Tracker`, esqueleto `TimeTracker.Dashboard` |
 | 2026-08-28 | `run.bat` Windows: venv, dependências e launch por duplo clique |

@@ -11,11 +11,13 @@ internal sealed class TrayApplicationContext : ApplicationContext
 {
     private readonly NotifyIcon _notifyIcon;
     private readonly IHost _host;
+    private readonly DashboardProcessService _dashboardProcess;
     private readonly CancellationTokenSource _shutdownCts = new();
 
-    public TrayApplicationContext(IHost host)
+    public TrayApplicationContext(IHost host, DashboardProcessService dashboardProcess)
     {
         _host = host;
+        _dashboardProcess = dashboardProcess;
 
         _notifyIcon = new NotifyIcon
         {
@@ -35,6 +37,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
             _shutdownCts.Cancel();
+            _dashboardProcess.Stop();
             _host.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
             _host.Dispose();
             _shutdownCts.Dispose();
@@ -91,11 +94,15 @@ internal static class Program
 
         host.Start();
 
+        var dashboardProcess = new DashboardProcessService(
+            host.Services.GetRequiredService<ILogger<DashboardProcessService>>());
+        dashboardProcess.Start(appDir);
+
         var startupService = new StartupShortcutService(
             host.Services.GetRequiredService<ILogger<StartupShortcutService>>());
         startupService.EnsureStartupShortcut(appDir, Environment.ProcessPath ?? Application.ExecutablePath);
 
-        Application.Run(new TrayApplicationContext(host));
+        Application.Run(new TrayApplicationContext(host, dashboardProcess));
     }
 
     private static string ResolveAppDirectory()

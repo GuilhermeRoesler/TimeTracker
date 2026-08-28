@@ -27,21 +27,21 @@ O **TimeTracker** é uma aplicação para Windows que monitoriza automaticamente
 
 ## 📦 Instalação
 
-### Stack C# (migração — Fase 1)
+### Stack C# (recomendada)
 
 1. Instale o [.NET SDK 8](https://dotnet.microsoft.com/download).
-2. Na raiz do repositório:
+2. Duplo clique em **`run-tracker.bat`** — inicia tracker + dashboard em `http://localhost:8501`.
+3. Use o ícone na bandeja do sistema para abrir o dashboard ou encerrar.
 
 ```bash
 dotnet build TimeTracker.sln
+dotnet run --project src/TimeTracker.Tracker   # equivalente ao run-tracker.bat
+dotnet run --project src/TimeTracker.Dashboard # só o dashboard (dev)
 ```
 
-3. Execute o tracker nativo: duplo clique em `run-tracker.bat` (ícone na bandeja).
-4. Para o dashboard Streamlit (ainda completo), use `run.bat` ou inicie o Streamlit manualmente — ver secção abaixo.
+> **Não execute** `run-tracker.bat` e `run.bat` (Python) ao mesmo tempo — ambos gravam no mesmo `productivity.db`.
 
-> Durante a migração, **não execute dois trackers em simultâneo** (`run-tracker.bat` e `python main.py`). Ambos gravam no mesmo `productivity.db`.
-
-### Stack Python (legada — ainda funcional)
+### Stack Python (legada)
 
 1. Clone o repositório ou descarregue os ficheiros.
 2. Instale as dependências listadas no `requirements.txt`:

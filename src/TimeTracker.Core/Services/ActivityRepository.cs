@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
+using TimeTracker.Core.Models;
 
 namespace TimeTracker.Core.Services;
 
@@ -115,6 +116,63 @@ public sealed class ActivityRepository
             _logger.LogError(ex, "Erro ao listar apps.");
             return Array.Empty<string>();
         }
+    }
+
+    public IReadOnlyList<ActivityLogRow> GetAllActivities()
+    {
+        try
+        {
+            using var connection = OpenConnection();
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT id, app_name, window_title, start_time, end_time, duration_seconds
+                FROM activity_log
+                ORDER BY start_time DESC
+                """;
+
+            var rows = new List<ActivityLogRow>();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                var startTime = ParseStoredTimestamp(reader.GetString(3));
+                if (startTime is null)
+                {
+                    continue;
+                }
+
+                rows.Add(new ActivityLogRow
+                {
+                    Id = reader.GetInt64(0),
+                    AppName = reader.GetString(1),
+                    WindowTitle = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                    StartTime = startTime.Value,
+                    EndTime = reader.IsDBNull(4) ? null : ParseStoredTimestamp(reader.GetString(4)),
+                    DurationSeconds = reader.IsDBNull(5) ? 0 : reader.GetDouble(5),
+                });
+            }
+
+            return rows;
+        }
+        catch (SqliteException ex)
+        {
+            _logger.LogError(ex, "Erro ao carregar atividades.");
+            return Array.Empty<ActivityLogRow>();
+        }
+    }
+
+    internal static DateTime? ParseStoredTimestamp(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        if (DateTime.TryParse(value, out var parsed))
+        {
+            return parsed;
+        }
+
+        return null;
     }
 
     private SqliteConnection OpenConnection()

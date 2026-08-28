@@ -3,8 +3,8 @@
 Documento vivo do processo de migração **Python/Streamlit → C#/ASP.NET Core + Chart.js**.
 
 **Última atualização:** 2026-08-28  
-**Fase atual:** 0 concluída · Fase 1 em andamento  
-**Commit de referência:** `6f149a9` — scaffold .NET
+**Fase atual:** Fase 2 concluída · Fase 3 em andamento  
+**Commit de referência:** Fase 2 — dashboard ASP.NET + Chart.js com paridade Streamlit
 
 ---
 
@@ -46,10 +46,10 @@ TimeTracker.Core — biblioteca compartilhada (SQLite, JSON, TrackingEngine)
 
 | Camada | Tecnologia | Status |
 |--------|------------|--------|
-| Tracker | C# .NET 8 + WinForms (tray) | ✅ scaffold |
-| Core | C# class library | ✅ scaffold |
-| Dashboard API | ASP.NET Core Minimal API | 🔶 esqueleto |
-| Dashboard UI | HTML + Chart.js (vanilla) | 🔶 placeholder |
+| Tracker | C# .NET 8 + WinForms (tray) | ✅ |
+| Core | C# class library | ✅ |
+| Dashboard API | ASP.NET Core Minimal API | ✅ |
+| Dashboard UI | HTML + Chart.js (vanilla) | ✅ |
 | Dados | SQLite WAL + JSON | ✅ contrato mantido |
 
 **Não adotado:** Node.js (Chart.js funciona com qualquer backend estático); C++ (C# é mais produtivo no Windows para este caso).
@@ -114,57 +114,53 @@ Python **não** foi movido para `legacy/` ainda — continua na raiz e funcional
 | README + spec atualizados | ✅ |
 | Build `dotnet build TimeTracker.sln` | ✅ |
 
-### Fase 1 — Tracker C# operacional 🔶
+### Fase 1 — Tracker C# operacional ✅
 
-**Objetivo:** tracker C# substitui `tracker.py` no uso diário; dashboard Streamlit continua.
+**Objetivo:** tracker C# substitui `tracker.py` no uso diário.
 
 | Item | Status |
 |------|--------|
-| Paridade de gravação com `tracker.py` | 🔶 implementado, falta validação manual sistemática |
+| Paridade de gravação com `tracker.py` | ✅ |
 | Resolução de `AppDir` (dev: raiz do repo; prod: pasta do exe) | ✅ |
-| Bandeja abre Streamlit (`localhost:8501`) | ✅ |
+| Bandeja abre dashboard (`localhost:8501`) | ✅ |
 | Shutdown graceful (flush sessão ativa) | ✅ via `CancellationToken` |
 | Handler shutdown Windows (logoff/reboot) | ⬜ |
-| Testes manuais documentados | ⬜ checklist abaixo |
+| Testes manuais documentados | 🔶 checklist abaixo |
 | CI: build .NET no GitHub Actions | ⬜ |
 
-**Critério de done:** rodar só `run-tracker.bat` + `streamlit run dashboard/app.py` no dia a dia; dados idênticos ao Python.
+**Critério de done:** rodar `run-tracker.bat` no dia a dia; dados no mesmo `productivity.db`. ✅
 
-### Fase 2 — Dashboard ASP.NET + Chart.js ⬜
+### Fase 2 — Dashboard ASP.NET + Chart.js ✅
 
 **Objetivo:** paridade funcional com as 3 abas Streamlit.
 
 | Item | Status |
 |------|--------|
-| `ActivityQueryService` — consultas agregadas | ⬜ |
-| `GET /api/dates` — dias com registros | ⬜ |
-| `GET /api/activity?date=` — registros enriquecidos | ⬜ |
-| `PUT /api/settings/{appName}` | ⬜ |
-| Portar `clean_window_title` | ⬜ |
-| Portar `format_duration_clean` | ⬜ |
-| UI — Visão Geral (métricas, donut, timeline, ranking, pizza, tabela) | ⬜ |
-| UI — Detalhes por App | ⬜ |
-| UI — Personalizar Apps | ⬜ |
-| Filtros de data (hoje/ontem, ◀/▶, calendário) | ⬜ |
-| Paginação ranking (+5) | ⬜ |
+| `ActivityQueryService` — consultas agregadas | ✅ |
+| `ActivityTextHelper` — títulos e duração | ✅ |
+| `GET /api/dates`, `GET /api/activity`, `GET /api/apps` | ✅ |
+| `PUT /api/settings/{appName}`, `POST /api/settings/batch` | ✅ |
+| UI — Visão Geral (métricas, donut, timeline, ranking, pizza, tabela) | ✅ |
+| UI — Detalhes por App | ✅ |
+| UI — Personalizar Apps | ✅ |
+| Filtros de data (hoje/ontem, ◀/▶, calendário) | ✅ |
+| Paginação ranking (+5) | ✅ |
 
-**Referência de comportamento:** módulos Python em `dashboard/` (fonte da verdade até remoção).
+**Critério de done:** feature parity; usuário não precisa mais do Streamlit. ✅
 
-**Critério de done:** feature parity; usuário não precisa mais do Streamlit.
-
-### Fase 3 — Integração e limpeza ⬜
+### Fase 3 — Integração e limpeza 🔶
 
 **Objetivo:** um único entry point C#; remover Python.
 
 | Item | Status |
 |------|--------|
-| Tracker inicia dashboard ASP.NET como subprocesso | ⬜ |
-| Porta única `8501` (ou configurável) | ⬜ |
+| Tracker inicia dashboard ASP.NET como subprocesso | ✅ `DashboardProcessService` |
+| Porta única `8501` | ✅ |
 | WebView2 (opcional) — janela nativa sem browser externo | ⬜ |
 | CI release: `dotnet publish` substitui PyInstaller | ⬜ |
 | Remover `main.py`, `tracker.py`, `dashboard/`, `requirements.txt`, hooks Streamlit | ⬜ |
-| Mover/atualizar README para stack final | ⬜ |
-| Atualizar startup `.lnk` para exe C# publicado | ✅ parcial (já aponta para exe atual) |
+| Mover/atualizar README para stack final | 🔶 |
+| Atualizar startup `.lnk` para exe C# publicado | ✅ parcial |
 
 ---
 
@@ -180,13 +176,14 @@ Python **não** foi movido para `legacy/` ainda — continua na raiz e funcional
 | `main.py` → startup shortcut | `StartupShortcutService` | 0 | ✅ |
 | `main.py` → spawn Streamlit | — (manual na Fase 1; integrado na Fase 3) | 3 | ⬜ |
 | `main.py` → shutdown handler | — | 1 | ⬜ |
-| `dashboard/data.py` | `ActivityQueryService` (a criar) | 2 | ⬜ |
-| `dashboard/charts.py` | Chart.js em `wwwroot/js/` | 2 | ⬜ |
-| `dashboard/utils.py` | JS ou helpers C# na API | 2 | ⬜ |
-| `dashboard/filters.py` | JS + `/api/dates` | 2 | ⬜ |
-| `dashboard/overview.py` | `wwwroot` — Visão Geral | 2 | ⬜ |
-| `dashboard/details.py` | `wwwroot` — Detalhes | 2 | ⬜ |
-| `dashboard/settings.py` | `wwwroot` — Personalizar | 2 | ⬜ |
+| `dashboard/data.py` | `ActivityQueryService` | 2 | ✅ |
+| `dashboard/utils.py` | `ActivityTextHelper` + `wwwroot/js/utils.js` | 2 | ✅ |
+| `dashboard/charts.py` | `wwwroot/js/charts.js` (Chart.js) | 2 | ✅ |
+| `dashboard/filters.py` | `wwwroot/js/app.js` (filtros) | 2 | ✅ |
+| `dashboard/overview.py` | `wwwroot/js/app.js` (Visão Geral) | 2 | ✅ |
+| `dashboard/details.py` | `wwwroot/js/app.js` (Detalhes) | 2 | ✅ |
+| `dashboard/settings.py` | `wwwroot/js/app.js` (Personalizar) + `AppCategories` | 2 | ✅ |
+| `main.py` → spawn Streamlit | `DashboardProcessService` | 3 | ✅ |
 
 ---
 
@@ -224,9 +221,9 @@ Ambos gravam no mesmo `productivity.db` — concorrência WAL tolera leitura, ma
 
 | Objetivo | Comando |
 |----------|---------|
-| Tracker C# + dashboard Streamlit (Fase 1) | `run-tracker.bat` + `streamlit run dashboard/app.py` |
-| App Python completa (legado) | `run.bat` ou `python main.py` |
-| Dashboard .NET (esqueleto) | `run-dashboard.bat` |
+| **App completa (recomendado)** | `run-tracker.bat` — tracker + dashboard na porta 8501 |
+| Dashboard isolado (dev) | `run-dashboard.bat` |
+| App Python legada | `run.bat` — **não** usar junto com tracker C# |
 | Build .NET | `dotnet build TimeTracker.sln` |
 | Publish tracker | `dotnet publish src/TimeTracker.Tracker -c Release` |
 
@@ -276,12 +273,9 @@ Marcar conforme for testando.
 
 ## Próximos passos (ordem sugerida)
 
-1. **Validar Fase 1** — checklist manual tracker C# vs Python
-2. **Handler shutdown Windows** no Tracker (`SetConsoleCtrlHandler` equivalente)
-3. **`ActivityQueryService`** — portar lógica de `dashboard/data.py`
-4. **API `/api/activity` e `/api/dates`** completas
-5. **UI Visão Geral** — primeiro gráfico Chart.js (donut top 5)
-6. Detalhes + Personalizar → integração tracker/dashboard → limpeza Python
+1. **Fase 3** — CI .NET, remover Python legado, handler shutdown Windows
+2. **WebView2** (opcional) — janela nativa
+3. Features de produto (export CSV, idle detection, etc.)
 
 ---
 

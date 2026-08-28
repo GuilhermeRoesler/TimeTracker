@@ -3,35 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TimeTracker Pro</title>
+  <title>TimeTracker Pro — Painel de Produtividade</title>
   <link rel="stylesheet" href="css/site.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
-  <script src="js/app.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>TimeTracker Pro</h1>
-    <p class="subtitle">Dashboard web — migração em andamento</p>
-  </header>
+  <div id="empty-state" class="empty-state hidden">
+    <h2>Sem dados</h2>
+    <p>Nenhum dado encontrado. Certifique-se de que o tracker está rodando (<code>run-tracker.bat</code>).</p>
+  </div>
 
-  <main>
-    <section class="card">
-      <h2>Status</h2>
-      <p id="health-status">Verificando API...</p>
-      <p class="hint">
-        Durante a Fase 1, use o dashboard Streamlit (<code>run.bat</code> ou <code>python main.py</code>)
-        enquanto o tracker C# grava no mesmo <code>productivity.db</code>.
-      </p>
-    </section>
+  <div id="app-layout" class="layout hidden">
+    <aside class="sidebar">
+      <h2>Filtros</h2>
+      <div id="date-shortcuts" class="shortcut-row"></div>
+      <div class="date-nav">
+        <button type="button" id="btn-prev-day" title="Dia anterior com registros">◀</button>
+        <input type="date" id="date-picker" aria-label="Selecione a data" />
+        <button type="button" id="btn-next-day" title="Próximo dia com registros">▶</button>
+      </div>
+      <p id="date-warning" class="warning hidden">Sem registros nesta data.</p>
+      <button type="button" id="btn-refresh" class="btn-secondary">Atualizar Dados</button>
+    </aside>
 
-    <section class="card">
-      <h2>Próximos passos</h2>
-      <ul>
-        <li>Visão Geral — métricas, donut, timeline, ranking</li>
-        <li>Detalhes por App</li>
-        <li>Personalizar Apps</li>
-      </ul>
-    </section>
-  </main>
+    <main class="main">
+      <header class="page-header">
+        <h1>📊 Painel de Produtividade Pessoal</h1>
+      </header>
+
+      <nav class="tabs" role="tablist">
+        <button type="button" class="tab active" data-tab="overview" role="tab">🏠 Visão Geral</button>
+        <button type="button" class="tab" data-tab="details" role="tab">🔍 Detalhes por App</button>
+        <button type="button" class="tab" data-tab="settings" role="tab">⚙️ Personalizar Apps</button>
+      </nav>
+
+      <section id="panel-overview" class="tab-panel" role="tabpanel"></section>
+      <section id="panel-details" class="tab-panel hidden" role="tabpanel"></section>
+      <section id="panel-settings" class="tab-panel hidden" role="tabpanel"></section>
+    </main>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
