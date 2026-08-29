@@ -113,7 +113,7 @@ function renderDonut(canvas, records, colorMap) {
   return true;
 }
 
-function renderHourlyTimeline(canvas, records, colorMap, tall = false) {
+function renderHourlyTimeline(canvas, records, colorMap) {
   destroyChart(canvas.id);
   const apps = [...new Set(records.map((r) => r.displayName))];
   if (!apps.length) return false;
@@ -183,10 +183,6 @@ function renderHourlyTimeline(canvas, records, colorMap, tall = false) {
       },
     },
   }));
-
-  if (tall) {
-    canvas.parentElement.style.minHeight = "420px";
-  }
   return true;
 }
 

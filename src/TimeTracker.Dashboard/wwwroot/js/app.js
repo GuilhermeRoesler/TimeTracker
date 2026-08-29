@@ -274,13 +274,6 @@ function renderOverview() {
         <div class="chart-box"><canvas id="chart-category"></canvas></div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-head">
-        <h3>Timeline completa</h3>
-        <p class="card-sub">24 horas · empilhado por aplicativo</p>
-      </div>
-      <div class="chart-box tall"><canvas id="chart-hourly-full"></canvas></div>
-    </div>
     <h3 class="section-title" style="margin-top: 1.35rem;">Histórico detalhado</h3>
     <p class="section-lead">Sessões do dia selecionado, da mais recente à mais antiga.</p>
     <div class="card table-wrap" data-lenis-prevent>${renderHistoryTable(records)}</div>
@@ -309,7 +302,6 @@ function renderOverview() {
   const catOk = renderCategoryPie(document.getElementById("chart-category"), records);
   if (!catOk) document.getElementById("chart-category").parentElement.innerHTML = '<p class="info-box">Sem dados de categoria.</p>';
 
-  renderHourlyTimeline(document.getElementById("chart-hourly-full"), records, colorMap, true);
   refreshSmoothScroll();
 }
 

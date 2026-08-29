@@ -182,6 +182,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Visão Geral: removido gráfico duplicado «Timeline completa» (mantida só a Linha do tempo) |
 | 2026-08-28 | Timeline horária: tooltip da coluna filtra apps com 0 min, ordena por uso e mostra total da hora |
 | 2026-08-28 | Dashboard: tooltips Chart.js claros (superfície/borda/tipografia dos cards; fade nativo preservado) |
 | 2026-08-28 | Dashboard: cursor personalizado (ponto + halo accent; hover em controles; off em touch/reduced-motion) |
