@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TimeTracker Pro — Painel de Produtividade</title>
+  <base href="/" />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -16,6 +17,12 @@
 </head>
 <body>
   <div class="ambient" aria-hidden="true"></div>
+
+  <div id="demo-banner" class="demo-banner hidden" role="status">
+    <strong>Demonstração</strong>
+    <span>Dados fictícios para preview. Baixe o app Windows para usar com seus próprios registros.</span>
+    <a id="demo-banner-link" class="demo-banner-link" href="https://github.com/GuilhermeRoesler/TimeTracker/releases" target="_blank" rel="noopener noreferrer">Ver releases</a>
+  </div>
 
   <div id="empty-state" class="empty-state hidden">
     <h2>Sem dados ainda</h2>

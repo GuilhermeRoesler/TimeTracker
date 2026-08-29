@@ -31,9 +31,19 @@ const els = {
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
+  setupDemoBanner();
   setupAppShellChrome();
   bindEvents();
   await reloadAll();
+}
+
+function setupDemoBanner() {
+  if (typeof isDemoMode !== "function" || !isDemoMode()) {
+    return;
+  }
+
+  document.body.classList.add("demo-mode");
+  document.getElementById("demo-banner")?.classList.remove("hidden");
 }
 
 function isAppShell() {
@@ -418,15 +428,18 @@ function renderSettings() {
       (app.displayName || "").toLowerCase().includes(search);
   });
 
+  const demo = typeof isDemoMode === "function" && isDemoMode();
   els.panelSettings.innerHTML = `
     <h3 class="section-title">Personalizar aplicativos</h3>
-    <p class="section-lead">Defina nomes amigáveis, cores e categorias. Somente alterações são salvas.</p>
+    <p class="section-lead">${demo
+      ? "Na demonstração, as alterações não são persistidas."
+      : "Defina nomes amigáveis, cores e categorias. Somente alterações são salvas."}</p>
     <input type="search" id="settings-search" class="settings-search" placeholder="Filtrar por executável ou nome de exibição…" value="${escapeHtml(state.settingsSearch)}" />
     <p class="settings-meta">${filtered.length} app(s) exibido(s)</p>
     <div class="card settings-table table-wrap" data-lenis-prevent>${filtered.length ? renderSettingsTable(filtered) : '<p class="info-box">Nenhum app corresponde à busca.</p>'}</div>
     <div class="settings-actions">
-      <button type="button" id="btn-save-settings" class="btn-primary">Salvar alterações</button>
-      <span id="settings-status" class="status-message"></span>
+      <button type="button" id="btn-save-settings" class="btn-primary" ${demo ? "disabled" : ""}>Salvar alterações</button>
+      <span id="settings-status" class="status-message">${demo ? "Modo demo: salvamento desativado." : ""}</span>
     </div>
   `;
 
@@ -435,7 +448,9 @@ function renderSettings() {
     renderSettings();
   });
 
-  document.getElementById("btn-save-settings")?.addEventListener("click", saveSettings);
+  if (!demo) {
+    document.getElementById("btn-save-settings")?.addEventListener("click", saveSettings);
+  }
   refreshSmoothScroll();
 }
 

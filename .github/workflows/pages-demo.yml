@@ -1,0 +1,81 @@
+name: Deploy demo (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/TimeTracker.Dashboard/wwwroot/**"
+      - ".github/workflows/pages-demo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-demo
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare static site
+        shell: bash
+        run: |
+          set -euo pipefail
+          SITE="_site"
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          BASE_HREF="/${REPO_NAME}/"
+
+          rm -rf "$SITE"
+          mkdir -p "$SITE"
+          cp -a src/TimeTracker.Dashboard/wwwroot/. "$SITE/"
+          touch "$SITE/.nojekyll"
+
+          python3 - "$SITE/index.html" "$BASE_HREF" <<'PY'
+          import pathlib
+          import sys
+
+          path = pathlib.Path(sys.argv[1])
+          base_href = sys.argv[2]
+          html = path.read_text(encoding="utf-8")
+
+          if '<base href="/" />' in html:
+              html = html.replace('<base href="/" />', f'<base href="{base_href}" />', 1)
+          elif "<base href=" not in html:
+              html = html.replace(
+                  "<head>",
+                  f'<head>\n  <base href="{base_href}" />',
+                  1,
+              )
+
+          if "window.__TIMETRACKER_DEMO__" not in html:
+              html = html.replace(
+                  "</head>",
+                  "  <script>window.__TIMETRACKER_DEMO__ = true;</script>\n</head>",
+                  1,
+              )
+
+          path.write_text(html, encoding="utf-8")
+          print(f"Configured demo site with base href {base_href}")
+          PY
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

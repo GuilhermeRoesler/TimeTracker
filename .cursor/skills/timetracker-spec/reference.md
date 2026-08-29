@@ -88,6 +88,8 @@
 - Instalador Inno Setup + publish framework-dependent
 - WebView2 + testes xUnit + CI build/test/release
 - Auto-update via GitHub Releases (bandeja + check silencioso ao iniciar)
+- Demo GitHub Pages (`pages-demo.yml`) com dataset mockado
+
 ## Testes
 
 **Estado atual:** suite xUnit em `tests/TimeTracker.Core.Tests` (Core). CI em `.github/workflows/ci.yml`.
@@ -196,6 +198,21 @@ Artefatos:
 git tag v1.0.0
 git push origin v1.0.0
 ```
+
+### Demo — GitHub Pages
+
+Workflow: `.github/workflows/pages-demo.yml`
+
+| Trigger | Comportamento |
+|---------|---------------|
+| Push em `main` (alterações em `wwwroot` ou no workflow) | Publica demo estática |
+| `workflow_dispatch` | Redeploy manual |
+
+- Fonte: `wwwroot` + `wwwroot/demo/dataset.json` (datas relativas a “hoje”)
+- Modo demo: `github.io`, `window.__TIMETRACKER_DEMO__`, ou `?demo=1`
+- URL: `https://guilhermeroesler.github.io/TimeTracker/`
+- Em Settings → Pages, fonte = **GitHub Actions**
+- Salvamento de settings desativado na demo
 
 ### Atualização de versão
 

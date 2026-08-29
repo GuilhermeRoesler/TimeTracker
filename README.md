@@ -2,6 +2,8 @@
 
 O **TimeTracker** é uma aplicação para Windows que monitoriza automaticamente a janela ativa do computador, registando quanto tempo é gasto em cada aplicação e site. O projeto inclui um dashboard interativo para análise de dados e gestão de categorias.
 
+**Demo online (dados fictícios):** [https://guilhermeroesler.github.io/TimeTracker/](https://guilhermeroesler.github.io/TimeTracker/)
+
 ![](images/dashboard.png)
 
 ## 🚀 Funcionalidades
@@ -90,10 +92,15 @@ TimeTracker/
 │   ├── TimeTracker.Core/        # SQLite, settings JSON, TrackingEngine
 │   ├── TimeTracker.Tracker/     # Win32, bandeja, Kestrel in-process, WebView2
 │   └── TimeTracker.Dashboard/   # API + wwwroot (embutido no Tracker)
+│       └── wwwroot/demo/        # dataset mock para GitHub Pages / ?demo=1
 ├── app_settings.example.json
 ├── productivity.db              # gerado em runtime (não versionado)
 └── app_settings.json            # personalizações (não versionado)
 ```
+
+### Demo no GitHub Pages
+
+O workflow `.github/workflows/pages-demo.yml` publica o `wwwroot` estático com dados mockados. Em Settings → Pages, use fonte **GitHub Actions**. Localmente: `http://localhost:8501/?demo=1`.
 
 ## 📝 Notas
 

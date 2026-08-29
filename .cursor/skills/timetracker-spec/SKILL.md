@@ -98,6 +98,7 @@ Campos expostos por `ActivityQueryService`:
 - Controles de data no cabeçalho do painel; botão Atualizar no canto superior direito.
 - Abas underline (sem emojis); métricas com acento teal; painéis leves com blur.
 - Gráficos Chart.js alinhados ao tema (tooltips claros no estilo dos cards, grades suaves, paleta sóbria).
+- **Demo estática (GitHub Pages / `?demo=1`):** banner no topo; dados de `wwwroot/demo/dataset.json` (offsets relativos a hoje); salvamento de settings desativado.
 
 ### Abas
 
@@ -182,6 +183,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-29 | Demo GitHub Pages: `wwwroot/demo/dataset.json`, modo demo em `api.js`, workflow `pages-demo.yml`, banner e settings somente leitura |
 | 2026-08-28 | Visão Geral: removido gráfico duplicado «Timeline completa» (mantida só a Linha do tempo) |
 | 2026-08-28 | Timeline horária: tooltip da coluna filtra apps com 0 min, ordena por uso e mostra total da hora |
 | 2026-08-28 | Dashboard: tooltips Chart.js claros (superfície/borda/tipografia dos cards; fade nativo preservado) |

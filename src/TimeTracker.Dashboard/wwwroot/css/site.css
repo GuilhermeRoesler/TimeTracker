@@ -67,6 +67,46 @@ body {
   display: none !important;
 }
 
+.demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 1rem;
+  padding: 0.7rem 1.25rem;
+  background: var(--accent-soft);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.demo-banner strong {
+  color: var(--accent);
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.demo-banner span {
+  flex: 1 1 14rem;
+  color: var(--muted);
+}
+
+.demo-banner-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.demo-banner-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+body.demo-mode .layout {
+  padding-top: 0.35rem;
+}
+
 /* —— Custom cursor —— */
 html.has-custom-cursor,
 html.has-custom-cursor * {
@@ -383,6 +423,13 @@ html.has-custom-cursor select {
 .btn-primary:hover {
   background: linear-gradient(165deg, var(--accent), var(--accent-hover));
   color: #fff;
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
 }
 
 .shortcut-row .btn-secondary.is-active {

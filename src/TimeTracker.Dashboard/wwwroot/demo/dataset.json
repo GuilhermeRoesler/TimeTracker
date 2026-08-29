@@ -1,0 +1,358 @@
+{
+  "meta": {
+    "categories": [
+      "Sem Categoria",
+      "Trabalho",
+      "Estudo",
+      "Desenvolvimento",
+      "Comunicação",
+      "Lazer",
+      "Navegação",
+      "Utilitários",
+      "Outros"
+    ],
+    "dashboardPort": 8501
+  },
+  "apps": [
+    {
+      "appName": "Code.exe",
+      "displayName": "VS Code",
+      "hexColor": "#007ACC",
+      "category": "Desenvolvimento"
+    },
+    {
+      "appName": "chrome.exe",
+      "displayName": "Google Chrome",
+      "hexColor": "#4285F4",
+      "category": "Navegação"
+    },
+    {
+      "appName": "Slack.exe",
+      "displayName": "Slack",
+      "hexColor": "#4A154B",
+      "category": "Comunicação"
+    },
+    {
+      "appName": "WINWORD.EXE",
+      "displayName": "Word",
+      "hexColor": "#2B579A",
+      "category": "Trabalho"
+    },
+    {
+      "appName": "spotify.exe",
+      "displayName": "Spotify",
+      "hexColor": "#1DB954",
+      "category": "Lazer"
+    },
+    {
+      "appName": "explorer.exe",
+      "displayName": "Explorador de Arquivos",
+      "hexColor": "#0078D4",
+      "category": "Utilitários"
+    },
+    {
+      "appName": "ms-teams.exe",
+      "displayName": "Microsoft Teams",
+      "hexColor": "#6264A7",
+      "category": "Comunicação"
+    },
+    {
+      "appName": "Notion.exe",
+      "displayName": "Notion",
+      "hexColor": "#000000",
+      "category": "Trabalho"
+    }
+  ],
+  "days": [
+    {
+      "dayOffset": 0,
+      "records": [
+        {
+          "id": 101,
+          "appName": "Code.exe",
+          "windowTitle": "TimeTracker — DashboardWeb.cs",
+          "startTime": "08:42:00",
+          "endTime": "09:55:00",
+          "durationSeconds": 4380,
+          "displayName": "VS Code",
+          "hexColor": "#007ACC",
+          "category": "Desenvolvimento"
+        },
+        {
+          "id": 102,
+          "appName": "chrome.exe",
+          "windowTitle": "ASP.NET Core Minimal APIs — documentação",
+          "startTime": "09:55:00",
+          "endTime": "10:18:00",
+          "durationSeconds": 1380,
+          "displayName": "Google Chrome",
+          "hexColor": "#4285F4",
+          "category": "Navegação"
+        },
+        {
+          "id": 103,
+          "appName": "Slack.exe",
+          "windowTitle": "squad-produto — TimeTracker",
+          "startTime": "10:18:00",
+          "endTime": "10:41:00",
+          "durationSeconds": 1380,
+          "displayName": "Slack",
+          "hexColor": "#4A154B",
+          "category": "Comunicação"
+        },
+        {
+          "id": 104,
+          "appName": "Code.exe",
+          "windowTitle": "TimeTracker — app.js",
+          "startTime": "10:41:00",
+          "endTime": "12:05:00",
+          "durationSeconds": 5040,
+          "displayName": "VS Code",
+          "hexColor": "#007ACC",
+          "category": "Desenvolvimento"
+        },
+        {
+          "id": 105,
+          "appName": "spotify.exe",
+          "windowTitle": "Spotify Premium",
+          "startTime": "12:05:00",
+          "endTime": "12:22:00",
+          "durationSeconds": 1020,
+          "displayName": "Spotify",
+          "hexColor": "#1DB954",
+          "category": "Lazer"
+        },
+        {
+          "id": 106,
+          "appName": "chrome.exe",
+          "windowTitle": "GitHub — GuilhermeRoesler/TimeTracker",
+          "startTime": "13:10:00",
+          "endTime": "13:35:00",
+          "durationSeconds": 1500,
+          "displayName": "Google Chrome",
+          "hexColor": "#4285F4",
+          "category": "Navegação"
+        },
+        {
+          "id": 107,
+          "appName": "ms-teams.exe",
+          "windowTitle": "Reunião diária — Produto",
+          "startTime": "13:35:00",
+          "endTime": "14:05:00",
+          "durationSeconds": 1800,
+          "displayName": "Microsoft Teams",
+          "hexColor": "#6264A7",
+          "category": "Comunicação"
+        },
+        {
+          "id": 108,
+          "appName": "Code.exe",
+          "windowTitle": "TimeTracker — charts.js",
+          "startTime": "14:05:00",
+          "endTime": "16:20:00",
+          "durationSeconds": 8100,
+          "displayName": "VS Code",
+          "hexColor": "#007ACC",
+          "category": "Desenvolvimento"
+        },
+        {
+          "id": 109,
+          "appName": "Notion.exe",
+          "windowTitle": "Notas da sprint",
+          "startTime": "16:20:00",
+          "endTime": "16:55:00",
+          "durationSeconds": 2100,
+          "displayName": "Notion",
+          "hexColor": "#000000",
+          "category": "Trabalho"
+        },
+        {
+          "id": 110,
+          "appName": "explorer.exe",
+          "windowTitle": "Projetos",
+          "startTime": "16:55:00",
+          "endTime": "17:08:00",
+          "durationSeconds": 780,
+          "displayName": "Explorador de Arquivos",
+          "hexColor": "#0078D4",
+          "category": "Utilitários"
+        }
+      ]
+    },
+    {
+      "dayOffset": -1,
+      "records": [
+        {
+          "id": 201,
+          "appName": "chrome.exe",
+          "windowTitle": "Stack Overflow — Chart.js stacked bar",
+          "startTime": "09:05:00",
+          "endTime": "09:40:00",
+          "durationSeconds": 2100,
+          "displayName": "Google Chrome",
+          "hexColor": "#4285F4",
+          "category": "Navegação"
+        },
+        {
+          "id": 202,
+          "appName": "Code.exe",
+          "windowTitle": "TimeTracker — ActivityQueryService.cs",
+          "startTime": "09:40:00",
+          "endTime": "11:30:00",
+          "durationSeconds": 6600,
+          "displayName": "VS Code",
+          "hexColor": "#007ACC",
+          "category": "Desenvolvimento"
+        },
+        {
+          "id": 203,
+          "appName": "WINWORD.EXE",
+          "windowTitle": "Relatório semanal.docx",
+          "startTime": "11:30:00",
+          "endTime": "12:15:00",
+          "durationSeconds": 2700,
+          "displayName": "Word",
+          "hexColor": "#2B579A",
+          "category": "Trabalho"
+        },
+        {
+          "id": 204,
+          "appName": "Slack.exe",
+          "windowTitle": "engenharia — threads",
+          "startTime": "13:00:00",
+          "endTime": "13:45:00",
+          "durationSeconds": 2700,
+          "displayName": "Slack",
+          "hexColor": "#4A154B",
+          "category": "Comunicação"
+        },
+        {
+          "id": 205,
+          "appName": "Code.exe",
+          "windowTitle": "TimeTracker — site.css",
+          "startTime": "13:45:00",
+          "endTime": "15:50:00",
+          "durationSeconds": 7500,
+          "displayName": "VS Code",
+          "hexColor": "#007ACC",
+          "category": "Desenvolvimento"
+        },
+        {
+          "id": 206,
+          "appName": "spotify.exe",
+          "windowTitle": "Discover Weekly",
+          "startTime": "15:50:00",
+          "endTime": "16:10:00",
+          "durationSeconds": 1200,
+          "displayName": "Spotify",
+          "hexColor": "#1DB954",
+          "category": "Lazer"
+        },
+        {
+          "id": 207,
+          "appName": "chrome.exe",
+          "windowTitle": "Figma — protótipo dashboard",
+          "startTime": "16:10:00",
+          "endTime": "17:25:00",
+          "durationSeconds": 4500,
+          "displayName": "Google Chrome",
+          "hexColor": "#4285F4",
+          "category": "Navegação"
+        }
+      ]
+    },
+    {
+      "dayOffset": -2,
+      "records": [
+        {
+          "id": 301,
+          "appName": "ms-teams.exe",
+          "windowTitle": "Planning — Sprint 14",
+          "startTime": "09:00:00",
+          "endTime": "10:00:00",
+          "durationSeconds": 3600,
+          "displayName": "Microsoft Teams",
+          "hexColor": "#6264A7",
+          "category": "Comunicação"
+        },
+        {
+          "id": 302,
+          "appName": "Notion.exe",
+          "windowTitle": "Backlog priorizado",
+          "startTime": "10:00:00",
+          "endTime": "10:50:00",
+          "durationSeconds": 3000,
+          "displayName": "Notion",
+          "hexColor": "#000000",
+          "category": "Trabalho"
+        },
+        {
+          "id": 303,
+          "appName": "Code.exe",
+          "windowTitle": "TimeTracker — TrackingEngine.cs",
+          "startTime": "10:50:00",
+          "endTime": "12:40:00",
+          "durationSeconds": 6600,
+          "displayName": "VS Code",
+          "hexColor": "#007ACC",
+          "category": "Desenvolvimento"
+        },
+        {
+          "id": 304,
+          "appName": "chrome.exe",
+          "windowTitle": "YouTube — clean code talk",
+          "startTime": "13:30:00",
+          "endTime": "14:15:00",
+          "durationSeconds": 2700,
+          "displayName": "Google Chrome",
+          "hexColor": "#4285F4",
+          "category": "Navegação"
+        },
+        {
+          "id": 305,
+          "appName": "Code.exe",
+          "windowTitle": "TimeTracker.Core.Tests — ActivityRepositoryTests.cs",
+          "startTime": "14:15:00",
+          "endTime": "16:00:00",
+          "durationSeconds": 6300,
+          "displayName": "VS Code",
+          "hexColor": "#007ACC",
+          "category": "Desenvolvimento"
+        },
+        {
+          "id": 306,
+          "appName": "Slack.exe",
+          "windowTitle": "random — memes",
+          "startTime": "16:00:00",
+          "endTime": "16:20:00",
+          "durationSeconds": 1200,
+          "displayName": "Slack",
+          "hexColor": "#4A154B",
+          "category": "Comunicação"
+        },
+        {
+          "id": 307,
+          "appName": "explorer.exe",
+          "windowTitle": "Downloads",
+          "startTime": "16:20:00",
+          "endTime": "16:28:00",
+          "durationSeconds": 480,
+          "displayName": "Explorador de Arquivos",
+          "hexColor": "#0078D4",
+          "category": "Utilitários"
+        },
+        {
+          "id": 308,
+          "appName": "WINWORD.EXE",
+          "windowTitle": "Ata da planning.docx",
+          "startTime": "16:28:00",
+          "endTime": "17:10:00",
+          "durationSeconds": 2520,
+          "displayName": "Word",
+          "hexColor": "#2B579A",
+          "category": "Trabalho"
+        }
+      ]
+    }
+  ]
+}
