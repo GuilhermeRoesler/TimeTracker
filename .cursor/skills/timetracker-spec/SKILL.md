@@ -87,7 +87,7 @@ Campos expostos por `ActivityQueryService`:
 - **Troca de foco:** salva sessão anterior e reinicia `start_time`.
 - **Shutdown:** `CancellationToken` ou `SystemEvents.SessionEnding` → flush da sessão ativa.
 - **Janelas protegidas:** fallback `app_name = "System/Protected"`.
-- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 (fallback: browser). `run-dashboard.bat` sobe só a API em dev.
+- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 com User Data Folder em `AppPaths.GetDataDir()/WebView2` (fallback: browser se a inicialização falhar). `run-dashboard.bat` sobe só a API em dev.
 
 ## Comportamento do dashboard
 
@@ -168,6 +168,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | WebView2: User Data Folder em `%LocalAppData%` (evita falha/fallback ao instalar em Program Files) |
 | 2026-08-28 | Auto-update: verifica GitHub Releases, notifica na bandeja e instala Setup |
 | 2026-08-28 | Removido `MIGRATION.md` (migração Python→C# concluída; histórico no changelog) |
 | 2026-08-28 | Ícone do produto (`assets/app.ico`): exe, bandeja, WebView2, favicon, Setup Inno; CI verifica presença |

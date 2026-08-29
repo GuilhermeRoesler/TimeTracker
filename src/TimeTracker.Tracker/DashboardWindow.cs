@@ -1,3 +1,4 @@
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using TimeTracker.Core;
 
@@ -25,7 +26,12 @@ internal sealed class DashboardWindow : Form
 
     public async Task InitializeAsync()
     {
-        await _webView.EnsureCoreWebView2Async(null);
+        // UDF padrão fica ao lado do .exe (Program Files) e falha sem escrita —
+        // usar a pasta de dados do app (%LocalAppData% em produção).
+        var userDataFolder = Path.Combine(AppPaths.GetDataDir(), "WebView2");
+        Directory.CreateDirectory(userDataFolder);
+        var environment = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
+        await _webView.EnsureCoreWebView2Async(environment);
         _webView.Source = new Uri(AppConstants.DashboardUrl);
     }
 }
@@ -42,18 +48,31 @@ internal static class DashboardWindowService
             return;
         }
 
+        DashboardWindow? window = null;
         try
         {
-            var window = new DashboardWindow();
-            window.FormClosed += (_, _) => _window = null;
-            await window.InitializeAsync();
+            window = new DashboardWindow();
+            window.FormClosed += (_, _) =>
+            {
+                if (ReferenceEquals(_window, window))
+                {
+                    _window = null;
+                }
+            };
 
             _window = window;
             window.Show();
             window.Activate();
+            await window.InitializeAsync();
         }
         catch (Exception)
         {
+            if (window is { IsDisposed: false })
+            {
+                window.Close();
+            }
+
+            _window = null;
             OpenInBrowser();
         }
     }

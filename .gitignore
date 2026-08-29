@@ -6,6 +6,7 @@ __pycache__
 
 productivity.db
 *.db
+WebView2/
 
 app_settings.json
 
