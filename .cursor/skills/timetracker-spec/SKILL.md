@@ -97,7 +97,7 @@ Campos expostos por `ActivityQueryService`:
 - Layout centralizado sem sidebar (`max-width` ~960px, margens laterais amplas).
 - Controles de data no cabeçalho do painel; botão Atualizar no canto superior direito.
 - Abas underline (sem emojis); métricas com acento teal; painéis leves com blur.
-- Gráficos Chart.js alinhados ao tema (tooltips escuros, grades suaves, paleta sóbria).
+- Gráficos Chart.js alinhados ao tema (tooltips claros no estilo dos cards, grades suaves, paleta sóbria).
 
 ### Abas
 
@@ -182,6 +182,8 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Timeline horária: tooltip da coluna filtra apps com 0 min, ordena por uso e mostra total da hora |
+| 2026-08-28 | Dashboard: tooltips Chart.js claros (superfície/borda/tipografia dos cards; fade nativo preservado) |
 | 2026-08-28 | Dashboard: cursor personalizado (ponto + halo accent; hover em controles; off em touch/reduced-motion) |
 | 2026-08-28 | Dashboard: smooth scroll Lenis (respeita `prefers-reduced-motion`; nested scroll com `data-lenis-prevent`) |
 | 2026-08-28 | WebView2 (`?shell=app`): ícone discreto «Abrir no navegador» no header HTML (sem faixa nativa) |

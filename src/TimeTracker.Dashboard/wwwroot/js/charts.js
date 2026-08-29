@@ -4,8 +4,10 @@ const CHART_THEME = {
   text: "#1a2740",
   muted: "#5b6b82",
   grid: "rgba(15, 28, 48, 0.07)",
-  tooltipBg: "rgba(12, 21, 36, 0.92)",
-  tooltipText: "#f8fafc",
+  tooltipBg: "rgba(255, 255, 255, 0.96)",
+  tooltipTitle: "#0c1524",
+  tooltipBody: "#5b6b82",
+  tooltipBorder: "rgba(15, 28, 48, 0.12)",
   accent: "rgba(14, 116, 144, 0.78)",
 };
 
@@ -18,13 +20,25 @@ function chartDefaults() {
       legend: { display: false },
       tooltip: {
         backgroundColor: CHART_THEME.tooltipBg,
-        titleColor: CHART_THEME.tooltipText,
-        bodyColor: CHART_THEME.tooltipText,
-        borderWidth: 0,
-        cornerRadius: 8,
-        padding: 10,
+        titleColor: CHART_THEME.tooltipTitle,
+        bodyColor: CHART_THEME.tooltipBody,
+        borderColor: CHART_THEME.tooltipBorder,
+        borderWidth: 1,
+        cornerRadius: 10,
+        padding: { top: 10, right: 12, bottom: 10, left: 12 },
+        caretSize: 5,
+        caretPadding: 8,
+        displayColors: true,
+        boxWidth: 8,
+        boxHeight: 8,
+        boxPadding: 4,
+        usePointStyle: true,
+        multiKeyBackground: "#ffffff",
+        titleMarginBottom: 6,
         titleFont: { family: "'Plus Jakarta Sans', sans-serif", weight: "600", size: 12 },
-        bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+        bodyFont: { family: "'Plus Jakarta Sans', sans-serif", weight: "500", size: 12 },
+        // Fade nativo do Chart.js (opacity) — duração alinhada ao --ease da UI
+        animation: { duration: 180 },
       },
     },
   };
@@ -128,6 +142,8 @@ function renderHourlyTimeline(canvas, records, colorMap, tall = false) {
     },
     options: {
       ...defaults,
+      // Coluna da hora: lista só apps com uso (> 0), não o stack inteiro com zeros
+      interaction: { mode: "index", intersect: false },
       scales: {
         x: {
           stacked: true,
@@ -147,10 +163,20 @@ function renderHourlyTimeline(canvas, records, colorMap, tall = false) {
         ...defaults.plugins,
         tooltip: {
           ...defaults.plugins.tooltip,
+          filter(item) {
+            return item.parsed.y > 0;
+          },
+          itemSort(a, b) {
+            return b.parsed.y - a.parsed.y;
+          },
           callbacks: {
             label(context) {
               const minutes = context.raw;
               return `${context.dataset.label}: ${formatDurationClean(minutes * 60)}`;
+            },
+            footer(items) {
+              const totalMin = items.reduce((sum, item) => sum + item.parsed.y, 0);
+              return totalMin > 0 ? `Total: ${formatDurationClean(totalMin * 60)}` : "";
             },
           },
         },
