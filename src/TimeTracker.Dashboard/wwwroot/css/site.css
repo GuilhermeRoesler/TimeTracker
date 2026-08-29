@@ -456,11 +456,42 @@ input[type="search"]:focus {
 .table-wrap {
   overflow: auto;
   max-height: min(560px, 70vh);
+  background: var(--surface-solid);
+  border-radius: inherit;
+}
+
+.card.table-wrap {
+  padding: 0;
+}
+
+.card.table-wrap th,
+.card.table-wrap td {
+  padding-left: 1.15rem;
+  padding-right: 1.15rem;
+}
+
+.card.table-wrap th:first-child,
+.card.table-wrap td:first-child {
+  padding-left: 1.2rem;
+}
+
+.card.table-wrap th:last-child,
+.card.table-wrap td:last-child {
+  padding-right: 1.2rem;
+}
+
+.card.table-wrap thead th {
+  padding-top: 0.95rem;
+}
+
+.card.table-wrap tbody tr:last-child td {
+  border-bottom: none;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.875rem;
 }
 
@@ -475,14 +506,14 @@ td {
 th {
   position: sticky;
   top: 0;
-  z-index: 1;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
+  z-index: 2;
+  background: var(--surface-solid);
   color: var(--muted-2);
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  box-shadow: 0 1px 0 var(--line);
 }
 
 tbody tr {

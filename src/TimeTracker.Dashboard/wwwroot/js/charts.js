@@ -15,17 +15,7 @@ function chartDefaults() {
     maintainAspectRatio: false,
     interaction: { mode: "nearest", intersect: false },
     plugins: {
-      legend: {
-        labels: {
-          color: CHART_THEME.muted,
-          boxWidth: 10,
-          boxHeight: 10,
-          borderRadius: 2,
-          useBorderRadius: true,
-          padding: 14,
-          font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: "500" },
-        },
-      },
+      legend: { display: false },
       tooltip: {
         backgroundColor: CHART_THEME.tooltipBg,
         titleColor: CHART_THEME.tooltipText,
@@ -75,7 +65,6 @@ function renderDonut(canvas, records, colorMap) {
       cutout: "68%",
       plugins: {
         ...defaults.plugins,
-        legend: { ...defaults.plugins.legend, position: "bottom" },
         tooltip: {
           ...defaults.plugins.tooltip,
           callbacks: {
@@ -139,11 +128,6 @@ function renderHourlyTimeline(canvas, records, colorMap, tall = false) {
       },
       plugins: {
         ...defaults.plugins,
-        legend: {
-          ...defaults.plugins.legend,
-          position: "bottom",
-          labels: { ...defaults.plugins.legend.labels, filter: (item) => item.text.length < 28 },
-        },
         tooltip: {
           ...defaults.plugins.tooltip,
           callbacks: {
@@ -198,7 +182,6 @@ function renderRanking(canvas, records, colorMap, limit) {
       },
       plugins: {
         ...defaults.plugins,
-        legend: { display: false },
         tooltip: {
           ...defaults.plugins.tooltip,
           callbacks: {
@@ -242,7 +225,6 @@ function renderCategoryPie(canvas, records) {
       cutout: "58%",
       plugins: {
         ...defaults.plugins,
-        legend: { ...defaults.plugins.legend, position: "bottom" },
         tooltip: {
           ...defaults.plugins.tooltip,
           callbacks: {
@@ -308,7 +290,6 @@ function renderWindowTitles(canvas, records, displayName) {
       },
       plugins: {
         ...defaults.plugins,
-        legend: { display: false },
         tooltip: {
           ...defaults.plugins.tooltip,
           callbacks: {
