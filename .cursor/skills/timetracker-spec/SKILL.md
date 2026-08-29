@@ -94,7 +94,8 @@ Campos expostos por `ActivityQueryService`:
 ### Visual (UI)
 
 - Tema **claro** corporativo; tipografia Plus Jakarta Sans + JetBrains Mono (durações/tabelas).
-- Sidebar com marca TimeTracker Pro, filtros de período e botão atualizar.
+- Layout centralizado sem sidebar (`max-width` ~960px, margens laterais amplas).
+- Controles de data no cabeçalho do painel; botão Atualizar no canto superior direito.
 - Abas underline (sem emojis); métricas com acento teal; painéis leves com blur.
 - Gráficos Chart.js alinhados ao tema (tooltips escuros, grades suaves, paleta sóbria).
 
@@ -104,11 +105,11 @@ Campos expostos por `ActivityQueryService`:
 2. **Detalhes por App** — select de apps; top 15 títulos limpos; histórico cronológico.
 3. **Personalizar Apps** — busca, edição em lote, salvar apenas alterações.
 
-### Filtros (sidebar)
+### Filtros (cabeçalho)
 
 - Atalhos Hoje/Ontem quando disponíveis (estado ativo no dia selecionado).
 - Navegação ◀/▶ entre dias **com registros** (não dias vazios do calendário).
-- Botão "Atualizar dados" recarrega via API.
+- Botão "Atualizar" no topo do painel recarrega via API.
 - Cabeçalho principal mostra a data selecionada por extenso (pt-BR).
 
 ## Convenções de código
@@ -176,7 +177,8 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
-| 2026-08-28 | UI do dashboard: redesign executivo (tema claro, Plus Jakarta Sans, sidebar com marca, tabs underline, gráficos refinados); removidos emojis da interface |
+| 2026-08-28 | UI: removida sidebar/marca; layout centralizado com margens amplas; data e Atualizar no cabeçalho do painel |
+| 2026-08-28 | UI do dashboard: redesign executivo (tema claro, Plus Jakarta Sans, tabs underline, gráficos refinados); removidos emojis da interface |
 | 2026-08-28 | Removidos `run-tracker.bat` / `run-dashboard.bat` (duplicata e launcher legado); entry point só `run.bat` |
 | 2026-08-28 | WebView2: User Data Folder em `%LocalAppData%` (evita falha/fallback ao instalar em Program Files) |
 | 2026-08-28 | Auto-update: verifica GitHub Releases, notifica na bandeja e instala Setup |
