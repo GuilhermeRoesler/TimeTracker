@@ -9,4 +9,5 @@ if errorlevel 1 (
     exit /b 1
 )
 
-dotnet run --project src\TimeTracker.Tracker\TimeTracker.Tracker.csproj
+rem --no-hot-reload: evita o host do `dotnet run` ficar preso apos o WinExe encerrar pela bandeja
+dotnet run --project src\TimeTracker.Tracker\TimeTracker.Tracker.csproj --no-hot-reload

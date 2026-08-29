@@ -11,15 +11,13 @@ namespace TimeTracker.Tracker;
 internal sealed class TrayApplicationContext : ApplicationContext
 {
     private readonly NotifyIcon _notifyIcon;
-    private readonly WebApplication _webApp;
     private readonly AppUpdateService _updateService;
     private readonly SynchronizationContext _uiContext;
     private int _updateCheckRunning;
     private CancellationTokenSource? _startupCheckCts;
 
-    public TrayApplicationContext(WebApplication webApp, AppUpdateService updateService)
+    public TrayApplicationContext(AppUpdateService updateService)
     {
-        _webApp = webApp;
         _updateService = updateService;
         _uiContext = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
 
@@ -43,11 +41,10 @@ internal sealed class TrayApplicationContext : ApplicationContext
         {
             _startupCheckCts?.Cancel();
             _startupCheckCts?.Dispose();
+            _startupCheckCts = null;
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
             DashboardWindowService.Close();
-            _webApp.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
-            (_webApp as IAsyncDisposable)?.DisposeAsync().AsTask().GetAwaiter().GetResult();
         }
 
         base.Dispose(disposing);
@@ -213,16 +210,48 @@ internal static class Program
             app.Services.GetRequiredService<ILogger<StartupShortcutService>>());
         startupService.EnsureStartupShortcut(installDir, Environment.ProcessPath ?? Application.ExecutablePath);
 
-        SystemEvents.SessionEnding += (_, e) =>
+        SessionEndingEventHandler sessionEnding = (_, e) =>
         {
             _trayContext?.ExitThread();
             e.Cancel = false;
         };
+        SystemEvents.SessionEnding += sessionEnding;
 
         _trayContext = new TrayApplicationContext(
-            app,
             app.Services.GetRequiredService<AppUpdateService>());
-        Application.Run(_trayContext);
+
+        try
+        {
+            Application.Run(_trayContext);
+        }
+        finally
+        {
+            SystemEvents.SessionEnding -= sessionEnding;
+            // Parar Kestrel fora do Dispose da UI — StopAsync no thread da mensagem
+            // pode travar o processo e deixar o `dotnet run`/terminal preso.
+            ShutdownWebApp(app);
+        }
+    }
+
+    private static void ShutdownWebApp(WebApplication webApp)
+    {
+        try
+        {
+            webApp.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+        }
+        catch
+        {
+            // Encerrando; ignorar falhas de shutdown.
+        }
+
+        try
+        {
+            webApp.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+        catch
+        {
+            // Encerrando; ignorar falhas de dispose.
+        }
     }
 
     private static void ResolveAndConfigurePaths()

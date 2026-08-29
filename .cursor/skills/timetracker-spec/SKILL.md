@@ -177,6 +177,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Shutdown: Kestrel para após `Application.Run` (não no Dispose da bandeja); `run.bat` usa `--no-hot-reload` |
 | 2026-08-28 | UI: removida sidebar/marca; layout centralizado com margens amplas; data e Atualizar no cabeçalho do painel |
 | 2026-08-28 | UI do dashboard: redesign executivo (tema claro, Plus Jakarta Sans, tabs underline, gráficos refinados); removidos emojis da interface |
 | 2026-08-28 | Removidos `run-tracker.bat` / `run-dashboard.bat` (duplicata e launcher legado); entry point só `run.bat` |
