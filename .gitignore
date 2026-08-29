@@ -1,15 +1,3 @@
-venv
-dist
-build
-backups
-__pycache__
-
-productivity.db
-*.db
-WebView2/
-
-app_settings.json
-
 # .NET
 bin/
 obj/
@@ -18,3 +6,9 @@ obj/
 *.suo
 publish/
 artifacts/
+
+# Dados locais (não versionar)
+productivity.db
+*.db
+app_settings.json
+WebView2/

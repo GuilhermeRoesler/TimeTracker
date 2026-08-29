@@ -14,7 +14,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Nome | TimeTracker Pro |
 | Plataforma | **Windows apenas** |
 | Stack | C# (.NET 8) tracker + ASP.NET Core + HTML/Chart.js |
-| Entry point | `run.bat` / `run-tracker.bat` → `src/TimeTracker.Tracker` |
+| Entry point | `run.bat` → `src/TimeTracker.Tracker` |
 | Dashboard | ASP.NET + Chart.js em `http://localhost:8501` |
 | Dados locais | Dev: raiz do repo · Instalado: `%LocalAppData%\TimeTracker Pro\` |
 | Ícone | `assets/app.ico` (fonte `app-icon.png`) — exe, bandeja, favicon, Setup |
@@ -29,7 +29,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 TimeTracker.sln
 ├── src/TimeTracker.Core/       → SQLite, settings JSON, TrackingEngine
 ├── src/TimeTracker.Tracker/  → Win32, bandeja, startup, Kestrel in-process + WebView2
-└── src/TimeTracker.Dashboard/ → API endpoints + wwwroot (Chart.js); também rodável isolado em dev
+└── src/TimeTracker.Dashboard/ → API endpoints + wwwroot (Chart.js); embutido no Tracker
 ```
 
 ### Responsabilidades por módulo
@@ -38,7 +38,7 @@ TimeTracker.sln
 |--------|------------------|
 | `src/TimeTracker.Core` | Contratos de dados, `ActivityRepository`, `SettingsStore`, `TrackingEngine`, `ActivityQueryService` |
 | `src/TimeTracker.Tracker` | Win32, bandeja WinForms, startup `.lnk`, worker, Kestrel in-process, auto-update GitHub |
-| `src/TimeTracker.Dashboard` | `DashboardWeb` (Minimal API) + `wwwroot` Chart.js; `run-dashboard.bat` para dev isolado |
+| `src/TimeTracker.Dashboard` | `DashboardWeb` (Minimal API) + `wwwroot` Chart.js; isolável via `dotnet run` em dev |
 
 ## Contratos de dados
 
@@ -87,7 +87,7 @@ Campos expostos por `ActivityQueryService`:
 - **Troca de foco:** salva sessão anterior e reinicia `start_time`.
 - **Shutdown:** `CancellationToken` ou `SystemEvents.SessionEnding` → flush da sessão ativa.
 - **Janelas protegidas:** fallback `app_name = "System/Protected"`.
-- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 com User Data Folder em `AppPaths.GetDataDir()/WebView2` (fallback: browser se a inicialização falhar). `run-dashboard.bat` sobe só a API em dev.
+- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 com User Data Folder em `AppPaths.GetDataDir()/WebView2` (fallback: browser se a inicialização falhar). Em dev, `dotnet run --project src/TimeTracker.Dashboard` sobe só a API.
 
 ## Comportamento do dashboard
 
@@ -120,7 +120,7 @@ Campos expostos por `ActivityQueryService`:
 | ASP.NET Core + Chart.js vanilla | Runtime único .NET; frontend leve |
 | Partição por hora | Gráficos de timeline horária precisam de granularidade correta |
 | Mínimo 1s por registro | Evita ruído de trocas rápidas de foco |
-| Subprocess dashboard | Desacoplamento; mesma porta 8501 do legado Streamlit |
+| Processo único (Kestrel in-process) | Um exe na bandeja; porta 8501 mantida por compatibilidade |
 
 ## Workflows de desenvolvimento
 
@@ -148,7 +148,7 @@ Campos expostos por `ActivityQueryService`:
 ```bash
 run.bat                                        # app completa (duplo clique)
 dotnet run --project src/TimeTracker.Tracker   # equivalente
-run-dashboard.bat                              # só dashboard (dev)
+dotnet run --project src/TimeTracker.Dashboard # API isolada (dev)
 dotnet build TimeTracker.sln
 ```
 
@@ -168,6 +168,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Removidos `run-tracker.bat` / `run-dashboard.bat` (duplicata e launcher legado); entry point só `run.bat` |
 | 2026-08-28 | WebView2: User Data Folder em `%LocalAppData%` (evita falha/fallback ao instalar em Program Files) |
 | 2026-08-28 | Auto-update: verifica GitHub Releases, notifica na bandeja e instala Setup |
 | 2026-08-28 | Removido `MIGRATION.md` (migração Python→C# concluída; histórico no changelog) |

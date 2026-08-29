@@ -36,13 +36,13 @@ Dados ficam em `%LocalAppData%\TimeTracker Pro\` (não em Program Files).
 ### Desenvolvimento (código-fonte)
 
 1. Instale o [.NET SDK 8](https://dotnet.microsoft.com/download).
-2. Duplo clique em **`run.bat`** (ou `run-tracker.bat`) — inicia tracker + dashboard em `http://localhost:8501`.
+2. Duplo clique em **`run.bat`** — inicia tracker + dashboard em `http://localhost:8501`.
 3. Use o ícone na bandeja do sistema para abrir o dashboard ou encerrar.
 
 ```bash
 dotnet build TimeTracker.sln
 dotnet run --project src/TimeTracker.Tracker   # equivalente ao run.bat
-dotnet run --project src/TimeTracker.Dashboard # só o dashboard (dev)
+dotnet run --project src/TimeTracker.Dashboard # API + wwwroot isolados (dev)
 dotnet test TimeTracker.sln                   # testes automatizados
 ```
 
@@ -81,12 +81,11 @@ Isto irá:
 ```
 TimeTracker/
 ├── TimeTracker.sln
-├── run.bat / run-tracker.bat    # entry point (duplo clique)
-├── run-dashboard.bat            # só dashboard (dev)
+├── run.bat                      # entry point (duplo clique)
 ├── src/
 │   ├── TimeTracker.Core/        # SQLite, settings JSON, TrackingEngine
 │   ├── TimeTracker.Tracker/     # Win32, bandeja, Kestrel in-process, WebView2
-│   └── TimeTracker.Dashboard/   # API + wwwroot (também isolado via run-dashboard.bat)
+│   └── TimeTracker.Dashboard/   # API + wwwroot (embutido no Tracker)
 ├── app_settings.example.json
 ├── productivity.db              # gerado em runtime (não versionado)
 └── app_settings.json            # personalizações (não versionado)

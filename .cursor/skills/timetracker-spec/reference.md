@@ -66,7 +66,7 @@
 
 - `productivity.db` — dados de atividade
 - `app_settings.json` — personalizações do usuário
-- `bin/`, `obj/`, `publish/`, `venv/`
+- `bin/`, `obj/`, `publish/`, `artifacts/`, `WebView2/`
 
 ## Roadmap
 
@@ -135,7 +135,7 @@ dotnet test TimeTracker.sln
 
 ```bash
 dotnet build TimeTracker.sln
-run.bat   # ou run-tracker.bat
+run.bat
 ```
 
 Startup automático via `StartupShortcutService` na primeira execução.
