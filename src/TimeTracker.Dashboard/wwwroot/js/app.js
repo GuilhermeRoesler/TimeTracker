@@ -19,6 +19,8 @@ const els = {
   btnNext: document.getElementById("btn-next-day"),
   dateWarning: document.getElementById("date-warning"),
   btnRefresh: document.getElementById("btn-refresh"),
+  btnOpenBrowser: document.getElementById("btn-open-browser"),
+  btnOpenBrowserEmpty: document.getElementById("btn-open-browser-empty"),
   headerDate: document.getElementById("header-date"),
   panelOverview: document.getElementById("panel-overview"),
   panelDetails: document.getElementById("panel-details"),
@@ -29,12 +31,38 @@ const els = {
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
+  setupAppShellChrome();
   bindEvents();
   await reloadAll();
 }
 
+function isAppShell() {
+  return new URLSearchParams(window.location.search).get("shell") === "app";
+}
+
+function setupAppShellChrome() {
+  if (!isAppShell()) {
+    return;
+  }
+
+  document.body.classList.add("shell-app");
+  els.btnOpenBrowser?.classList.remove("hidden");
+  els.btnOpenBrowserEmpty?.classList.remove("hidden");
+}
+
+function openInSystemBrowser() {
+  if (window.chrome?.webview?.postMessage) {
+    window.chrome.webview.postMessage("openInBrowser");
+    return;
+  }
+
+  window.open(`${window.location.origin}/`, "_blank", "noopener,noreferrer");
+}
+
 function bindEvents() {
   els.btnRefresh.addEventListener("click", () => reloadAll());
+  els.btnOpenBrowser?.addEventListener("click", openInSystemBrowser);
+  els.btnOpenBrowserEmpty?.addEventListener("click", openInSystemBrowser);
   els.btnPrev.addEventListener("click", () => navigateDate(1));
   els.btnNext.addEventListener("click", () => navigateDate(-1));
   els.datePicker.addEventListener("change", () => {

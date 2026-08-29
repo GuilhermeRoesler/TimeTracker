@@ -32,7 +32,29 @@ internal sealed class DashboardWindow : Form
         Directory.CreateDirectory(userDataFolder);
         var environment = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
         await _webView.EnsureCoreWebView2Async(environment);
-        _webView.Source = new Uri(AppConstants.DashboardUrl);
+
+        _webView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
+        // shell=app: o HTML mostra a opção discreta "abrir no navegador" só nesta janela.
+        _webView.Source = new Uri($"{AppConstants.DashboardUrl}/?shell=app");
+    }
+
+    private static void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        string message;
+        try
+        {
+            message = e.TryGetWebMessageAsString();
+        }
+        catch (ArgumentException)
+        {
+            message = e.WebMessageAsJson;
+        }
+
+        if (string.Equals(message, "openInBrowser", StringComparison.Ordinal)
+            || message.Contains("openInBrowser", StringComparison.Ordinal))
+        {
+            DashboardWindowService.OpenInBrowser();
+        }
     }
 }
 
@@ -86,6 +108,15 @@ internal static class DashboardWindowService
         }
     }
 
+    public static void OpenInBrowser()
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = AppConstants.DashboardUrl,
+            UseShellExecute = true,
+        });
+    }
+
     private static void ActivateExisting()
     {
         if (_window is null || _window.IsDisposed)
@@ -97,14 +128,5 @@ internal static class DashboardWindowService
         _window.WindowState = FormWindowState.Normal;
         _window.Activate();
         _window.BringToFront();
-    }
-
-    private static void OpenInBrowser()
-    {
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-        {
-            FileName = AppConstants.DashboardUrl,
-            UseShellExecute = true,
-        });
     }
 }

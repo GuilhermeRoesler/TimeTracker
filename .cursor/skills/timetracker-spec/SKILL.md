@@ -87,7 +87,7 @@ Campos expostos por `ActivityQueryService`:
 - **Troca de foco:** salva sessão anterior e reinicia `start_time`.
 - **Shutdown:** `CancellationToken` ou `SystemEvents.SessionEnding` → flush da sessão ativa.
 - **Janelas protegidas:** fallback `app_name = "System/Protected"`.
-- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 com User Data Folder em `AppPaths.GetDataDir()/WebView2` (fallback: browser se a inicialização falhar). Em dev, `dotnet run --project src/TimeTracker.Dashboard` sobe só a API.
+- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 com User Data Folder em `AppPaths.GetDataDir()/WebView2` (fallback: browser se a inicialização falhar). Com `?shell=app`, o HTML mostra opção discreta de abrir no navegador. Em dev, `dotnet run --project src/TimeTracker.Dashboard` sobe só a API.
 
 ## Comportamento do dashboard
 
@@ -180,6 +180,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | WebView2 (`?shell=app`): ícone discreto «Abrir no navegador» no header HTML (sem faixa nativa) |
 | 2026-08-28 | Auto-update desativado em dev (`AppPaths.IsDevelopmentRun`); só instalação publicada |
 | 2026-08-28 | Shutdown: Kestrel para após `Application.Run` (não no Dispose da bandeja); `run.bat` usa `--no-hot-reload` |
 | 2026-08-28 | `build.bat`: rebuild Debug com `--no-incremental` para forçar cópia fresca do `wwwroot` |
