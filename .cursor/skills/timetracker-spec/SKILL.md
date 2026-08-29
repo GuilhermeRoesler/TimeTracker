@@ -120,6 +120,7 @@ Campos expostos por `ActivityQueryService`:
 - **Títulos de navegador:** `ActivityTextHelper.CleanWindowTitle()` remove sufixos conhecidos.
 - **Gráficos:** Chart.js em `wwwroot/js/charts.js`.
 - **Smooth scroll:** Lenis em `wwwroot/js/smooth-scroll.js` (respeita `prefers-reduced-motion`).
+- **Cursor:** personalizado em `wwwroot/js/cursor.js` (desktop com hover fino; desliga em touch / reduced-motion).
 
 ## Restrições e decisões
 
@@ -181,6 +182,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Dashboard: cursor personalizado (ponto + halo accent; hover em controles; off em touch/reduced-motion) |
 | 2026-08-28 | Dashboard: smooth scroll Lenis (respeita `prefers-reduced-motion`; nested scroll com `data-lenis-prevent`) |
 | 2026-08-28 | WebView2 (`?shell=app`): ícone discreto «Abrir no navegador» no header HTML (sem faixa nativa) |
 | 2026-08-28 | Auto-update desativado em dev (`AppPaths.IsDevelopmentRun`); só instalação publicada |

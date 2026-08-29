@@ -67,6 +67,111 @@ body {
   display: none !important;
 }
 
+/* —— Custom cursor —— */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+
+html.has-custom-cursor input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+html.has-custom-cursor textarea,
+html.has-custom-cursor select,
+html.has-custom-cursor [contenteditable="true"] {
+  cursor: text !important;
+}
+
+html.has-custom-cursor select {
+  cursor: pointer !important;
+}
+
+.cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.28s var(--ease);
+}
+
+.cursor.is-visible {
+  opacity: 1;
+}
+
+.cursor.is-text {
+  opacity: 0;
+}
+
+.cursor-tip,
+.cursor-halo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.cursor-tip {
+  width: 5px;
+  height: 5px;
+  background: var(--ink);
+  box-shadow:
+    0 0 0 1.5px rgba(255, 255, 255, 0.7),
+    0 1px 6px rgba(12, 21, 36, 0.18);
+  transition:
+    width 0.28s var(--ease),
+    height 0.28s var(--ease),
+    background 0.28s var(--ease),
+    box-shadow 0.28s var(--ease);
+}
+
+.cursor-halo {
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid rgba(14, 116, 144, 0.55);
+  background: rgba(14, 116, 144, 0.04);
+  box-shadow: 0 4px 18px rgba(14, 116, 144, 0.08);
+  transition:
+    width 0.38s var(--ease),
+    height 0.38s var(--ease),
+    border-color 0.38s var(--ease),
+    background 0.38s var(--ease),
+    box-shadow 0.38s var(--ease);
+}
+
+.cursor.is-hover .cursor-tip {
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  box-shadow:
+    0 0 0 1.5px rgba(255, 255, 255, 0.75),
+    0 0 12px rgba(14, 116, 144, 0.35);
+}
+
+.cursor.is-hover .cursor-halo {
+  width: 46px;
+  height: 46px;
+  border-color: var(--accent);
+  background: rgba(14, 116, 144, 0.1);
+  box-shadow: 0 8px 24px rgba(14, 116, 144, 0.14);
+}
+
+.cursor.is-down .cursor-tip {
+  width: 3px;
+  height: 3px;
+}
+
+.cursor.is-down .cursor-halo {
+  width: 22px;
+  height: 22px;
+  background: rgba(14, 116, 144, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    display: none !important;
+  }
+}
+
 /* —— Layout —— */
 .layout {
   min-height: 100vh;
