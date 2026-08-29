@@ -30,9 +30,12 @@ internal sealed class TrayApplicationContext : ApplicationContext
         };
 
         _notifyIcon.DoubleClick += (_, _) => DashboardWindowService.Open();
-        _notifyIcon.BalloonTipClicked += (_, _) => _ = CheckForUpdatesAsync(silentIfUpToDate: false);
 
-        ScheduleStartupUpdateCheck();
+        if (!AppPaths.IsDevelopmentRun())
+        {
+            _notifyIcon.BalloonTipClicked += (_, _) => _ = CheckForUpdatesAsync(silentIfUpToDate: false);
+            ScheduleStartupUpdateCheck();
+        }
     }
 
     protected override void Dispose(bool disposing)
@@ -54,8 +57,12 @@ internal sealed class TrayApplicationContext : ApplicationContext
     {
         var menu = new ContextMenuStrip();
         menu.Items.Add("Abrir Dashboard", null, (_, _) => DashboardWindowService.Open());
-        menu.Items.Add("Verificar atualizações...", null, (_, _) => _ = CheckForUpdatesAsync(silentIfUpToDate: false));
-        menu.Items.Add(new ToolStripSeparator());
+        if (!AppPaths.IsDevelopmentRun())
+        {
+            menu.Items.Add("Verificar atualizações...", null, (_, _) => _ = CheckForUpdatesAsync(silentIfUpToDate: false));
+            menu.Items.Add(new ToolStripSeparator());
+        }
+
         menu.Items.Add("Sair", null, (_, _) => ExitThread());
         return menu;
     }

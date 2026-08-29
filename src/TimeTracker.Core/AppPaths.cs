@@ -25,6 +25,16 @@ public static class AppPaths
         return _installDir!;
     }
 
+    /// <summary>
+    /// True quando o processo roda a partir da árvore do repositório (ex.: <c>run.bat</c> / <c>dotnet run</c>).
+    /// Instalação publicada (Program Files / portable) retorna false.
+    /// </summary>
+    public static bool IsDevelopmentRun()
+    {
+        EnsureInitialized();
+        return FindSolutionRoot(_installDir!) is not null;
+    }
+
     /// <summary>Compatível com chamadas existentes — aponta para a pasta de dados.</summary>
     public static string GetAppDir() => GetDataDir();
 

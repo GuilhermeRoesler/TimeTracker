@@ -44,14 +44,14 @@
 1. `StartupShortcutService.EnsureStartupShortcut()` — cria/atualiza `.lnk` em Startup
 2. `Host` inicia `TrackingBackgroundService` → `TrackingEngine.RunAsync()`
 3. `WebApplication.Start()` — Kestrel + `TrackingBackgroundService` no **mesmo processo**
-4. `TrayApplicationContext` — bandeja; check silencioso de update (~12s) via GitHub Releases
+4. `TrayApplicationContext` — bandeja; em **produção**, check silencioso de update (~12s) via GitHub Releases (desligado em dev / `run.bat`)
 5. Shutdown via "Sair" ou `SystemEvents.SessionEnding` — flush sessão e para Kestrel
 
 ### Auto-update
 
 - Fonte: `GET /repos/GuilhermeRoesler/TimeTracker/releases/latest`
 - Asset esperado: `*setup-win-x64.exe`
-- Menu bandeja: **Verificar atualizações...**
+- Menu bandeja: **Verificar atualizações...** (apenas fora de dev)
 - Ao iniciar: se houver versão maior, balão na bandeja; clique abre o fluxo de download
 - Download → executa Setup → encerra o app (upgrade in-place)
 
