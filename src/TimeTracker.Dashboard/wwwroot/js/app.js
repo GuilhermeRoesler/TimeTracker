@@ -20,6 +20,7 @@ const els = {
   btnNext: document.getElementById("btn-next-day"),
   dateWarning: document.getElementById("date-warning"),
   btnRefresh: document.getElementById("btn-refresh"),
+  headerDate: document.getElementById("header-date"),
   panelOverview: document.getElementById("panel-overview"),
   panelDetails: document.getElementById("panel-details"),
   panelSettings: document.getElementById("panel-settings"),
@@ -103,6 +104,19 @@ function showAppLayout() {
   els.appLayout.classList.remove("hidden");
 }
 
+function formatHeaderDate(iso) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  const formatted = date.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
+
 function updateDateControls() {
   const dates = state.availableDates;
   if (!dates.length) return;
@@ -120,6 +134,10 @@ function updateDateControls() {
 
   els.dateWarning.classList.toggle("hidden", state.hasData);
 
+  if (els.headerDate) {
+    els.headerDate.textContent = formatHeaderDate(state.selectedDate);
+  }
+
   els.dateShortcuts.innerHTML = "";
   const shortcuts = [];
   if (dates.includes(todayIso())) shortcuts.push(["Hoje", todayIso()]);
@@ -128,7 +146,7 @@ function updateDateControls() {
   for (const [label, value] of shortcuts) {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "btn-secondary";
+    button.className = `btn-secondary${value === state.selectedDate ? " is-active" : ""}`;
     button.textContent = label;
     button.addEventListener("click", () => {
       state.selectedDate = value;
@@ -149,7 +167,11 @@ function navigateDate(direction) {
 
 function switchTab(tabName) {
   state.activeTab = tabName;
-  els.tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === tabName));
+  els.tabs.forEach((tab) => {
+    const active = tab.dataset.tab === tabName;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", active ? "true" : "false");
+  });
   els.panelOverview.classList.toggle("hidden", tabName !== "overview");
   els.panelDetails.classList.toggle("hidden", tabName !== "details");
   els.panelSettings.classList.toggle("hidden", tabName !== "settings");
@@ -168,30 +190,66 @@ function renderOverview() {
   const summary = state.summary || { totalSeconds: 0, sessionCount: 0, topApp: null };
   const hours = Math.floor(summary.totalSeconds / 3600);
   const minutes = Math.floor((summary.totalSeconds % 3600) / 60);
+  const topApp = summary.topApp || "—";
+  const topAppClass = topApp.length > 18 ? " metric-value is-long" : "metric-value";
 
   els.panelOverview.innerHTML = `
     <div class="metrics">
-      <div class="metric-card"><div class="metric-label">Tempo Total</div><div class="metric-value">${hours}h ${minutes}m</div></div>
-      <div class="metric-card"><div class="metric-label">Sessões (Focos)</div><div class="metric-value">${summary.sessionCount}</div></div>
-      <div class="metric-card"><div class="metric-label">App Mais Usado</div><div class="metric-value">${summary.topApp || "—"}</div></div>
-    </div>
-    <div class="grid-2">
-      <div class="card"><h3>Distribuição (Top 5)</h3><div class="chart-box"><canvas id="chart-donut"></canvas></div></div>
-      <div class="card"><h3>Linha do Tempo</h3><div class="chart-box"><canvas id="chart-hourly"></canvas></div></div>
+      <div class="metric-card">
+        <div class="metric-label">Tempo total</div>
+        <div class="metric-value">${hours}h ${minutes}m</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Sessões de foco</div>
+        <div class="metric-value">${summary.sessionCount}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">App mais usado</div>
+        <div class="${topAppClass}">${escapeHtml(topApp)}</div>
+      </div>
     </div>
     <div class="grid-2">
       <div class="card">
-        <h3>Ranking Detalhado</h3>
+        <div class="card-head">
+          <h3>Distribuição</h3>
+          <p class="card-sub">Top 5 aplicativos</p>
+        </div>
+        <div class="chart-box"><canvas id="chart-donut"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Linha do tempo</h3>
+          <p class="card-sub">Uso por hora</p>
+        </div>
+        <div class="chart-box"><canvas id="chart-hourly"></canvas></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Ranking</h3>
+          <p class="card-sub">Detalhado por app</p>
+        </div>
         <div class="chart-box"><canvas id="chart-ranking"></canvas></div>
         <div id="ranking-more"></div>
       </div>
-      <div class="card"><h3>Categorias</h3><div class="chart-box"><canvas id="chart-category"></canvas></div></div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Categorias</h3>
+          <p class="card-sub">Composição do dia</p>
+        </div>
+        <div class="chart-box"><canvas id="chart-category"></canvas></div>
+      </div>
     </div>
     <div class="card">
-      <h3>Linha do Tempo</h3>
+      <div class="card-head">
+        <h3>Timeline completa</h3>
+        <p class="card-sub">24 horas · empilhado por aplicativo</p>
+      </div>
       <div class="chart-box tall"><canvas id="chart-hourly-full"></canvas></div>
     </div>
-    <h3 class="section-title">Histórico Detalhado</h3>
+    <h3 class="section-title" style="margin-top: 1.35rem;">Histórico detalhado</h3>
+    <p class="section-lead">Sessões do dia selecionado, da mais recente à mais antiga.</p>
     <div class="card table-wrap">${renderHistoryTable(records)}</div>
   `;
 
@@ -216,7 +274,7 @@ function renderOverview() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn-more";
-    btn.textContent = "➕ Mostrar Mais 5";
+    btn.textContent = "Mostrar mais 5";
     btn.addEventListener("click", () => {
       state.limitApps += 5;
       renderOverview();
@@ -272,18 +330,26 @@ function renderDetails() {
   if (defaultIndex < 0) defaultIndex = 0;
 
   els.panelDetails.innerHTML = `
-    <header class="section-title">🔎 O que você fez dentro de cada App?</header>
-    <p class="info-box">Selecione um aplicativo para ver em quais abas ou arquivos você passou mais tempo.</p>
-    <label class="field-label" for="details-app-select">Selecione o Aplicativo:</label>
-    <select id="details-app-select">${apps.map((app, i) => `<option value="${escapeHtml(app)}" ${i === defaultIndex ? "selected" : ""}>${escapeHtml(app)}</option>`).join("")}</select>
-    <div class="details-layout" style="margin-top: 1rem;">
+    <h3 class="section-title">Detalhes por aplicativo</h3>
+    <p class="section-lead">Selecione um app para ver em quais abas ou arquivos você passou mais tempo.</p>
+    <div class="panel-toolbar">
+      <label class="field-label" for="details-app-select">Aplicativo</label>
+      <select id="details-app-select">${apps.map((app, i) => `<option value="${escapeHtml(app)}" ${i === defaultIndex ? "selected" : ""}>${escapeHtml(app)}</option>`).join("")}</select>
+    </div>
+    <div class="details-layout">
       <div class="card">
-        <h3 id="details-chart-title">Top Abas/Janelas</h3>
+        <div class="card-head">
+          <h3 id="details-chart-title">Top abas e janelas</h3>
+          <p class="card-sub">Até 15 títulos</p>
+        </div>
         <div class="chart-box tall"><canvas id="chart-windows"></canvas></div>
       </div>
       <div class="card">
-        <h3>Histórico Cronológico</h3>
-        <div id="details-history"></div>
+        <div class="card-head">
+          <h3>Histórico cronológico</h3>
+          <p class="card-sub">Sessões do app</p>
+        </div>
+        <div id="details-history" class="table-wrap"></div>
       </div>
     </div>
   `;
@@ -291,7 +357,7 @@ function renderDetails() {
   const select = document.getElementById("details-app-select");
   const renderForApp = () => {
     const appName = select.value;
-    document.getElementById("details-chart-title").textContent = `Top Abas/Janelas em: ${appName}`;
+    document.getElementById("details-chart-title").textContent = `Top abas e janelas · ${appName}`;
     const canvas = document.getElementById("chart-windows");
     const ok = renderWindowTitles(canvas, records, appName);
     if (!ok) canvas.parentElement.innerHTML = '<p class="info-box">Sem dados detalhados.</p>';
@@ -335,13 +401,13 @@ function renderSettings() {
   });
 
   els.panelSettings.innerHTML = `
-    <header class="section-title">⚙️ Personalizar Apps</header>
-    <p class="info-box">Defina nomes amigáveis, cores e categorias para cada aplicativo.</p>
-    <input type="search" id="settings-search" class="settings-search" placeholder="Filtrar por nome do executável ou nome de exibição..." value="${escapeHtml(state.settingsSearch)}" />
-    <p class="info-box">${filtered.length} app(s) exibido(s)</p>
-    <div class="card settings-table">${filtered.length ? renderSettingsTable(filtered) : '<p class="info-box">Nenhum app corresponde à busca.</p>'}</div>
+    <h3 class="section-title">Personalizar aplicativos</h3>
+    <p class="section-lead">Defina nomes amigáveis, cores e categorias. Somente alterações são salvas.</p>
+    <input type="search" id="settings-search" class="settings-search" placeholder="Filtrar por executável ou nome de exibição…" value="${escapeHtml(state.settingsSearch)}" />
+    <p class="settings-meta">${filtered.length} app(s) exibido(s)</p>
+    <div class="card settings-table table-wrap">${filtered.length ? renderSettingsTable(filtered) : '<p class="info-box">Nenhum app corresponde à busca.</p>'}</div>
     <div class="settings-actions">
-      <button type="button" id="btn-save-settings" class="btn-primary">💾 Salvar alterações</button>
+      <button type="button" id="btn-save-settings" class="btn-primary">Salvar alterações</button>
       <span id="settings-status" class="status-message"></span>
     </div>
   `;
@@ -360,11 +426,11 @@ function renderSettingsTable(apps) {
   ).join("");
 
   const rows = apps.map((app) => {
-    const color = app.hexColor || "#808080";
+    const color = app.hexColor || "#64748b";
     const category = app.category || "Sem Categoria";
     return `
       <tr data-app="${escapeHtml(app.appName)}">
-        <td>${escapeHtml(app.appName)}</td>
+        <td><code style="font-family:var(--mono);font-size:0.78rem;">${escapeHtml(app.appName)}</code></td>
         <td><input type="text" class="setting-display" value="${escapeHtml(app.displayName || app.appName)}" /></td>
         <td><select class="setting-category">${categoryOptions(category)}</select></td>
         <td><input type="color" class="setting-color" value="${escapeHtml(color)}" /></td>
@@ -398,7 +464,7 @@ async function saveSettings() {
   try {
     const result = await saveSettingsBatch(changes);
     status.textContent = result.saved > 0
-      ? `${result.saved} app(s) atualizado(s)!`
+      ? `${result.saved} app(s) atualizado(s).`
       : "Nenhuma alteração para salvar.";
     status.className = `status-message ${result.saved > 0 ? "success" : ""}`;
     await reloadAll();

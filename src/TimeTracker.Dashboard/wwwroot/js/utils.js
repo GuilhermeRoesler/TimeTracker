@@ -1,6 +1,6 @@
 const CHART_PALETTE = [
-  "#636EFA", "#EF553B", "#00CC96", "#AB63FA", "#FFA15A",
-  "#19D3F3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52",
+  "#0e7490", "#1e3a5f", "#c2410c", "#0f766e", "#475569",
+  "#b45309", "#0369a1", "#3f6212", "#9f1239", "#4338ca",
 ];
 
 function formatDurationClean(seconds) {

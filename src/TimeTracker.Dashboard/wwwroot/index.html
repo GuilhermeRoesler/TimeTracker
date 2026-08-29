@@ -7,37 +7,67 @@
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/site.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
+  <div class="ambient" aria-hidden="true"></div>
+
   <div id="empty-state" class="empty-state hidden">
-    <h2>Sem dados</h2>
-    <p>Nenhum dado encontrado. Certifique-se de que o tracker está rodando (<code>run.bat</code> ou pelo ícone na bandeja).</p>
+    <div class="empty-mark">TT</div>
+    <h2>Sem dados ainda</h2>
+    <p>Nenhum registro encontrado. Certifique-se de que o tracker está ativo (<code>run.bat</code> ou pelo ícone na bandeja).</p>
   </div>
 
   <div id="app-layout" class="layout hidden">
     <aside class="sidebar">
-      <h2>Filtros</h2>
-      <div id="date-shortcuts" class="shortcut-row"></div>
-      <div class="date-nav">
-        <button type="button" id="btn-prev-day" title="Dia anterior com registros">◀</button>
-        <input type="date" id="date-picker" aria-label="Selecione a data" />
-        <button type="button" id="btn-next-day" title="Próximo dia com registros">▶</button>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">TT</div>
+        <div class="brand-copy">
+          <span class="brand-name">TimeTracker</span>
+          <span class="brand-badge">Pro</span>
+        </div>
       </div>
-      <p id="date-warning" class="warning hidden">Sem registros nesta data.</p>
-      <button type="button" id="btn-refresh" class="btn-secondary">Atualizar Dados</button>
+
+      <div class="sidebar-block">
+        <p class="sidebar-label">Período</p>
+        <div id="date-shortcuts" class="shortcut-row"></div>
+        <div class="date-nav">
+          <button type="button" id="btn-prev-day" class="btn-icon" title="Dia anterior com registros" aria-label="Dia anterior">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <input type="date" id="date-picker" aria-label="Selecione a data" />
+          <button type="button" id="btn-next-day" class="btn-icon" title="Próximo dia com registros" aria-label="Próximo dia">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <p id="date-warning" class="warning hidden">Sem registros nesta data.</p>
+      </div>
+
+      <div class="sidebar-footer">
+        <button type="button" id="btn-refresh" class="btn-secondary btn-block">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 0 1 9.6-3.7M13.5 8A5.5 5.5 0 0 1 3.9 11.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12.5 2.5v3h-3M3.5 13.5v-3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Atualizar dados
+        </button>
+      </div>
     </aside>
 
     <main class="main">
       <header class="page-header">
-        <h1>📊 Painel de Produtividade Pessoal</h1>
+        <div class="page-header-text">
+          <p class="eyebrow">Produtividade pessoal</p>
+          <h1>Painel executivo</h1>
+          <p id="header-date" class="header-date"></p>
+        </div>
       </header>
 
       <nav class="tabs" role="tablist">
-        <button type="button" class="tab active" data-tab="overview" role="tab">🏠 Visão Geral</button>
-        <button type="button" class="tab" data-tab="details" role="tab">🔍 Detalhes por App</button>
-        <button type="button" class="tab" data-tab="settings" role="tab">⚙️ Personalizar Apps</button>
+        <button type="button" class="tab active" data-tab="overview" role="tab" aria-selected="true">Visão Geral</button>
+        <button type="button" class="tab" data-tab="details" role="tab" aria-selected="false">Detalhes por App</button>
+        <button type="button" class="tab" data-tab="settings" role="tab" aria-selected="false">Personalizar Apps</button>
       </nav>
 
       <section id="panel-overview" class="tab-panel" role="tabpanel"></section>
