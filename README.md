@@ -4,7 +4,7 @@ O **TimeTracker** é uma aplicação para Windows que monitoriza automaticamente
 
 **Demo online (dados fictícios):** [https://guilhermeroesler.github.io/TimeTracker/](https://guilhermeroesler.github.io/TimeTracker/)
 
-![](images/dashboard.png)
+![](images/demo.png)
 
 ## 🚀 Funcionalidades
 
