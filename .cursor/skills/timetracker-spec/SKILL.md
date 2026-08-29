@@ -119,6 +119,7 @@ Campos expostos por `ActivityQueryService`:
 - **Cores:** `hex_color` do settings; fallback paleta sóbria em `utils.js` (`CHART_PALETTE`).
 - **Títulos de navegador:** `ActivityTextHelper.CleanWindowTitle()` remove sufixos conhecidos.
 - **Gráficos:** Chart.js em `wwwroot/js/charts.js`.
+- **Smooth scroll:** Lenis em `wwwroot/js/smooth-scroll.js` (respeita `prefers-reduced-motion`).
 
 ## Restrições e decisões
 
@@ -180,6 +181,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-28 | Dashboard: smooth scroll Lenis (respeita `prefers-reduced-motion`; nested scroll com `data-lenis-prevent`) |
 | 2026-08-28 | WebView2 (`?shell=app`): ícone discreto «Abrir no navegador» no header HTML (sem faixa nativa) |
 | 2026-08-28 | Auto-update desativado em dev (`AppPaths.IsDevelopmentRun`); só instalação publicada |
 | 2026-08-28 | Shutdown: Kestrel para após `Application.Run` (não no Dispose da bandeja); `run.bat` usa `--no-hot-reload` |

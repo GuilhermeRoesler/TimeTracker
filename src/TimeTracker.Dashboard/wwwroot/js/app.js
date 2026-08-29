@@ -129,6 +129,7 @@ function showEmptyState(message) {
 function showAppLayout() {
   els.emptyState.classList.add("hidden");
   els.appLayout.classList.remove("hidden");
+  refreshSmoothScroll();
 }
 
 function formatHeaderDate(iso) {
@@ -202,6 +203,11 @@ function switchTab(tabName) {
   els.panelDetails.classList.toggle("hidden", tabName !== "details");
   els.panelSettings.classList.toggle("hidden", tabName !== "settings");
   renderActiveTab();
+  refreshSmoothScroll();
+}
+
+function refreshSmoothScroll() {
+  window.TimeTrackerSmoothScroll?.refresh?.();
 }
 
 function renderActiveTab() {
@@ -256,7 +262,7 @@ function renderOverview() {
           <h3>Ranking</h3>
           <p class="card-sub">Detalhado por app</p>
         </div>
-        <div class="chart-scroll">
+        <div class="chart-scroll" data-lenis-prevent>
           <div class="chart-box" id="ranking-chart-box"><canvas id="chart-ranking"></canvas></div>
         </div>
       </div>
@@ -277,13 +283,14 @@ function renderOverview() {
     </div>
     <h3 class="section-title" style="margin-top: 1.35rem;">Histórico detalhado</h3>
     <p class="section-lead">Sessões do dia selecionado, da mais recente à mais antiga.</p>
-    <div class="card table-wrap">${renderHistoryTable(records)}</div>
+    <div class="card table-wrap" data-lenis-prevent>${renderHistoryTable(records)}</div>
   `;
 
   if (!records.length) {
     els.panelOverview.querySelectorAll(".chart-box").forEach((box) => {
       box.innerHTML = '<p class="info-box">Sem dados.</p>';
     });
+    refreshSmoothScroll();
     return;
   }
 
@@ -303,6 +310,7 @@ function renderOverview() {
   if (!catOk) document.getElementById("chart-category").parentElement.innerHTML = '<p class="info-box">Sem dados de categoria.</p>';
 
   renderHourlyTimeline(document.getElementById("chart-hourly-full"), records, colorMap, true);
+  refreshSmoothScroll();
 }
 
 function renderHistoryTable(records) {
@@ -366,7 +374,7 @@ function renderDetails() {
           <h3>Histórico cronológico</h3>
           <p class="card-sub">Sessões do app</p>
         </div>
-        <div id="details-history" class="table-wrap"></div>
+        <div id="details-history" class="table-wrap" data-lenis-prevent></div>
       </div>
     </div>
   `;
@@ -395,6 +403,7 @@ function renderDetails() {
 
   select.addEventListener("change", renderForApp);
   renderForApp();
+  refreshSmoothScroll();
 }
 
 async function loadSettingsPanel() {
@@ -422,7 +431,7 @@ function renderSettings() {
     <p class="section-lead">Defina nomes amigáveis, cores e categorias. Somente alterações são salvas.</p>
     <input type="search" id="settings-search" class="settings-search" placeholder="Filtrar por executável ou nome de exibição…" value="${escapeHtml(state.settingsSearch)}" />
     <p class="settings-meta">${filtered.length} app(s) exibido(s)</p>
-    <div class="card settings-table table-wrap">${filtered.length ? renderSettingsTable(filtered) : '<p class="info-box">Nenhum app corresponde à busca.</p>'}</div>
+    <div class="card settings-table table-wrap" data-lenis-prevent>${filtered.length ? renderSettingsTable(filtered) : '<p class="info-box">Nenhum app corresponde à busca.</p>'}</div>
     <div class="settings-actions">
       <button type="button" id="btn-save-settings" class="btn-primary">Salvar alterações</button>
       <span id="settings-status" class="status-message"></span>
@@ -435,6 +444,7 @@ function renderSettings() {
   });
 
   document.getElementById("btn-save-settings")?.addEventListener("click", saveSettings);
+  refreshSmoothScroll();
 }
 
 function renderSettingsTable(apps) {
