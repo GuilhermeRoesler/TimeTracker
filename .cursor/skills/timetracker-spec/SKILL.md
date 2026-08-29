@@ -101,13 +101,13 @@ Campos expostos por `ActivityQueryService`:
 
 ### Abas
 
-1. **Visão Geral** — métricas, donut top 5, timeline horária, ranking paginado (+5), pizza por categoria, histórico tabular.
+1. **Visão Geral** — métricas, donut top 5 (com legenda), timeline horária, ranking scrolável (maior→menor), categorias (com legenda), histórico tabular.
 2. **Detalhes por App** — select de apps; top 15 títulos limpos; histórico cronológico.
 3. **Personalizar Apps** — busca, edição em lote, salvar apenas alterações.
 
 ### Filtros (cabeçalho)
 
-- Atalhos Hoje/Ontem quando disponíveis (estado ativo no dia selecionado).
+- Atalho Hoje quando disponível (estado ativo no dia selecionado).
 - Navegação ◀/▶ entre dias **com registros** (não dias vazios do calendário).
 - Botão "Atualizar" no topo do painel recarrega via API.
 - Cabeçalho principal mostra a data selecionada por extenso (pt-BR).
@@ -183,6 +183,7 @@ dotnet build TimeTracker.sln
 | 2026-08-28 | Auto-update desativado em dev (`AppPaths.IsDevelopmentRun`); só instalação publicada |
 | 2026-08-28 | Shutdown: Kestrel para após `Application.Run` (não no Dispose da bandeja); `run.bat` usa `--no-hot-reload` |
 | 2026-08-28 | `build.bat`: rebuild Debug com `--no-incremental` para forçar cópia fresca do `wwwroot` |
+| 2026-08-28 | UI: sem atalho Ontem; ranking scrolável (maior no topo, sem +5); legendas só em Distribuição e Categorias |
 | 2026-08-28 | UI: removida sidebar/marca; layout centralizado com margens amplas; data e Atualizar no cabeçalho do painel |
 | 2026-08-28 | UI do dashboard: redesign executivo (tema claro, Plus Jakarta Sans, tabs underline, gráficos refinados); removidos emojis da interface |
 | 2026-08-28 | Removidos `run-tracker.bat` / `run-dashboard.bat` (duplicata e launcher legado); entry point só `run.bat` |

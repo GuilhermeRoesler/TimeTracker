@@ -30,6 +30,22 @@ function chartDefaults() {
   };
 }
 
+function legendOptions() {
+  return {
+    display: true,
+    position: "bottom",
+    labels: {
+      color: CHART_THEME.muted,
+      boxWidth: 10,
+      boxHeight: 10,
+      borderRadius: 2,
+      useBorderRadius: true,
+      padding: 14,
+      font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: "500" },
+    },
+  };
+}
+
 function destroyChart(key) {
   const existing = chartInstances.get(key);
   if (existing) {
@@ -65,6 +81,7 @@ function renderDonut(canvas, records, colorMap) {
       cutout: "68%",
       plugins: {
         ...defaults.plugins,
+        legend: legendOptions(),
         tooltip: {
           ...defaults.plugins.tooltip,
           callbacks: {
@@ -147,14 +164,23 @@ function renderHourlyTimeline(canvas, records, colorMap, tall = false) {
   return true;
 }
 
-function renderRanking(canvas, records, colorMap, limit) {
+function renderRanking(canvas, records, colorMap) {
   destroyChart(canvas.id);
-  const totals = toSortedEntries(sumBy(records, (r) => r.displayName)).slice(0, limit);
-  if (!totals.length) return { rendered: false, totalApps: 0 };
+  const totals = toSortedEntries(sumBy(records, (r) => r.displayName));
+  if (!totals.length) return false;
 
-  const labels = totals.map(([label]) => label).reverse();
-  const values = totals.map(([, value]) => value).reverse();
+  // Ordem decrescente: maior no topo (primeiro no eixo Y do Chart.js)
+  const labels = totals.map(([label]) => label);
+  const values = totals.map(([, value]) => value);
   const colors = labels.map((label, index) => colorForLabel(label, colorMap, index));
+
+  const rowHeight = 36;
+  const chartHeight = Math.max(160, totals.length * rowHeight + 16);
+  const box = canvas.parentElement;
+  if (box) {
+    box.style.height = `${chartHeight}px`;
+    box.style.minHeight = `${chartHeight}px`;
+  }
 
   const defaults = chartDefaults();
   chartInstances.set(canvas.id, new Chart(canvas, {
@@ -194,8 +220,7 @@ function renderRanking(canvas, records, colorMap, limit) {
     },
   }));
 
-  const allCount = sumBy(records, (r) => r.displayName).size;
-  return { rendered: true, totalApps: allCount };
+  return true;
 }
 
 function renderCategoryPie(canvas, records) {
@@ -225,6 +250,7 @@ function renderCategoryPie(canvas, records) {
       cutout: "58%",
       plugins: {
         ...defaults.plugins,
+        legend: legendOptions(),
         tooltip: {
           ...defaults.plugins.tooltip,
           callbacks: {

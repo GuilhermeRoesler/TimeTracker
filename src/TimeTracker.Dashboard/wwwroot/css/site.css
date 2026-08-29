@@ -422,6 +422,37 @@ input[type="search"]:focus {
   min-height: 420px;
 }
 
+.chart-scroll {
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0 -0.15rem;
+  padding: 0 0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 28, 48, 0.18) transparent;
+}
+
+.chart-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chart-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chart-scroll::-webkit-scrollbar-thumb {
+  background: rgba(15, 28, 48, 0.16);
+  border-radius: 999px;
+}
+
+.chart-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 28, 48, 0.28);
+}
+
+.chart-scroll .chart-box {
+  min-height: 0;
+}
+
 .info-box {
   color: var(--muted);
   padding: 0.35rem 0;

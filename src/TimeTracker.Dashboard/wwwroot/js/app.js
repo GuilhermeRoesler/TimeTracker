@@ -4,7 +4,6 @@ const state = {
   records: [],
   summary: null,
   hasData: false,
-  limitApps: 5,
   categories: [],
   apps: [],
   activeTab: "overview",
@@ -141,7 +140,6 @@ function updateDateControls() {
   els.dateShortcuts.innerHTML = "";
   const shortcuts = [];
   if (dates.includes(todayIso())) shortcuts.push(["Hoje", todayIso()]);
-  if (dates.includes(yesterdayIso())) shortcuts.push(["Ontem", yesterdayIso()]);
 
   for (const [label, value] of shortcuts) {
     const button = document.createElement("button");
@@ -230,8 +228,9 @@ function renderOverview() {
           <h3>Ranking</h3>
           <p class="card-sub">Detalhado por app</p>
         </div>
-        <div class="chart-box"><canvas id="chart-ranking"></canvas></div>
-        <div id="ranking-more"></div>
+        <div class="chart-scroll">
+          <div class="chart-box" id="ranking-chart-box"><canvas id="chart-ranking"></canvas></div>
+        </div>
       </div>
       <div class="card">
         <div class="card-head">
@@ -266,20 +265,10 @@ function renderOverview() {
   const hourlyOk = renderHourlyTimeline(document.getElementById("chart-hourly"), records, colorMap);
   if (!hourlyOk) document.getElementById("chart-hourly").parentElement.innerHTML = '<p class="info-box">Sem atividades.</p>';
 
-  const ranking = renderRanking(document.getElementById("chart-ranking"), records, colorMap, state.limitApps);
-  const moreContainer = document.getElementById("ranking-more");
-  if (!ranking.rendered) {
-    document.getElementById("chart-ranking").parentElement.innerHTML = '<p class="info-box">Sem dados.</p>';
-  } else if (ranking.totalApps > state.limitApps) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn-more";
-    btn.textContent = "Mostrar mais 5";
-    btn.addEventListener("click", () => {
-      state.limitApps += 5;
-      renderOverview();
-    });
-    moreContainer.appendChild(btn);
+  const rankingOk = renderRanking(document.getElementById("chart-ranking"), records, colorMap);
+  if (!rankingOk) {
+    const box = document.getElementById("ranking-chart-box");
+    if (box) box.innerHTML = '<p class="info-box">Sem dados.</p>';
   }
 
   const catOk = renderCategoryPie(document.getElementById("chart-category"), records);
