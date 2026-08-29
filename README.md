@@ -39,8 +39,11 @@ Dados ficam em `%LocalAppData%\TimeTracker Pro\` (não em Program Files).
 2. Duplo clique em **`run.bat`** — inicia tracker + dashboard em `http://localhost:8501`.
 3. Use o ícone na bandeja do sistema para abrir o dashboard ou encerrar.
 
+Após alterar HTML/CSS/JS do dashboard, rode **`build.bat`** (rebuild Debug com cópia fresca do `wwwroot`) e reinicie pelo `run.bat`. O build incremental do `dotnet run` às vezes não atualiza esses arquivos.
+
 ```bash
-dotnet build TimeTracker.sln
+build.bat                              # rebuild Debug + wwwroot fresco
+dotnet build TimeTracker.sln               # build normal (incremental)
 dotnet run --project src/TimeTracker.Tracker   # equivalente ao run.bat
 dotnet run --project src/TimeTracker.Dashboard # API + wwwroot isolados (dev)
 dotnet test TimeTracker.sln                   # testes automatizados
@@ -82,6 +85,7 @@ Isto irá:
 TimeTracker/
 ├── TimeTracker.sln
 ├── run.bat                      # entry point (duplo clique)
+├── build.bat                # rebuild Debug + wwwroot fresco
 ├── src/
 │   ├── TimeTracker.Core/        # SQLite, settings JSON, TrackingEngine
 │   ├── TimeTracker.Tracker/     # Win32, bandeja, Kestrel in-process, WebView2

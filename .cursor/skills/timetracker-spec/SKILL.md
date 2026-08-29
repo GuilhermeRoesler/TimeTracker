@@ -155,11 +155,14 @@ Campos expostos por `ActivityQueryService`:
 ### Testar localmente
 
 ```bash
+build.bat                                  # rebuild Debug (wwwroot fresco → bin/)
 run.bat                                        # app completa (duplo clique)
 dotnet run --project src/TimeTracker.Tracker   # equivalente
 dotnet run --project src/TimeTracker.Dashboard # API isolada (dev)
 dotnet build TimeTracker.sln
 ```
+
+> Após editar `wwwroot`, use `build.bat` e reinicie o Tracker. O `run.bat` (`dotnet run` incremental) pode não recopiar CSS/JS.
 
 ## Manutenção deste documento vivo
 
@@ -178,6 +181,7 @@ dotnet build TimeTracker.sln
 | Data | Mudança |
 |------|---------|
 | 2026-08-28 | Shutdown: Kestrel para após `Application.Run` (não no Dispose da bandeja); `run.bat` usa `--no-hot-reload` |
+| 2026-08-28 | `build.bat`: rebuild Debug com `--no-incremental` para forçar cópia fresca do `wwwroot` |
 | 2026-08-28 | UI: removida sidebar/marca; layout centralizado com margens amplas; data e Atualizar no cabeçalho do painel |
 | 2026-08-28 | UI do dashboard: redesign executivo (tema claro, Plus Jakarta Sans, tabs underline, gráficos refinados); removidos emojis da interface |
 | 2026-08-28 | Removidos `run-tracker.bat` / `run-dashboard.bat` (duplicata e launcher legado); entry point só `run.bat` |
