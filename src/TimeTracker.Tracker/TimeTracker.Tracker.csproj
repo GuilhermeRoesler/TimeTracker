@@ -26,6 +26,14 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
   </ItemGroup>
 
+  <!-- O NuGet do WebView2 referencia também Wpf.dll (WindowsBase 5.x) → MSB3277 no net8.
+       Usamos só WinForms; remove a referência WPF antes da resolução de assemblies. -->
+  <Target Name="RemoveWebView2WpfReference" BeforeTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <Reference Remove="@(Reference)" Condition="$([System.String]::Copy('%(Identity)').Contains('Microsoft.Web.WebView2.Wpf'))" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <Content Include="..\..\assets\app.ico" Link="app.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\TimeTracker.Dashboard\wwwroot\**\*">
@@ -37,10 +45,10 @@
 
   <!-- Referência ao Dashboard copia o apphost; o release usa um único processo (Tracker). -->
   <Target Name="RemoveDashboardAppHost" AfterTargets="Build">
-    <Delete Files="$(OutputPath)TimeTracker.Dashboard.exe;$(OutputPath)TimeTracker.Dashboard.runtimeconfig.json" TreatErrorsAsWarnings="true" />
+    <Delete Files="$(OutputPath)TimeTracker.Dashboard.exe;$(OutputPath)TimeTracker.Dashboard.runtimeconfig.json;$(OutputPath)Microsoft.Web.WebView2.Wpf.dll;$(OutputPath)Microsoft.Web.WebView2.Wpf.xml" TreatErrorsAsWarnings="true" />
   </Target>
   <Target Name="RemoveDashboardAppHostOnPublish" AfterTargets="Publish">
-    <Delete Files="$(PublishDir)TimeTracker.Dashboard.exe;$(PublishDir)TimeTracker.Dashboard.runtimeconfig.json" TreatErrorsAsWarnings="true" />
+    <Delete Files="$(PublishDir)TimeTracker.Dashboard.exe;$(PublishDir)TimeTracker.Dashboard.runtimeconfig.json;$(PublishDir)Microsoft.Web.WebView2.Wpf.dll;$(PublishDir)Microsoft.Web.WebView2.Wpf.xml" TreatErrorsAsWarnings="true" />
   </Target>
 
 </Project>
