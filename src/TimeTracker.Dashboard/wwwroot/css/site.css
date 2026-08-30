@@ -216,7 +216,6 @@ html.has-custom-cursor select {
 .layout {
   min-height: 100vh;
   padding-inline: clamp(1.25rem, 10vw, 6.5rem);
-  animation: fade-rise 0.55s var(--ease) both;
 }
 
 .main {
@@ -230,7 +229,6 @@ html.has-custom-cursor select {
 /* —— Header —— */
 .page-header {
   margin-bottom: 1.75rem;
-  animation: fade-rise 0.6s var(--ease) 0.05s both;
 }
 
 .page-header-top {
@@ -304,7 +302,6 @@ html.has-custom-cursor select {
   gap: 0.15rem;
   margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--line);
-  animation: fade-rise 0.6s var(--ease) 0.1s both;
 }
 
 .tab {
@@ -348,7 +345,10 @@ html.has-custom-cursor select {
 
 .tab-panel {
   display: block;
-  animation: fade-rise 0.45s var(--ease) both;
+}
+
+.tab-panel.panel-enter {
+  animation: fade-rise 0.4s var(--ease) both;
 }
 
 /* —— Controls —— */
@@ -819,6 +819,9 @@ input[type="search"] {
   border: 1px solid var(--line);
   border-radius: calc(var(--radius) + 4px);
   box-shadow: var(--shadow);
+}
+
+.empty-state.is-entering {
   animation: fade-rise 0.55s var(--ease) both;
 }
 
@@ -874,6 +877,92 @@ input[type="search"] {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Entrada ao abrir o dashboard (só com .is-entering — layout nasce hidden) */
+.layout.is-entering .page-header,
+.layout.is-entering .tabs,
+.layout.is-entering .tab-panel:not(.hidden) > .metrics > .metric-card,
+.layout.is-entering .tab-panel:not(.hidden) > .grid-2 > .card,
+.layout.is-entering .tab-panel:not(.hidden) > .section-title,
+.layout.is-entering .tab-panel:not(.hidden) > .section-lead,
+.layout.is-entering .tab-panel:not(.hidden) > .table-wrap,
+.layout.is-entering .tab-panel:not(.hidden) > .info-box,
+.layout.is-entering .tab-panel:not(.hidden) > .panel-toolbar,
+.layout.is-entering .tab-panel:not(.hidden) > .details-layout > *,
+.layout.is-entering .tab-panel:not(.hidden) > .settings-search,
+.layout.is-entering .tab-panel:not(.hidden) > .settings-meta,
+.layout.is-entering .tab-panel:not(.hidden) > .settings-table,
+.layout.is-entering .tab-panel:not(.hidden) > .settings-actions {
+  animation: fade-rise 0.55s var(--ease) both;
+}
+
+.layout.is-entering .page-header {
+  animation-delay: 0ms;
+}
+
+.layout.is-entering .tabs {
+  animation-delay: 55ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .metrics > .metric-card:nth-child(1) {
+  animation-delay: 110ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .metrics > .metric-card:nth-child(2) {
+  animation-delay: 160ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .metrics > .metric-card:nth-child(3) {
+  animation-delay: 210ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .grid-2:nth-child(2) > .card:nth-child(1) {
+  animation-delay: 270ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .grid-2:nth-child(2) > .card:nth-child(2) {
+  animation-delay: 320ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .grid-2:nth-child(3) > .card:nth-child(1) {
+  animation-delay: 370ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .grid-2:nth-child(3) > .card:nth-child(2) {
+  animation-delay: 420ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .section-title {
+  animation-delay: 470ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .section-lead {
+  animation-delay: 510ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .table-wrap {
+  animation-delay: 550ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .info-box,
+.layout.is-entering .tab-panel:not(.hidden) > .panel-toolbar,
+.layout.is-entering .tab-panel:not(.hidden) > .settings-search {
+  animation-delay: 110ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .details-layout > *:nth-child(1),
+.layout.is-entering .tab-panel:not(.hidden) > .settings-meta {
+  animation-delay: 170ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .details-layout > *:nth-child(2),
+.layout.is-entering .tab-panel:not(.hidden) > .settings-table {
+  animation-delay: 230ms;
+}
+
+.layout.is-entering .tab-panel:not(.hidden) > .settings-actions {
+  animation-delay: 290ms;
 }
 
 @media (prefers-reduced-motion: reduce) {

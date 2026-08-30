@@ -8,6 +8,7 @@ const state = {
   apps: [],
   activeTab: "overview",
   settingsSearch: "",
+  enterPlayed: false,
 };
 
 const els = {
@@ -204,15 +205,39 @@ async function loadActivityForSelectedDate() {
 function showEmptyState(message) {
   els.emptyState.classList.remove("hidden");
   els.appLayout.classList.add("hidden");
+  els.appLayout.classList.remove("is-entering");
   if (message) {
     els.emptyState.querySelector("p").textContent = message;
   }
+  playEmptyEnter();
 }
 
 function showAppLayout() {
   els.emptyState.classList.add("hidden");
+  els.emptyState.classList.remove("is-entering");
   els.appLayout.classList.remove("hidden");
   refreshSmoothScroll();
+}
+
+function playEmptyEnter() {
+  if (state.enterPlayed) return;
+  state.enterPlayed = true;
+  const empty = els.emptyState;
+  empty.classList.remove("is-entering");
+  void empty.offsetWidth;
+  empty.classList.add("is-entering");
+  window.setTimeout(() => empty.classList.remove("is-entering"), 650);
+}
+
+function playDashboardEnter() {
+  if (state.enterPlayed) return;
+  state.enterPlayed = true;
+  const layout = els.appLayout;
+  layout.classList.remove("is-entering");
+  void layout.offsetWidth;
+  layout.classList.add("is-entering");
+  // Maior delay (~550ms) + duração (550ms); remove a classe para não reanimar em refresh/data.
+  window.setTimeout(() => layout.classList.remove("is-entering"), 1200);
 }
 
 function formatHeaderDate(iso) {
@@ -286,6 +311,18 @@ function switchTab(tabName) {
   els.panelDetails.classList.toggle("hidden", tabName !== "details");
   els.panelSettings.classList.toggle("hidden", tabName !== "settings");
   renderActiveTab();
+
+  const panel = tabName === "overview"
+    ? els.panelOverview
+    : tabName === "details"
+      ? els.panelDetails
+      : els.panelSettings;
+  if (state.enterPlayed && panel) {
+    panel.classList.remove("panel-enter");
+    void panel.offsetWidth;
+    panel.classList.add("panel-enter");
+  }
+
   refreshSmoothScroll();
 }
 
@@ -366,6 +403,7 @@ function renderOverview() {
     els.panelOverview.querySelectorAll(".chart-box").forEach((box) => {
       box.innerHTML = '<p class="info-box">Sem dados.</p>';
     });
+    playDashboardEnter();
     refreshSmoothScroll();
     return;
   }
@@ -385,6 +423,7 @@ function renderOverview() {
   const catOk = renderCategoryPie(document.getElementById("chart-category"), records);
   if (!catOk) document.getElementById("chart-category").parentElement.innerHTML = '<p class="info-box">Sem dados de categoria.</p>';
 
+  playDashboardEnter();
   refreshSmoothScroll();
 }
 

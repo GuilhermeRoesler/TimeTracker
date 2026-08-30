@@ -126,6 +126,7 @@ Campos expostos por `ActivityQueryService`:
 - **Gráficos:** Chart.js em `wwwroot/js/charts.js`.
 - **Smooth scroll:** Lenis em `wwwroot/js/smooth-scroll.js` (respeita `prefers-reduced-motion`).
 - **Cursor:** personalizado em `wwwroot/js/cursor.js` (desktop com hover fino; desliga em touch / reduced-motion).
+- **Entrada:** fade-rise com stagger ao revelar o layout (header → abas → métricas → cards); uma vez por carga; respeita `prefers-reduced-motion`.
 
 ## Restrições e decisões
 
@@ -188,6 +189,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-29 | UI: fade-in com stagger ao abrir o dashboard (entrada única; reduced-motion off) |
 | 2026-08-29 | UI: botão de atualizar app no cabeçalho quando há versão nova (check ~3s ao abrir + poll) |
 | 2026-08-29 | Produção: `data\` (DB/settings) e `WebView2\` irmãos sob `%LocalAppData%\TimeTracker Pro\` |
 | 2026-08-29 | Dados de produção em `%LocalAppData%\TimeTracker Pro\data\` (+ migração automática do layout legado) |
