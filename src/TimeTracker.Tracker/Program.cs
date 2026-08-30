@@ -12,13 +12,16 @@ internal sealed class TrayApplicationContext : ApplicationContext
 {
     private readonly NotifyIcon _notifyIcon;
     private readonly AppUpdateService _updateService;
+    private readonly UpdateAvailabilityState _updateState;
     private readonly SynchronizationContext _uiContext;
     private int _updateCheckRunning;
     private CancellationTokenSource? _startupCheckCts;
+    private AppUpdateInfo? _pendingUpdate;
 
-    public TrayApplicationContext(AppUpdateService updateService)
+    public TrayApplicationContext(AppUpdateService updateService, UpdateAvailabilityState updateState)
     {
         _updateService = updateService;
+        _updateState = updateState;
         _uiContext = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
 
         _notifyIcon = new NotifyIcon
@@ -31,9 +34,14 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
         _notifyIcon.DoubleClick += (_, _) => DashboardWindowService.Open();
 
-        if (!AppPaths.IsDevelopmentRun())
+        var updatesEnabled = !AppPaths.IsDevelopmentRun();
+        _updateState.UpdatesEnabled = updatesEnabled;
+        _updateState.CurrentVersion = FormatVersion(AppUpdateService.GetCurrentVersion());
+        _updateState.ApplyHandler = ApplyPendingUpdateAsync;
+
+        if (updatesEnabled)
         {
-            _notifyIcon.BalloonTipClicked += (_, _) => _ = CheckForUpdatesAsync(silentIfUpToDate: false);
+            _notifyIcon.BalloonTipClicked += (_, _) => _ = InstallUpdateAsync(confirm: true);
             ScheduleStartupUpdateCheck();
         }
     }
@@ -45,6 +53,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
             _startupCheckCts?.Cancel();
             _startupCheckCts?.Dispose();
             _startupCheckCts = null;
+            _updateState.ApplyHandler = null;
+
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
             DashboardWindowService.Close();
@@ -75,7 +85,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
         {
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(12), token);
+                // Check cedo para o botão da UI aparecer ao abrir o dashboard.
+                await Task.Delay(TimeSpan.FromSeconds(3), token);
                 await CheckForUpdatesAsync(silentIfUpToDate: true, cancellationToken: token);
             }
             catch (OperationCanceledException)
@@ -97,6 +108,9 @@ internal sealed class TrayApplicationContext : ApplicationContext
             var update = await _updateService.CheckForUpdateAsync(cancellationToken);
             if (update is null)
             {
+                _pendingUpdate = null;
+                _updateState.ClearPending();
+
                 if (!silentIfUpToDate)
                 {
                     RunOnUi(() => MessageBox.Show(
@@ -109,47 +123,21 @@ internal sealed class TrayApplicationContext : ApplicationContext
                 return;
             }
 
+            RememberPending(update);
+
             if (silentIfUpToDate)
             {
                 RunOnUi(() =>
                 {
                     _notifyIcon.BalloonTipTitle = "Atualização disponível";
                     _notifyIcon.BalloonTipText =
-                        $"{AppConstants.AppDisplayName} {update.TagName} está disponível. Clique para atualizar.";
+                        $"{AppConstants.AppDisplayName} {update.TagName} está disponível. Abra o painel ou clique para atualizar.";
                     _notifyIcon.ShowBalloonTip(8000);
                 });
                 return;
             }
 
-            var accept = false;
-            RunOnUi(() =>
-            {
-                accept = MessageBox.Show(
-                    $"Nova versão {update.TagName} disponível (atual: {AppUpdateService.GetCurrentVersion()}).\n\n" +
-                    "Deseja baixar e instalar agora? O aplicativo será encerrado durante a instalação.",
-                    AppConstants.AppDisplayName,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question) == DialogResult.Yes;
-            });
-
-            if (!accept)
-            {
-                return;
-            }
-
-            RunOnUi(() =>
-            {
-                _notifyIcon.BalloonTipTitle = "Baixando atualização";
-                _notifyIcon.BalloonTipText = $"Baixando {update.TagName}…";
-                _notifyIcon.ShowBalloonTip(5000);
-            });
-
-            var setupPath = await _updateService.DownloadSetupAsync(update, cancellationToken: cancellationToken);
-
-            RunOnUi(() => _updateService.LaunchSetupAndExit(
-                setupPath,
-                prepareExit: () => DashboardWindowService.Close(),
-                exitApplication: ExitThread));
+            await InstallUpdateAsync(confirm: true, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -171,6 +159,107 @@ internal sealed class TrayApplicationContext : ApplicationContext
             Interlocked.Exchange(ref _updateCheckRunning, 0);
         }
     }
+
+    private async Task<UpdateApplyResult> ApplyPendingUpdateAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var started = await InstallUpdateAsync(confirm: false, cancellationToken);
+            if (!started)
+            {
+                return new UpdateApplyResult(
+                    Accepted: false,
+                    _updateState.Available
+                        ? "Não foi possível iniciar a atualização."
+                        : "Nenhuma atualização pendente.");
+            }
+
+            return new UpdateApplyResult(Accepted: true);
+        }
+        catch (OperationCanceledException)
+        {
+            _updateState.Installing = false;
+            return new UpdateApplyResult(Accepted: false, "Atualização cancelada.");
+        }
+        catch (Exception ex)
+        {
+            _updateState.Installing = false;
+            return new UpdateApplyResult(Accepted: false, ex.Message);
+        }
+    }
+
+    /// <returns>True se o download/Setup foi iniciado.</returns>
+    private async Task<bool> InstallUpdateAsync(bool confirm, CancellationToken cancellationToken = default)
+    {
+        if (_updateState.Installing)
+        {
+            return true;
+        }
+
+        var update = _pendingUpdate ?? await _updateService.CheckForUpdateAsync(cancellationToken);
+        if (update is null)
+        {
+            _pendingUpdate = null;
+            _updateState.ClearPending();
+            if (confirm)
+            {
+                RunOnUi(() => MessageBox.Show(
+                    $"Você já está na versão mais recente ({AppUpdateService.GetCurrentVersion()}).",
+                    AppConstants.AppDisplayName,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information));
+            }
+
+            return false;
+        }
+
+        RememberPending(update);
+
+        if (confirm)
+        {
+            var accept = false;
+            RunOnUi(() =>
+            {
+                accept = MessageBox.Show(
+                    $"Nova versão {update.TagName} disponível (atual: {AppUpdateService.GetCurrentVersion()}).\n\n" +
+                    "Deseja baixar e instalar agora? O aplicativo será encerrado durante a instalação.",
+                    AppConstants.AppDisplayName,
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question) == DialogResult.Yes;
+            });
+
+            if (!accept)
+            {
+                return false;
+            }
+        }
+
+        _updateState.Installing = true;
+
+        RunOnUi(() =>
+        {
+            _notifyIcon.BalloonTipTitle = "Baixando atualização";
+            _notifyIcon.BalloonTipText = $"Baixando {update.TagName}…";
+            _notifyIcon.ShowBalloonTip(5000);
+        });
+
+        var setupPath = await _updateService.DownloadSetupAsync(update, cancellationToken: cancellationToken);
+
+        RunOnUi(() => _updateService.LaunchSetupAndExit(
+            setupPath,
+            prepareExit: () => DashboardWindowService.Close(),
+            exitApplication: ExitThread));
+        return true;
+    }
+
+    private void RememberPending(AppUpdateInfo update)
+    {
+        _pendingUpdate = update;
+        _updateState.SetPending(update.TagName, FormatVersion(update.Version));
+    }
+
+    private static string FormatVersion(Version version) =>
+        $"{version.Major}.{version.Minor}.{Math.Max(version.Build, 0)}";
 
     private void RunOnUi(Action action)
     {
@@ -242,7 +331,8 @@ internal static class Program
         SystemEvents.SessionEnding += sessionEnding;
 
         _trayContext = new TrayApplicationContext(
-            app.Services.GetRequiredService<AppUpdateService>());
+            app.Services.GetRequiredService<AppUpdateService>(),
+            app.Services.GetRequiredService<UpdateAvailabilityState>());
 
         try
         {

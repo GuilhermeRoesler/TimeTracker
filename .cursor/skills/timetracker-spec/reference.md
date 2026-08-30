@@ -38,6 +38,8 @@
 | `GET /api/settings` | Mapa de settings (JSON legado) |
 | `PUT /api/settings/{appName}` | Atualiza um app |
 | `POST /api/settings/batch` | Salva alterações em lote |
+| `GET /api/update` | Status de atualização (`enabled`, `available`, `tagName`, …) |
+| `POST /api/update/apply` | Inicia download/instalação da versão pendente |
 
 ## Ciclo de vida — Tracker C#
 
@@ -52,7 +54,8 @@
 - Fonte: `GET /repos/GuilhermeRoesler/TimeTracker/releases/latest`
 - Asset esperado: `*setup-win-x64.exe`
 - Menu bandeja: **Verificar atualizações...** (apenas fora de dev)
-- Ao iniciar: se houver versão maior, balão na bandeja; clique abre o fluxo de download
+- Ao iniciar (~3s): verifica GitHub; se houver versão maior, preenche `UpdateAvailabilityState` e mostra balão na bandeja
+- Dashboard: botão **Atualizar vX** no cabeçalho (visível só com update pendente); `GET /api/update` + `POST /api/update/apply`
 - Fluxo de instalação:
   1. Fecha WebView2 / dashboard
   2. Lança `TimeTracker.UpdateHelper.exe --pid <pid> --setup <path> --timeout 30`

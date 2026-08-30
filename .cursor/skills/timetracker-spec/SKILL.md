@@ -114,6 +114,7 @@ Campos expostos por `ActivityQueryService`:
 - Atalho Hoje quando disponível (estado ativo no dia selecionado).
 - Navegação ◀/▶ entre dias **com registros** (não dias vazios do calendário).
 - Botão "Atualizar" no topo do painel recarrega via API.
+- Botão "Atualizar vX" (primário) aparece automaticamente quando há release mais nova no GitHub (produção).
 - Cabeçalho principal mostra a data selecionada por extenso (pt-BR).
 
 ## Convenções de código
@@ -187,6 +188,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-29 | UI: botão de atualizar app no cabeçalho quando há versão nova (check ~3s ao abrir + poll) |
 | 2026-08-29 | Produção: `data\` (DB/settings) e `WebView2\` irmãos sob `%LocalAppData%\TimeTracker Pro\` |
 | 2026-08-29 | Dados de produção em `%LocalAppData%\TimeTracker Pro\data\` (+ migração automática do layout legado) |
 | 2026-08-29 | Auto-update: `TimeTracker.UpdateHelper` espera/kill PID antes do Setup; mutex + Inno `CloseApplications=force` |

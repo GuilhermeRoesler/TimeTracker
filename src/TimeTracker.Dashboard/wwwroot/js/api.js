@@ -148,10 +148,19 @@ async function apiPost(path, body) {
   const response = await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body ?? {}),
   });
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status} em ${path}`);
+    let detail = `HTTP ${response.status} em ${path}`;
+    try {
+      const payload = await response.json();
+      if (payload?.error) {
+        detail = payload.error;
+      }
+    } catch {
+      // manter detail genérico
+    }
+    throw new Error(detail);
   }
   return response.json();
 }
@@ -189,4 +198,25 @@ function saveSettingsBatch(changes) {
     return Promise.resolve({ saved: 0, demo: true });
   }
   return apiPost("/api/settings/batch", { changes });
+}
+
+function fetchUpdateStatus() {
+  if (isDemoMode()) {
+    return Promise.resolve({
+      enabled: false,
+      available: false,
+      installing: false,
+      currentVersion: null,
+      latestVersion: null,
+      tagName: null,
+    });
+  }
+  return apiGet("/api/update");
+}
+
+function applyAppUpdate() {
+  if (isDemoMode()) {
+    return Promise.reject(new Error("Atualização indisponível no modo demo."));
+  }
+  return apiPost("/api/update/apply", {});
 }

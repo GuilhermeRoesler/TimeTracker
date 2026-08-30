@@ -19,6 +19,7 @@ const els = {
   btnNext: document.getElementById("btn-next-day"),
   dateWarning: document.getElementById("date-warning"),
   btnRefresh: document.getElementById("btn-refresh"),
+  btnAppUpdate: document.getElementById("btn-app-update"),
   btnOpenBrowser: document.getElementById("btn-open-browser"),
   btnOpenBrowserEmpty: document.getElementById("btn-open-browser-empty"),
   headerDate: document.getElementById("header-date"),
@@ -28,6 +29,8 @@ const els = {
   tabs: document.querySelectorAll(".tab"),
 };
 
+let updatePollTimer = null;
+
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
@@ -35,6 +38,7 @@ async function init() {
   setupAppShellChrome();
   bindEvents();
   await reloadAll();
+  startUpdateStatusPolling();
 }
 
 function setupDemoBanner() {
@@ -71,6 +75,7 @@ function openInSystemBrowser() {
 
 function bindEvents() {
   els.btnRefresh.addEventListener("click", () => reloadAll());
+  els.btnAppUpdate?.addEventListener("click", onAppUpdateClick);
   els.btnOpenBrowser?.addEventListener("click", openInSystemBrowser);
   els.btnOpenBrowserEmpty?.addEventListener("click", openInSystemBrowser);
   els.btnPrev.addEventListener("click", () => navigateDate(1));
@@ -83,6 +88,73 @@ function bindEvents() {
   els.tabs.forEach((tab) => {
     tab.addEventListener("click", () => switchTab(tab.dataset.tab));
   });
+}
+
+function startUpdateStatusPolling() {
+  refreshUpdateButton();
+  if (updatePollTimer) {
+    clearInterval(updatePollTimer);
+  }
+  // O check no Tracker roda ~3s após abrir; poll curto no início, depois a cada 60s.
+  updatePollTimer = setInterval(refreshUpdateButton, 15_000);
+  setTimeout(refreshUpdateButton, 4_000);
+  setTimeout(refreshUpdateButton, 8_000);
+}
+
+async function refreshUpdateButton() {
+  const button = els.btnAppUpdate;
+  if (!button || typeof fetchUpdateStatus !== "function") {
+    return;
+  }
+
+  try {
+    const status = await fetchUpdateStatus();
+    const show = Boolean(status?.enabled && status?.available);
+    button.classList.toggle("hidden", !show);
+    if (!show) {
+      return;
+    }
+
+    const tag = status.tagName || status.latestVersion || "";
+    if (status.installing) {
+      button.disabled = true;
+      button.textContent = "Baixando…";
+      button.title = "Download da atualização em andamento";
+      return;
+    }
+
+    button.disabled = false;
+    button.textContent = tag ? `Atualizar ${tag}` : "Atualizar app";
+    button.title = tag
+      ? `Baixar e instalar ${tag} (versão atual: ${status.currentVersion || "?"})`
+      : "Baixar e instalar a nova versão";
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function onAppUpdateClick() {
+  const button = els.btnAppUpdate;
+  if (!button || button.disabled) {
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Baixando…";
+
+  try {
+    await applyAppUpdate();
+    // O app encerra ao iniciar o Setup; se ainda estiver aberto, manter feedback.
+    button.textContent = "Instalando…";
+  } catch (error) {
+    console.error(error);
+    button.disabled = false;
+    button.textContent = "Atualizar app";
+    window.alert(error?.message
+      ? `Não foi possível atualizar:\n${error.message}`
+      : "Não foi possível iniciar a atualização.");
+    await refreshUpdateButton();
+  }
 }
 
 async function reloadAll() {
@@ -103,6 +175,7 @@ async function reloadAll() {
     showAppLayout();
     updateDateControls();
     await loadActivityForSelectedDate();
+    refreshUpdateButton();
 
     if (state.activeTab === "settings") {
       await loadSettingsPanel();

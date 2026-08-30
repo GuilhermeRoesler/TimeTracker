@@ -15,6 +15,7 @@ public static class DashboardWeb
         services.TryAddSingleton<SettingsStore>(sp =>
             SettingsStore.FromAppPaths(sp.GetRequiredService<ILogger<SettingsStore>>()));
         services.TryAddSingleton<ActivityQueryService>();
+        services.TryAddSingleton<UpdateAvailabilityState>();
         return services;
     }
 
@@ -130,6 +131,48 @@ public static class DashboardWeb
 
             var saved = settings.UpdateChangedSettings(updates);
             return Results.Ok(new { saved });
+        });
+
+        app.MapGet("/api/update", (UpdateAvailabilityState updateState) =>
+            Results.Ok(updateState.ToApiResponse()));
+
+        app.MapPost("/api/update/apply", async (UpdateAvailabilityState updateState, CancellationToken cancellationToken) =>
+        {
+            if (!updateState.UpdatesEnabled)
+            {
+                return Results.Json(
+                    new { error = "Atualizações automáticas não estão disponíveis neste modo." },
+                    statusCode: StatusCodes.Status403Forbidden);
+            }
+
+            if (!updateState.Available)
+            {
+                return Results.Json(
+                    new { error = "Nenhuma atualização pendente." },
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+
+            if (updateState.ApplyHandler is null)
+            {
+                return Results.Json(
+                    new { error = "Instalação de atualização indisponível." },
+                    statusCode: StatusCodes.Status503ServiceUnavailable);
+            }
+
+            if (updateState.Installing)
+            {
+                return Results.Ok(new { started = true, alreadyRunning = true });
+            }
+
+            var result = await updateState.ApplyHandler(cancellationToken);
+            if (!result.Accepted)
+            {
+                return Results.Json(
+                    new { error = result.ErrorMessage ?? "Não foi possível iniciar a atualização." },
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
+
+            return Results.Ok(new { started = true });
         });
 
         app.MapFallbackToFile("index.html");

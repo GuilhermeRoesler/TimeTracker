@@ -293,6 +293,11 @@ html.has-custom-cursor select {
   white-space: nowrap;
 }
 
+.btn-app-update {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 /* —— Tabs —— */
 .tabs {
   display: flex;
@@ -905,6 +910,10 @@ input[type="search"] {
   }
 
   .btn-refresh {
+    align-self: flex-start;
+  }
+
+  .btn-app-update {
     align-self: flex-start;
   }
 

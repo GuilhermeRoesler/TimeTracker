@@ -12,3 +12,4 @@ productivity.db
 *.db
 app_settings.json
 WebView2/
+webview2-profile-version.txt
