@@ -146,7 +146,10 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
             var setupPath = await _updateService.DownloadSetupAsync(update, cancellationToken: cancellationToken);
 
-            RunOnUi(() => AppUpdateService.LaunchSetupAndExit(setupPath, ExitThread));
+            RunOnUi(() => _updateService.LaunchSetupAndExit(
+                setupPath,
+                prepareExit: () => DashboardWindowService.Close(),
+                exitApplication: ExitThread));
         }
         catch (OperationCanceledException)
         {
@@ -189,6 +192,19 @@ internal static class Program
     private static void Main()
     {
         ApplicationConfiguration.Initialize();
+
+        // Mutex Local (instância única) + Global (Inno Setup elevado detecta AppMutex).
+        using var localMutex = TryCreateMutex(@"Local\" + AppConstants.AppMutexName, out var createdNew);
+        using var globalMutex = TryCreateMutex(@"Global\" + AppConstants.AppMutexName, out _);
+        if (!createdNew)
+        {
+            MessageBox.Show(
+                $"{AppConstants.AppDisplayName} já está em execução.",
+                AppConstants.AppDisplayName,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            return;
+        }
 
         ResolveAndConfigurePaths();
         WebView2ProfileCache.InvalidateIfVersionChanged(AppUpdateService.GetCurrentVersion());
@@ -238,6 +254,23 @@ internal static class Program
             // Parar Kestrel fora do Dispose da UI — StopAsync no thread da mensagem
             // pode travar o processo e deixar o `dotnet run`/terminal preso.
             ShutdownWebApp(app);
+        }
+
+        // Mantém referências vivas até o fim do processo (Inno / segunda instância).
+        GC.KeepAlive(localMutex);
+        GC.KeepAlive(globalMutex);
+    }
+
+    private static Mutex? TryCreateMutex(string name, out bool createdNew)
+    {
+        try
+        {
+            return new Mutex(initiallyOwned: true, name, out createdNew);
+        }
+        catch
+        {
+            createdNew = true;
+            return null;
         }
     }
 

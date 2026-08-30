@@ -14,4 +14,11 @@ public static class AppConstants
     public const string GitHubRepo = "TimeTracker";
     public static string GitHubReleasesLatestApi =>
         $"https://api.github.com/repos/{GitHubOwner}/{GitHubRepo}/releases/latest";
+
+    /// <summary>
+    /// Nome do mutex (sem prefixo Local/Global) — deve coincidir com AppMutex no Inno Setup.
+    /// </summary>
+    public const string AppMutexName = "TimeTrackerPro-A7C3E9F1";
+
+    public const string UpdateHelperExeName = "TimeTracker.UpdateHelper.exe";
 }

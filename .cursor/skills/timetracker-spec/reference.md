@@ -53,7 +53,13 @@
 - Asset esperado: `*setup-win-x64.exe`
 - Menu bandeja: **Verificar atualizações...** (apenas fora de dev)
 - Ao iniciar: se houver versão maior, balão na bandeja; clique abre o fluxo de download
-- Download → executa Setup → encerra o app (upgrade in-place)
+- Fluxo de instalação:
+  1. Fecha WebView2 / dashboard
+  2. Lança `TimeTracker.UpdateHelper.exe --pid <pid> --setup <path> --timeout 30`
+  3. Encerra o Tracker (Kestrel no `finally`)
+  4. Helper espera o PID (kill forçado + leftovers `TimeTracker.exe` se necessário) e só então inicia o Setup
+- Instância única: mutex `TimeTrackerPro-A7C3E9F1` (`Local\` + `Global\`) alinhado ao `AppMutex` do Inno
+- Inno: `CloseApplications=force` + `taskkill` em `PrepareToInstall` como rede de segurança
 
 ## Startup Windows (atalho)
 

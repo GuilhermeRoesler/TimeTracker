@@ -126,13 +126,47 @@ internal sealed class AppUpdateService
         return targetPath;
     }
 
-    public static void LaunchSetupAndExit(string setupPath, Action exitApplication)
+    /// <summary>
+    /// Fecha a UI, lança o UpdateHelper (espera PID / kill / Setup) e encerra o app.
+    /// </summary>
+    public void LaunchSetupAndExit(string setupPath, Action prepareExit, Action exitApplication)
     {
-        Process.Start(new ProcessStartInfo
+        prepareExit();
+
+        var helperPath = Path.Combine(AppContext.BaseDirectory, AppConstants.UpdateHelperExeName);
+        if (File.Exists(helperPath))
         {
-            FileName = setupPath,
-            UseShellExecute = true,
-        });
+            var args =
+                $"--pid {Environment.ProcessId} " +
+                $"--setup \"{setupPath}\" " +
+                "--timeout 30";
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = helperPath,
+                Arguments = args,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = Path.GetTempPath(),
+            });
+
+            _logger.LogInformation(
+                "UpdateHelper iniciado (pid={Pid}, setup={Setup}).",
+                Environment.ProcessId,
+                setupPath);
+        }
+        else
+        {
+            _logger.LogWarning(
+                "UpdateHelper não encontrado em {Path}; iniciando Setup diretamente.",
+                helperPath);
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = setupPath,
+                UseShellExecute = true,
+            });
+        }
+
         exitApplication();
     }
 

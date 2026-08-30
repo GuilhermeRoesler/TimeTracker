@@ -45,6 +45,12 @@ dotnet publish "src\TimeTracker.Tracker\TimeTracker.Tracker.csproj" `
     -o $publishDir
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+# Garante UpdateHelper no publish (MSBuild PublishUpdateHelper; reforço explícito)
+dotnet publish "src\TimeTracker.UpdateHelper\TimeTracker.UpdateHelper.csproj" `
+    -c Release --self-contained false `
+    -o $publishDir
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 # Remover arquivos de desenvolvimento / símbolos desnecessários
 Get-ChildItem $publishDir -Include "*.pdb","*.xml" -Recurse -ErrorAction SilentlyContinue | Remove-Item -Force
 $devSettings = Join-Path $publishDir "appsettings.Development.json"

@@ -29,6 +29,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 TimeTracker.sln
 ├── src/TimeTracker.Core/       → SQLite, settings JSON, TrackingEngine
 ├── src/TimeTracker.Tracker/  → Win32, bandeja, startup, Kestrel in-process + WebView2
+├── src/TimeTracker.UpdateHelper/ → aguarda PID / kill e inicia Setup (auto-update)
 └── src/TimeTracker.Dashboard/ → API endpoints + wwwroot (Chart.js); embutido no Tracker
 ```
 
@@ -38,6 +39,7 @@ TimeTracker.sln
 |--------|------------------|
 | `src/TimeTracker.Core` | Contratos de dados, `ActivityRepository`, `SettingsStore`, `TrackingEngine`, `ActivityQueryService` |
 | `src/TimeTracker.Tracker` | Win32, bandeja WinForms, startup `.lnk`, worker, Kestrel in-process, auto-update GitHub |
+| `src/TimeTracker.UpdateHelper` | Processo auxiliar: espera o Tracker sair (kill forçado se necessário) e só então inicia o Setup |
 | `src/TimeTracker.Dashboard` | `DashboardWeb` (Minimal API) + `wwwroot` Chart.js; isolável via `dotnet run` em dev |
 
 ## Contratos de dados
@@ -134,6 +136,7 @@ Campos expostos por `ActivityQueryService`:
 | Partição por hora | Gráficos de timeline horária precisam de granularidade correta |
 | Mínimo 1s por registro | Evita ruído de trocas rápidas de foco |
 | Processo único (Kestrel in-process) | Um exe na bandeja; porta 8501 mantida por compatibilidade |
+| Auto-update via UpdateHelper | Evita race: Setup só sobe após o Tracker (e filhos) liberarem os arquivos |
 
 ## Workflows de desenvolvimento
 
@@ -184,6 +187,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-29 | Auto-update: `TimeTracker.UpdateHelper` espera/kill PID antes do Setup; mutex + Inno `CloseApplications=force` |
 | 2026-08-29 | WebView2: limpa UDF na mudança de versão + `[InstallDelete]` no Setup; estáticos com `Cache-Control: no-cache` |
 | 2026-08-29 | Demo GitHub Pages: `wwwroot/demo/dataset.json`, modo demo em `api.js`, workflow `pages-demo.yml`, banner e settings somente leitura |
 | 2026-08-28 | Visão Geral: removido gráfico duplicado «Timeline completa» (mantida só a Linha do tempo) |

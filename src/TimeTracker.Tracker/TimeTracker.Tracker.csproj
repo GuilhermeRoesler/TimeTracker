@@ -51,4 +51,23 @@
     <Delete Files="$(PublishDir)TimeTracker.Dashboard.exe;$(PublishDir)TimeTracker.Dashboard.runtimeconfig.json;$(PublishDir)Microsoft.Web.WebView2.Wpf.dll;$(PublishDir)Microsoft.Web.WebView2.Wpf.xml" TreatErrorsAsWarnings="true" />
   </Target>
 
+  <!-- UpdateHelper ao lado do exe (auto-update espera o PID antes do Setup). -->
+  <Target Name="BuildAndCopyUpdateHelper" AfterTargets="Build">
+    <MSBuild Projects="..\TimeTracker.UpdateHelper\TimeTracker.UpdateHelper.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration);TargetFramework=net8.0" />
+    <ItemGroup>
+      <_UpdateHelperBuild Include="..\TimeTracker.UpdateHelper\bin\$(Configuration)\net8.0\TimeTracker.UpdateHelper.exe" />
+      <_UpdateHelperBuild Include="..\TimeTracker.UpdateHelper\bin\$(Configuration)\net8.0\TimeTracker.UpdateHelper.dll" />
+      <_UpdateHelperBuild Include="..\TimeTracker.UpdateHelper\bin\$(Configuration)\net8.0\TimeTracker.UpdateHelper.deps.json" />
+      <_UpdateHelperBuild Include="..\TimeTracker.UpdateHelper\bin\$(Configuration)\net8.0\TimeTracker.UpdateHelper.runtimeconfig.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_UpdateHelperBuild)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" Condition="Exists('%(_UpdateHelperBuild.Identity)')" />
+  </Target>
+  <Target Name="PublishUpdateHelper" AfterTargets="Publish">
+    <MSBuild Projects="..\TimeTracker.UpdateHelper\TimeTracker.UpdateHelper.csproj"
+             Targets="Publish"
+             Properties="Configuration=$(Configuration);TargetFramework=net8.0;PublishDir=$([System.IO.Path]::GetFullPath('$(PublishDir)'))" />
+  </Target>
+
 </Project>

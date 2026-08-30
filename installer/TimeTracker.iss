@@ -9,6 +9,8 @@
 #define MyAppPublisher "TimeTracker"
 #define MyAppExeName "TimeTracker.exe"
 #define MyAppId "{{A7C3E9F1-4B2D-4E8A-9C1F-6D5A8B0E2F34}"
+; Deve coincidir com AppConstants.AppMutexName (sem prefixo Local/Global).
+#define MyAppMutex "TimeTrackerPro-A7C3E9F1"
 
 [Setup]
 AppId={#MyAppId}
@@ -28,7 +30,11 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\{#MyAppExeName}
 SetupIconFile=..\assets\app.ico
-CloseApplications=yes
+; Nome sem Local/Global — Inno adiciona o prefixo conforme PrivilegesRequired.
+AppMutex={#MyAppMutex}
+CloseApplications=force
+CloseApplicationsFilter=*.exe
+RestartApplications=no
 SetupLogging=yes
 
 [Languages]
@@ -111,10 +117,22 @@ begin
   end;
 end;
 
+function KillRunningApp: Boolean;
+var
+  ResultCode: Integer;
+begin
+  { Rede de segurança: encerra o app antes de sobrescrever arquivos em {app}. }
+  Exec('taskkill.exe', '/IM {#MyAppExeName} /F /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Sleep(1000);
+  Result := True;
+end;
+
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
   Result := '';
   NeedsRestart := False;
+
+  KillRunningApp();
 
   if NeedsDesktopRuntime then
   begin
