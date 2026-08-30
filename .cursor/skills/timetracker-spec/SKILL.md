@@ -127,7 +127,7 @@ Campos expostos por `ActivityQueryService`:
 - **Smooth scroll:** Lenis em `wwwroot/js/smooth-scroll.js` (respeita `prefers-reduced-motion`).
 - **Cursor:** personalizado em `wwwroot/js/cursor.js` (desktop com hover fino; desliga em touch / reduced-motion).
 - **Entrada:** fade-rise com stagger ao revelar o layout (header → abas → métricas → cards); uma vez por carga; respeita `prefers-reduced-motion`.
-- **Loader:** `#boot-loader` na abertura; loader no painel ao trocar data/atualizar; aviso «Sem registros» só após o fetch (nunca durante `isLoading`).
+- **Loader:** abertura com cartão brand (eyebrow + marca pulsante + barra); troca de data com skeleton no estilo dos cards; aviso «Sem registros» só após o fetch.
 
 ## Restrições e decisões
 

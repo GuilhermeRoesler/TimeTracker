@@ -252,18 +252,42 @@ function setLoading(loading, { boot = false } = {}) {
 }
 
 function showPanelLoader() {
-  const html = `
-    <div class="panel-loader" role="status" aria-live="polite">
-      <div class="loader-spinner" aria-hidden="true"></div>
-      <p>Carregando dados…</p>
+  const mark = `
+    <div class="panel-loader-copy">
+      <div class="loader-mark" aria-hidden="true">
+        <span class="loader-mark-ring"></span>
+        <span class="loader-mark-core"></span>
+      </div>
+      <p>Atualizando dados do dia…</p>
     </div>`;
+
+  let body = `
+    <div class="skel-metrics" aria-hidden="true">
+      <div class="skel skel-metric"></div>
+      <div class="skel skel-metric"></div>
+      <div class="skel skel-metric"></div>
+    </div>
+    <div class="skel-grid" aria-hidden="true">
+      <div class="skel skel-card"></div>
+      <div class="skel skel-card"></div>
+    </div>`;
+
+  if (state.activeTab === "details") {
+    body = `
+      <div class="skel skel-toolbar" aria-hidden="true"></div>
+      <div class="skel-grid" aria-hidden="true">
+        <div class="skel skel-card"></div>
+        <div class="skel skel-card"></div>
+      </div>`;
+  }
+
+  const html = `<div class="panel-loader" role="status" aria-live="polite">${mark}${body}</div>`;
 
   if (state.activeTab === "overview") {
     els.panelOverview.innerHTML = html;
   } else if (state.activeTab === "details") {
     els.panelDetails.innerHTML = html;
   }
-  // Settings mantém a lista; só overview/details dependem do dia.
 }
 
 function showEmptyState(message) {
