@@ -20,6 +20,11 @@
   <ItemGroup>
     <ProjectReference Include="..\TimeTracker.Core\TimeTracker.Core.csproj" />
     <ProjectReference Include="..\TimeTracker.Dashboard\TimeTracker.Dashboard.csproj" />
+    <!-- Garante restore/build do helper no grafo do Tracker (CI/release). -->
+    <ProjectReference Include="..\TimeTracker.UpdateHelper\TimeTracker.UpdateHelper.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -53,9 +58,6 @@
 
   <!-- UpdateHelper ao lado do exe (auto-update espera o PID antes do Setup). -->
   <Target Name="BuildAndCopyUpdateHelper" AfterTargets="Build">
-    <MSBuild Projects="..\TimeTracker.UpdateHelper\TimeTracker.UpdateHelper.csproj"
-             Targets="Build"
-             Properties="Configuration=$(Configuration);TargetFramework=net8.0" />
     <ItemGroup>
       <_UpdateHelperBuild Include="..\TimeTracker.UpdateHelper\bin\$(Configuration)\net8.0\TimeTracker.UpdateHelper.exe" />
       <_UpdateHelperBuild Include="..\TimeTracker.UpdateHelper\bin\$(Configuration)\net8.0\TimeTracker.UpdateHelper.dll" />
@@ -67,7 +69,7 @@
   <Target Name="PublishUpdateHelper" AfterTargets="Publish">
     <MSBuild Projects="..\TimeTracker.UpdateHelper\TimeTracker.UpdateHelper.csproj"
              Targets="Publish"
-             Properties="Configuration=$(Configuration);TargetFramework=net8.0;PublishDir=$([System.IO.Path]::GetFullPath('$(PublishDir)'))" />
+             Properties="Configuration=$(Configuration);TargetFramework=net8.0;RuntimeIdentifier=;SelfContained=false;PublishDir=$([System.IO.Path]::GetFullPath('$(PublishDir)'))" />
   </Target>
 
 </Project>

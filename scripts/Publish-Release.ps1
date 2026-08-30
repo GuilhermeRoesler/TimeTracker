@@ -36,6 +36,10 @@ if ($semver.Contains("-")) {
 }
 Write-Host ">> Versao do assembly: $semver (tag/input: $Version)"
 
+Write-Host ">> Restaurando solution (inclui UpdateHelper)..."
+dotnet restore "TimeTracker.sln"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 dotnet publish "src\TimeTracker.Tracker\TimeTracker.Tracker.csproj" `
     -c Release -r win-x64 --self-contained false `
     -p:Version=$semver `
@@ -45,9 +49,9 @@ dotnet publish "src\TimeTracker.Tracker\TimeTracker.Tracker.csproj" `
     -o $publishDir
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-# Garante UpdateHelper no publish (MSBuild PublishUpdateHelper; reforço explícito)
+# Reforço: garante UpdateHelper no publish dir (além do target PublishUpdateHelper)
 dotnet publish "src\TimeTracker.UpdateHelper\TimeTracker.UpdateHelper.csproj" `
-    -c Release --self-contained false `
+    -c Release --self-contained false --no-restore `
     -o $publishDir
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

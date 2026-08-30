@@ -124,7 +124,7 @@ function KillRunningApp: Boolean;
 var
   ResultCode: Integer;
 begin
-  { Rede de segurança: encerra o app antes de sobrescrever arquivos em {app}. }
+  // Rede de segurança: encerra o app antes de sobrescrever arquivos na pasta de instalação.
   Exec('taskkill.exe', '/IM {#MyAppExeName} /F /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Sleep(1000);
   Result := True;
