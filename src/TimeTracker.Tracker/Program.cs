@@ -307,9 +307,9 @@ internal static class Program
             return;
         }
 
-        var dataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            AppConstants.AppDisplayName);
-        AppPaths.Configure(dataDir, baseDir);
+        var appRoot = AppPaths.GetDefaultProductionAppRoot();
+        var dataDir = AppPaths.GetDefaultProductionDataDir();
+        AppPaths.MigrateLegacyProductionDataIfNeeded(appRoot, dataDir);
+        AppPaths.Configure(dataDir, baseDir, appRoot);
     }
 }

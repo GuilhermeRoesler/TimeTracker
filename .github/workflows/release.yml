@@ -95,6 +95,6 @@ jobs:
             ## Portable (avançado)
             O zip `*-portable-win-x64.zip` também exige .NET 8 Desktop + ASP.NET Core Runtime instalados no sistema.
 
-            Dados do usuário: `%LocalAppData%\TimeTracker Pro\`
+            Dados do usuário: `%LocalAppData%\TimeTracker Pro\data\`
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -47,10 +47,13 @@ Name: "desktopicon"; Description: "Criar ícone na área de trabalho"; GroupDesc
 [Files]
 Source: "..\artifacts\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; Cache do WebView2 em LocalAppData — limpar no upgrade para não servir UI antiga.
+; Cache do WebView2 — irmão de data\ em LocalAppData\TimeTracker Pro\.
+; Entrada data\WebView2 é limpeza do layout incorreto temporário.
 [InstallDelete]
 Type: filesandordirs; Name: "{localappdata}\{#MyAppName}\WebView2"
 Type: files; Name: "{localappdata}\{#MyAppName}\webview2-profile-version.txt"
+Type: filesandordirs; Name: "{localappdata}\{#MyAppName}\data\WebView2"
+Type: files; Name: "{localappdata}\{#MyAppName}\data\webview2-profile-version.txt"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"

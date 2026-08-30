@@ -9,14 +9,9 @@ namespace TimeTracker.Tracker;
 /// </summary>
 internal static class WebView2ProfileCache
 {
-    public const string FolderName = "WebView2";
-    private const string VersionMarkerFileName = "webview2-profile-version.txt";
+    public static string GetUserDataFolder() => AppPaths.GetWebView2UserDataFolder();
 
-    public static string GetUserDataFolder() =>
-        Path.Combine(AppPaths.GetDataDir(), FolderName);
-
-    public static string GetVersionMarkerPath() =>
-        Path.Combine(AppPaths.GetDataDir(), VersionMarkerFileName);
+    public static string GetVersionMarkerPath() => AppPaths.GetWebView2VersionMarkerPath();
 
     public static void InvalidateIfVersionChanged(Version currentVersion)
     {
@@ -78,7 +73,7 @@ internal static class WebView2ProfileCache
     {
         try
         {
-            Directory.CreateDirectory(AppPaths.GetDataDir());
+            Directory.CreateDirectory(AppPaths.GetUserRoot());
             File.WriteAllText(markerPath, versionText);
         }
         catch (IOException)

@@ -16,7 +16,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Stack | C# (.NET 8) tracker + ASP.NET Core + HTML/Chart.js |
 | Entry point | `run.bat` → `src/TimeTracker.Tracker` |
 | Dashboard | ASP.NET + Chart.js em `http://localhost:8501` |
-| Dados locais | Dev: raiz do repo · Instalado: `%LocalAppData%\TimeTracker Pro\` |
+| Dados locais | Dev: raiz do repo · Instalado: `%LocalAppData%\TimeTracker Pro\data\` |
 | Ícone | `assets/app.ico` (fonte `app-icon.png`) — exe, bandeja, favicon, Setup |
 
 **Propósito:** monitorar a janela ativa do Windows, registrar tempo por app/título, e exibir análises em dashboard web com personalização de apps.
@@ -89,8 +89,8 @@ Campos expostos por `ActivityQueryService`:
 - **Troca de foco:** salva sessão anterior e reinicia `start_time`.
 - **Shutdown:** `CancellationToken` ou `SystemEvents.SessionEnding` → flush da sessão ativa.
 - **Janelas protegidas:** fallback `app_name = "System/Protected"`.
-- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 com User Data Folder em `AppPaths.GetDataDir()/WebView2` (fallback: browser se a inicialização falhar). Com `?shell=app`, o HTML mostra opção discreta de abrir no navegador. Em dev, `dotnet run --project src/TimeTracker.Dashboard` sobe só a API.
-- **Cache UI:** estáticos com `Cache-Control: no-cache, must-revalidate`. Na mudança de versão do exe, `WebView2ProfileCache` apaga a UDF e grava `webview2-profile-version.txt`. O Setup Inno também remove `WebView2` em `%LocalAppData%` no upgrade.
+- **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 com User Data Folder em `AppPaths.GetUserRoot()/WebView2` (irmão de `data/`; fallback: browser se a inicialização falhar). Com `?shell=app`, o HTML mostra opção discreta de abrir no navegador. Em dev, `dotnet run --project src/TimeTracker.Dashboard` sobe só a API.
+- **Cache UI:** estáticos com `Cache-Control: no-cache, must-revalidate`. Na mudança de versão do exe, `WebView2ProfileCache` apaga a UDF e grava `webview2-profile-version.txt` na raiz do produto. O Setup Inno também remove `WebView2` no upgrade.
 
 ## Comportamento do dashboard
 
@@ -187,6 +187,8 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-29 | Produção: `data\` (DB/settings) e `WebView2\` irmãos sob `%LocalAppData%\TimeTracker Pro\` |
+| 2026-08-29 | Dados de produção em `%LocalAppData%\TimeTracker Pro\data\` (+ migração automática do layout legado) |
 | 2026-08-29 | Auto-update: `TimeTracker.UpdateHelper` espera/kill PID antes do Setup; mutex + Inno `CloseApplications=force` |
 | 2026-08-29 | WebView2: limpa UDF na mudança de versão + `[InstallDelete]` no Setup; estáticos com `Cache-Control: no-cache` |
 | 2026-08-29 | Demo GitHub Pages: `wwwroot/demo/dataset.json`, modo demo em `api.js`, workflow `pages-demo.yml`, banner e settings somente leitura |

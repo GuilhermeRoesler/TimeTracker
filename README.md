@@ -33,7 +33,7 @@ O **TimeTracker** é uma aplicação para Windows que monitoriza automaticamente
 2. Execute o Setup (instala em `Program Files` e cria atalhos).
 3. Inicie pelo menu Iniciar ou pela área de trabalho.
 
-Dados ficam em `%LocalAppData%\TimeTracker Pro\` (não em Program Files).
+Dados ficam em `%LocalAppData%\TimeTracker Pro\data\` (não em Program Files).
 
 ### Desenvolvimento (código-fonte)
 

@@ -27,7 +27,7 @@ internal sealed class DashboardWindow : Form
     public async Task InitializeAsync()
     {
         // UDF padrão fica ao lado do .exe (Program Files) e falha sem escrita —
-        // usar a pasta de dados do app (%LocalAppData% em produção).
+        // usar a pasta de dados do app (%LocalAppData%\...\data em produção).
         var userDataFolder = WebView2ProfileCache.GetUserDataFolder();
         Directory.CreateDirectory(userDataFolder);
         var environment = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
