@@ -32,8 +32,17 @@ public static class DashboardWeb
 
     public static WebApplication MapDashboard(this WebApplication app)
     {
+        // Evita WebView2/browser reutilizar JS/CSS antigos após update do wwwroot.
+        var staticFiles = new StaticFileOptions
+        {
+            OnPrepareResponse = ctx =>
+            {
+                ctx.Context.Response.Headers.CacheControl = "no-cache, must-revalidate";
+            },
+        };
+
         app.UseDefaultFiles();
-        app.UseStaticFiles();
+        app.UseStaticFiles(staticFiles);
 
         app.MapGet("/api/health", () => Results.Ok(new { status = "ok", app = AppConstants.AppDisplayName }));
 

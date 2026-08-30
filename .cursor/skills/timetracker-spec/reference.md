@@ -172,7 +172,7 @@ Pré-requisitos de runtime (instalados pelo Setup se faltarem):
 | Conceito | Caminho |
 |----------|---------|
 | Executáveis | `{autopf}\TimeTracker Pro\` |
-| Dados | `%LocalAppData%\TimeTracker Pro\` (`productivity.db`, `app_settings.json`) |
+| Dados | `%LocalAppData%\TimeTracker Pro\` (`productivity.db`, `app_settings.json`, `WebView2/`, `webview2-profile-version.txt`) |
 | Dev (com `TimeTracker.sln`) | raiz do repositório |
 
 - `AppPaths.GetInstallDir()` — pasta do exe

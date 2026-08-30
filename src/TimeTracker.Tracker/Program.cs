@@ -191,6 +191,7 @@ internal static class Program
         ApplicationConfiguration.Initialize();
 
         ResolveAndConfigurePaths();
+        WebView2ProfileCache.InvalidateIfVersionChanged(AppUpdateService.GetCurrentVersion());
         var installDir = AppPaths.GetInstallDir();
 
         var webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");

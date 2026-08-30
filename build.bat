@@ -29,8 +29,7 @@ echo Build OK.
 echo Output Tracker: src\TimeTracker.Tracker\bin\Debug\net8.0-windows\
 echo.
 echo Proximo passo: feche o app na bandeja ^(Sair^) e rode run.bat
-echo Se o WebView2 ainda mostrar UI antiga, apague a pasta:
-echo   %%LocalAppData%%\TimeTracker Pro\WebView2
+echo ^(wwwroot com Cache-Control no-cache; WebView2 limpa sozinho ao mudar a versao^)
 echo.
 pause
 exit /b 0

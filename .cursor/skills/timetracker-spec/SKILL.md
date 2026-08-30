@@ -88,6 +88,7 @@ Campos expostos por `ActivityQueryService`:
 - **Shutdown:** `CancellationToken` ou `SystemEvents.SessionEnding` → flush da sessão ativa.
 - **Janelas protegidas:** fallback `app_name = "System/Protected"`.
 - **Dashboard:** Kestrel in-process no Tracker (`DashboardWeb`). UI WebView2 com User Data Folder em `AppPaths.GetDataDir()/WebView2` (fallback: browser se a inicialização falhar). Com `?shell=app`, o HTML mostra opção discreta de abrir no navegador. Em dev, `dotnet run --project src/TimeTracker.Dashboard` sobe só a API.
+- **Cache UI:** estáticos com `Cache-Control: no-cache, must-revalidate`. Na mudança de versão do exe, `WebView2ProfileCache` apaga a UDF e grava `webview2-profile-version.txt`. O Setup Inno também remove `WebView2` em `%LocalAppData%` no upgrade.
 
 ## Comportamento do dashboard
 
@@ -183,6 +184,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-29 | WebView2: limpa UDF na mudança de versão + `[InstallDelete]` no Setup; estáticos com `Cache-Control: no-cache` |
 | 2026-08-29 | Demo GitHub Pages: `wwwroot/demo/dataset.json`, modo demo em `api.js`, workflow `pages-demo.yml`, banner e settings somente leitura |
 | 2026-08-28 | Visão Geral: removido gráfico duplicado «Timeline completa» (mantida só a Linha do tempo) |
 | 2026-08-28 | Timeline horária: tooltip da coluna filtra apps com 0 min, ordena por uso e mostra total da hora |
