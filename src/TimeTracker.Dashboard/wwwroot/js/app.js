@@ -4,6 +4,7 @@ const state = {
   records: [],
   summary: null,
   hasData: false,
+  isLoading: true,
   categories: [],
   apps: [],
   activeTab: "overview",
@@ -12,6 +13,7 @@ const state = {
 };
 
 const els = {
+  bootLoader: document.getElementById("boot-loader"),
   emptyState: document.getElementById("empty-state"),
   appLayout: document.getElementById("app-layout"),
   dateShortcuts: document.getElementById("date-shortcuts"),
@@ -82,6 +84,7 @@ function bindEvents() {
   els.btnPrev.addEventListener("click", () => navigateDate(1));
   els.btnNext.addEventListener("click", () => navigateDate(-1));
   els.datePicker.addEventListener("change", () => {
+    if (state.isLoading) return;
     state.selectedDate = els.datePicker.value;
     loadActivityForSelectedDate();
   });
@@ -159,12 +162,16 @@ async function onAppUpdateClick() {
 }
 
 async function reloadAll() {
+  const layoutVisible = !els.appLayout.classList.contains("hidden");
+  setLoading(true, { boot: !layoutVisible });
+
   try {
     const [dates, meta] = await Promise.all([fetchDates(), fetchMeta()]);
     state.availableDates = dates;
     state.categories = meta.categories || [];
 
     if (!dates.length) {
+      setLoading(false);
       showEmptyState();
       return;
     }
@@ -173,9 +180,11 @@ async function reloadAll() {
       state.selectedDate = dates[0];
     }
 
+    await fetchAndApplyActivity(state.selectedDate);
+    setLoading(false);
     showAppLayout();
     updateDateControls();
-    await loadActivityForSelectedDate();
+    renderActiveTab();
     refreshUpdateButton();
 
     if (state.activeTab === "settings") {
@@ -183,6 +192,7 @@ async function reloadAll() {
     }
   } catch (error) {
     console.error(error);
+    setLoading(false);
     showEmptyState("Erro ao carregar dados. Verifique se o dashboard está rodando.");
   }
 }
@@ -190,19 +200,74 @@ async function reloadAll() {
 async function loadActivityForSelectedDate() {
   if (!state.selectedDate) return;
 
+  setLoading(true, { boot: false });
   try {
-    const payload = await fetchActivity(state.selectedDate);
-    state.records = payload.records || [];
-    state.summary = payload.summary || null;
-    state.hasData = payload.hasData;
+    await fetchAndApplyActivity(state.selectedDate);
+    setLoading(false);
     updateDateControls();
     renderActiveTab();
   } catch (error) {
     console.error(error);
+    setLoading(false);
+    updateDateControls();
+    renderActiveTab();
   }
 }
 
+async function fetchAndApplyActivity(date) {
+  const payload = await fetchActivity(date);
+  state.records = payload.records || [];
+  state.summary = payload.summary || null;
+  state.hasData = Boolean(payload.hasData);
+}
+
+function setLoading(loading, { boot = false } = {}) {
+  state.isLoading = loading;
+
+  if (boot || (loading && els.appLayout.classList.contains("hidden"))) {
+    els.bootLoader?.classList.toggle("hidden", !loading);
+  } else if (!loading) {
+    els.bootLoader?.classList.add("hidden");
+  }
+
+  if (els.btnRefresh) {
+    els.btnRefresh.disabled = loading;
+  }
+  if (els.datePicker) {
+    els.datePicker.disabled = loading;
+  }
+  if (loading) {
+    els.btnPrev.disabled = true;
+    els.btnNext.disabled = true;
+  }
+
+  // Nunca mostrar "sem registros" enquanto ainda carrega.
+  if (els.dateWarning) {
+    els.dateWarning.classList.toggle("hidden", loading || state.hasData);
+  }
+
+  if (loading && !boot && !els.appLayout.classList.contains("hidden")) {
+    showPanelLoader();
+  }
+}
+
+function showPanelLoader() {
+  const html = `
+    <div class="panel-loader" role="status" aria-live="polite">
+      <div class="loader-spinner" aria-hidden="true"></div>
+      <p>Carregando dados…</p>
+    </div>`;
+
+  if (state.activeTab === "overview") {
+    els.panelOverview.innerHTML = html;
+  } else if (state.activeTab === "details") {
+    els.panelDetails.innerHTML = html;
+  }
+  // Settings mantém a lista; só overview/details dependem do dia.
+}
+
 function showEmptyState(message) {
+  els.bootLoader?.classList.add("hidden");
   els.emptyState.classList.remove("hidden");
   els.appLayout.classList.add("hidden");
   els.appLayout.classList.remove("is-entering");
@@ -213,6 +278,7 @@ function showEmptyState(message) {
 }
 
 function showAppLayout() {
+  els.bootLoader?.classList.add("hidden");
   els.emptyState.classList.add("hidden");
   els.emptyState.classList.remove("is-entering");
   els.appLayout.classList.remove("hidden");
@@ -265,10 +331,14 @@ function updateDateControls() {
 
   const currentIndex = dates.indexOf(state.selectedDate);
   const inList = currentIndex >= 0;
-  els.btnPrev.disabled = !inList || currentIndex >= dates.length - 1;
-  els.btnNext.disabled = !inList || currentIndex <= 0;
+  const navLocked = state.isLoading;
+  els.btnPrev.disabled = navLocked || !inList || currentIndex >= dates.length - 1;
+  els.btnNext.disabled = navLocked || !inList || currentIndex <= 0;
+  if (els.datePicker) {
+    els.datePicker.disabled = navLocked;
+  }
 
-  els.dateWarning.classList.toggle("hidden", state.hasData);
+  els.dateWarning.classList.toggle("hidden", state.isLoading || state.hasData);
 
   if (els.headerDate) {
     els.headerDate.textContent = formatHeaderDate(state.selectedDate);
@@ -284,6 +354,7 @@ function updateDateControls() {
     button.className = `btn-secondary${value === state.selectedDate ? " is-active" : ""}`;
     button.textContent = label;
     button.addEventListener("click", () => {
+      if (state.isLoading) return;
       state.selectedDate = value;
       loadActivityForSelectedDate();
     });
@@ -292,6 +363,7 @@ function updateDateControls() {
 }
 
 function navigateDate(direction) {
+  if (state.isLoading) return;
   const index = state.availableDates.indexOf(state.selectedDate);
   if (index < 0) return;
   const nextIndex = index + direction;
