@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="TimeTracker Pro">
+  <!-- Master: cantos arredondados; teal de marca (--accent); arco em creme do painel (sem mint). -->
+  <rect width="1024" height="1024" rx="220" ry="220" fill="#0e7490"/>
+
+  <!-- Anel de progresso — tom claro do dashboard (--surface-2 / --bg-1) -->
+  <circle cx="512" cy="500" r="318" fill="none" stroke="#f3f6fa" stroke-width="56" stroke-linecap="round"
+          stroke-dasharray="1500 2000" transform="rotate(-110 512 500)"/>
+
+  <circle cx="512" cy="500" r="248" fill="#ffffff"/>
+
+  <g fill="#0e7490">
+    <rect x="496" y="292" width="32" height="56" rx="10"/>
+    <rect x="496" y="652" width="32" height="56" rx="10"/>
+    <rect x="304" y="484" width="56" height="32" rx="10"/>
+    <rect x="664" y="484" width="56" height="32" rx="10"/>
+  </g>
+
+  <g stroke="#b45309" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="512" y1="500" x2="406" y2="430" stroke-width="44"/>
+    <line x1="512" y1="500" x2="618" y2="430" stroke-width="36"/>
+  </g>
+  <circle cx="512" cy="500" r="28" fill="#b45309"/>
+</svg>

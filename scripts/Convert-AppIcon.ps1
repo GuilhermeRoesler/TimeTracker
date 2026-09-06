@@ -2,6 +2,7 @@
 <#
 .SYNOPSIS
   Gera assets/app.ico (multi-tamanho) e favicons do dashboard a partir de assets/app-icon.png.
+  Para redesenhar a partir do master, use Render-AppIcon.ps1 (SVG → PNG → este script).
 #>
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -34,8 +35,10 @@ function Get-ResizedPngBytes([System.Drawing.Image]$source, [int]$size) {
 function Save-Png([System.Drawing.Image]$source, [int]$size, [string]$path) {
     $bmp = New-Object System.Drawing.Bitmap $size, $size
     $g = [System.Drawing.Graphics]::FromImage($bmp)
+    $g.Clear([System.Drawing.Color]::Transparent)
     $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
     $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+    $g.CompositingMode = [System.Drawing.Drawing2D.CompositingMode]::SourceOver
     $g.DrawImage($source, 0, 0, $size, $size)
     $g.Dispose()
     $bmp.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)

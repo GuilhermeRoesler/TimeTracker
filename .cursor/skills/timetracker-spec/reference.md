@@ -158,13 +158,15 @@ Startup automático via `StartupShortcutService` na primeira execução.
 .\scripts\Publish-Release.ps1 -Version "1.0.0"
 ```
 
-Ícone do produto (`assets/app.ico`, fonte `assets/app-icon.png`):
+Ícone do produto (`assets/app.ico`):
 
+- Master vetorial: `assets/app-icon.svg` (fundo `#0e7490` com `rx=220`, arco creme `#f3f6fa`, ponteiros `--warning`)
+- Raster 1024²: `assets/app-icon.png` — gerar com `powershell.exe -File .\scripts\Render-AppIcon.ps1` (também regenera `.ico`/favicons)
+- Só a partir do PNG existente: `powershell.exe -File .\scripts\Convert-AppIcon.ps1`
 - Embutido nos exes via `ApplicationIcon` (Tracker + Dashboard)
 - Bandeja e janela WebView2 (`AppIconLoader`)
 - Favicon do dashboard (`wwwroot/favicon.ico`)
 - `SetupIconFile` do Inno Setup
-- Regenerar: `powershell.exe -File .\scripts\Convert-AppIcon.ps1`
 
 Saída:
 

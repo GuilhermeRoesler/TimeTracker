@@ -17,7 +17,7 @@ Documento de referência para agentes e desenvolvedores. **Atualize este skill s
 | Entry point | `run.bat` → `src/TimeTracker.Tracker` |
 | Dashboard | ASP.NET + Chart.js em `http://localhost:8501` |
 | Dados locais | Dev: raiz do repo · Instalado: `%LocalAppData%\TimeTracker Pro\data\` |
-| Ícone | `assets/app.ico` (fonte `app-icon.png`) — exe, bandeja, favicon, Setup |
+| Ícone | `assets/app.ico` (master `app-icon.svg` → `Render-AppIcon.ps1`) — exe, bandeja, favicon, Setup |
 
 **Propósito:** monitorar a janela ativa do Windows, registrar tempo por app/título, e exibir análises em dashboard web com personalização de apps.
 
@@ -197,6 +197,8 @@ dotnet build TimeTracker.sln
 | 2026-08-29 | Dados de produção em `%LocalAppData%\TimeTracker Pro\data\` (+ migração automática do layout legado) |
 | 2026-08-29 | Auto-update: `TimeTracker.UpdateHelper` espera/kill PID antes do Setup; mutex + Inno `CloseApplications=force` |
 | 2026-08-29 | WebView2: limpa UDF na mudança de versão + `[InstallDelete]` no Setup; estáticos com `Cache-Control: no-cache` |
+| 2026-09-06 | Ícone: cantos arredondados (rx 220); arco em creme `--surface-2` (sem mint); fundo `--accent` |
+| 2026-09-06 | Ícone redesenhado: master SVG, cores do dashboard (`--accent`/`--warning`), arco de progresso no lugar das barras; `Render-AppIcon.ps1` |
 | 2026-08-29 | Demo GitHub Pages: `wwwroot/demo/dataset.json`, modo demo em `api.js`, workflow `pages-demo.yml`, banner e settings somente leitura |
 | 2026-08-28 | Visão Geral: removido gráfico duplicado «Timeline completa» (mantida só a Linha do tempo) |
 | 2026-08-28 | Timeline horária: tooltip da coluna filtra apps com 0 min, ordena por uso e mostra total da hora |
