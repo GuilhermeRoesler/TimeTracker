@@ -100,6 +100,7 @@ Campos expostos por `ActivityQueryService`:
 - Layout centralizado sem sidebar (`max-width` ~960px, margens laterais amplas).
 - Controles de data no cabeçalho do painel; botão Atualizar no canto superior direito.
 - Abas underline (sem emojis); métricas com acento teal; painéis leves com blur.
+- Scrollbar customizada (fina, thumb discreto, track transparente) em página e containers com overflow.
 - Gráficos Chart.js alinhados ao tema (tooltips claros no estilo dos cards, grades suaves, paleta sóbria).
 - **Demo estática (GitHub Pages / `?demo=1`):** banner no topo; dados de `wwwroot/demo/dataset.json` (offsets relativos a hoje); salvamento de settings desativado.
 
@@ -190,6 +191,7 @@ dotnet build TimeTracker.sln
 
 | Data | Mudança |
 |------|---------|
+| 2026-09-06 | UI: scrollbar customizada global (fina, alinhada ao tema; página + overflow) |
 | 2026-08-29 | UI: loader na abertura/troca de data (evita flash «Sem registros» antes do fetch) |
 | 2026-08-29 | UI: fade-in com stagger ao abrir o dashboard (entrada única; reduced-motion off) |
 | 2026-08-29 | UI: botão de atualizar app no cabeçalho quando há versão nova (check ~3s ao abrir + poll) |
